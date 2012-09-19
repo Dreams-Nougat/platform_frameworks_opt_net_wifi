@@ -740,7 +740,23 @@ public class WifiMonitor {
             } else if (eventStr.startsWith(WPS_TIMEOUT_STR)) {
                 mStateMachine.sendMessage(WPS_TIMEOUT_EVENT);
             } else if (eventStr.startsWith(P2P_EVENT_PREFIX_STR)) {
-                handleP2pEvents(eventStr);
+                try {
+                    handleP2pEvents(eventStr);
+                } catch (IllegalArgumentException e) {
+                    /**
+                     * When WifiP2pDevice or WifiP2pGroup receives
+                     * malformed supplicant event, these constructor cannot parse
+                     * this event string.
+                     * From spec, device name is UTF8 string.
+                     * JNI checks whether event string is UTF8 or not.
+                     * JNI passes illegal string to WifiMonitor
+                     * even if event string is not UTF8.
+                     * Therefore it is necessary for us to catch this Exception
+                     * for these events.
+                     * In this case, WifiMonitor should ignore this event.
+                     */
+                    Log.e(TAG, "Receives Malformed supplicant event: " + eventStr);
+                }
             } else if (eventStr.startsWith(HOST_AP_EVENT_PREFIX_STR)) {
                 handleHostApEvents(eventStr);
             } else if (eventStr.startsWith(GAS_QUERY_PREFIX_STR)) {
