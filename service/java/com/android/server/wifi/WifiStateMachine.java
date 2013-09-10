@@ -6356,6 +6356,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     }
 
     class DisconnectedState extends State {
+        private long mScanIntervalP2pConnectedMs;
+
         @Override
         public void enter() {
             // We dont scan frequently if this is a temporary disconnect
@@ -6374,6 +6376,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
             mWifiConnectivityManager.handleConnectionStateChanged(
                     WifiConnectivityManager.WIFI_STATE_DISCONNECTED);
+
+            int defaultInterval = mContext.getResources().getInteger(
+                    R.integer.config_wifi_scan_interval_p2p_connected);
+            mScanIntervalP2pConnectedMs = Settings.Global.getLong(mContext.getContentResolver(),
+                    Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
+                    defaultInterval);
+
+            if (mP2pConnected.get()) {
+                mWifiNative.setScanInterval((int)mScanIntervalP2pConnectedMs / 1000);
+            }
 
             /**
              * If we have no networks saved, the supplicant stops doing the periodic scan.
@@ -6460,16 +6472,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     NetworkInfo info = (NetworkInfo) message.obj;
                     mP2pConnected.set(info.isConnected());
                     if (mP2pConnected.get()) {
-                        int defaultInterval = mContext.getResources().getInteger(
-                                R.integer.config_wifi_scan_interval_p2p_connected);
-                        long scanIntervalMs = mFacade.getLongSetting(mContext,
-                                Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
-                                defaultInterval);
-                        mWifiNative.setScanInterval((int) scanIntervalMs/1000);
-                    } else if (mWifiConfigManager.getSavedNetworks().size() == 0) {
-                        if (mVerboseLoggingEnabled) log("Turn on scanning after p2p disconnected");
-                        sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
-                                    ++mPeriodicScanToken, 0), mNoNetworksPeriodicScan);
+                        mWifiNative.setScanInterval((int)mScanIntervalP2pConnectedMs / 1000);
+                    } else {
+                        if (mWifiConfigManager.getSavedNetworks().size() == 0) {
+                            if (mVerboseLoggingEnabled) log("Turn on scanning after p2p disconnected");
+                            sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
+                                        ++mPeriodicScanToken, 0), mNoNetworksPeriodicScan);
+                        }
+
+                        // Reset scan interval to default value
+                        mWifiNative.setScanInterval((int)mSupplicantScanIntervalMs / 1000);
                     }
                     break;
                 case CMD_RECONNECT:
@@ -6496,6 +6508,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         public void exit() {
             mWifiConnectivityManager.handleConnectionStateChanged(
                      WifiConnectivityManager.WIFI_STATE_TRANSITIONING);
+            mWifiNative.setScanInterval((int)mSupplicantScanIntervalMs / 1000);
         }
     }
 
