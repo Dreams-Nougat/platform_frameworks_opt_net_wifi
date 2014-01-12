@@ -2338,6 +2338,7 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                         }
                     })
             .create();
+        dialog.setCanceledOnTouchOutside(false);
 
         //make the enter pin area or the display pin area visible
         switch (wps.setup) {
