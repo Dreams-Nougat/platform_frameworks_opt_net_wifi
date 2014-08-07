@@ -1815,10 +1815,11 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     mTemporarilyDisconnectedWifi = true;
                     break;
                 case DISCONNECT_WIFI_RESPONSE:
+                    WifiP2pConfig config = new WifiP2pConfig(mSavedPeerConfig);
                     // Got a response from wifistatemachine, retry p2p
                     if (DBG) logd(getName() + "Wifi disconnected, retry p2p");
                     transitionTo(mInactiveState);
-                    sendMessage(WifiP2pManager.CONNECT, mSavedPeerConfig);
+                    sendMessage(WifiP2pManager.CONNECT, config);
                     break;
                 default:
                     return NOT_HANDLED;
