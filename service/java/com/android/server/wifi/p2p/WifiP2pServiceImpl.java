@@ -1863,10 +1863,12 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     // Clear timeout that was set when group was started.
                     mWifiNative.setP2pGroupIdle(mGroup.getInterface(), 0);
                     if (deviceAddress != null) {
-                        if (mPeers.get(deviceAddress) != null) {
-                            mGroup.addClient(mPeers.get(deviceAddress));
+                        WifiP2pDevice peer = mPeers.get(deviceAddress);
+                        if (peer != null) {
+                            peer.interfaceAddress = device.interfaceAddress;
+                            mGroup.addClient(peer);
                         } else {
-                            mGroup.addClient(deviceAddress);
+                            mGroup.addClient(device);
                         }
                         mPeers.updateStatus(deviceAddress, WifiP2pDevice.CONNECTED);
                         if (DBG) logd(getName() + " ap sta connected");
