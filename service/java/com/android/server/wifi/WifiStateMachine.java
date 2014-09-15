@@ -398,6 +398,9 @@ public class WifiStateMachine extends StateMachine {
     /* Tracks if we are filtering Multicast v4 packets. Default is to filter. */
     private AtomicBoolean mFilteringMulticastV4Packets = new AtomicBoolean(true);
 
+    /* Tracks if we are filtering Multicast v6 packets. Default is to filter. */
+    private AtomicBoolean mFilteringMulticastV6Packets = new AtomicBoolean(true);
+
     // Channel for sending replies.
     private AsyncChannel mReplyChannel = new AsyncChannel();
 
@@ -2287,16 +2290,18 @@ public class WifiStateMachine extends StateMachine {
     }
 
     /**
-     * Start filtering Multicast v4 packets
+     * Start filtering Multicast v6 packets
      */
     public void startFilteringMulticastV6Packets() {
+        mFilteringMulticastV6Packets.set(true);
         sendMessage(CMD_START_PACKET_FILTERING, MULTICAST_V6, 0);
     }
 
     /**
-     * Stop filtering Multicast v4 packets
+     * Stop filtering Multicast v6 packets
      */
     public void stopFilteringMulticastV6Packets() {
+        mFilteringMulticastV6Packets.set(false);
         sendMessage(CMD_STOP_PACKET_FILTERING, MULTICAST_V6, 0);
     }
 
@@ -5375,7 +5380,12 @@ public class WifiStateMachine extends StateMachine {
             setNetworkDetailedState(DetailedState.DISCONNECTED);
 
             /* Remove any filtering on Multicast v6 at start */
-            mWifiNative.stopFilteringMulticastV6Packets();
+            if (mFilteringMulticastV6Packets.get()) {
+                mWifiNative.startFilteringMulticastV6Packets();
+            } else {
+                mWifiNative.stopFilteringMulticastV6Packets();
+            }
+
 
             /* Reset Multicast v4 filtering state */
             if (mFilteringMulticastV4Packets.get()) {
