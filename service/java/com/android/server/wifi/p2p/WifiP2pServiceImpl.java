@@ -1294,11 +1294,20 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     break;
                 case WifiMonitor.P2P_PROV_DISC_PBC_REQ_EVENT:
                 case WifiMonitor.P2P_PROV_DISC_ENTER_PIN_EVENT:
-                case WifiMonitor.P2P_PROV_DISC_SHOW_PIN_EVENT:
                     //We let the supplicant handle the provision discovery response
                     //and wait instead for the GO_NEGOTIATION_REQUEST_EVENT.
                     //Handling provision discovery and issuing a p2p_connect before
                     //group negotiation comes through causes issues
+                    break;
+                case WifiMonitor.P2P_PROV_DISC_SHOW_PIN_EVENT:
+                    // need to show pin right away otherwise peer can't start the
+                    // GO negotiation
+                    WifiP2pProvDiscEvent provDisc;
+                    provDisc = (WifiP2pProvDiscEvent) message.obj;
+                    mSavedPeerConfig.deviceAddress = provDisc.device.deviceAddress;
+                    mSavedPeerConfig.wps.setup = WpsInfo.DISPLAY;
+                    mSavedPeerConfig.wps.pin = provDisc.pin;
+                    transitionTo(mUserAuthorizingNegotiationRequestState);
                     break;
                 case WifiP2pManager.CREATE_GROUP:
                     mAutonomousGroup = true;
