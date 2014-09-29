@@ -5004,6 +5004,10 @@ public class WifiStateMachine extends StateMachine {
                     } else {
                         loge("Failed to load driver for softap");
                     }
+                    break;
+                case CMD_SET_COUNTRY_CODE:
+                    deferMessage(message);
+                    break;
                 default:
                     return NOT_HANDLED;
             }
