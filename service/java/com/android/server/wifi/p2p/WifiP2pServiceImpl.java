@@ -1711,7 +1711,8 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                         break;
                     }
                     loge("Invitation result " + status);
-                    if (status == P2pStatus.UNKNOWN_P2P_GROUP) {
+                    if ((status == P2pStatus.UNKNOWN_P2P_GROUP) ||
+                            (status == P2pStatus.INFORMATION_IS_CURRENTLY_UNAVAILABLE)) {
                         // target device has already removed the credential.
                         // So, remove this credential accordingly.
                         int netId = mSavedPeerConfig.netId;
