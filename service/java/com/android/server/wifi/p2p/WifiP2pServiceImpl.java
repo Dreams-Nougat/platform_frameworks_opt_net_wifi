@@ -1918,7 +1918,7 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                             String iface = mGroup.getInterface();
                             mNwService.addInterfaceToLocalNetwork(iface,
                                                                   dhcpResults.getRoutes(iface));
-                        } catch (RemoteException e) {
+                        } catch (Exception e) {
                             loge("Failed to add iface to local network " + e);
                         }
                     } else {
