@@ -810,6 +810,10 @@ static jobject android_net_wifi_getLinkLayerStats (JNIEnv *env, jclass cls, jint
     wifi_stats_result_handler handler;
     memset(&handler, 0, sizeof(handler));
     handler.on_link_stats_results = &onLinkStatsResults;
+    if (iface < 0) {
+        ALOGE("android_net_wifi_getLinkLayerStats: invalid iface index\n");
+        return NULL;
+    }
     wifi_interface_handle handle = getIfaceHandle(env, cls, iface);
     int result = wifi_get_link_stats(0, handle, handler);
     if (result < 0) {
