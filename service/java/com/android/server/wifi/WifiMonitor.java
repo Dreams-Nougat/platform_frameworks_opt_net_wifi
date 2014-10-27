@@ -279,6 +279,18 @@ public class WifiMonitor {
     /**
      * Regex pattern for extracting SSIDs from request identity string.
      * Matches a strings like the following:<pre>
+     * CTRL-REQ-SIM-<network id>:UMTS-AUTH:<RAND>:<AUTN> needed for SSID <SSID>
+     * This pattern should find
+     *    0 - id
+     *    1 - RAND
+     *    2 - AUTN
+     *    3 - SSID
+     */
+    private static Pattern mRequestUmtsAuthPattern =
+            Pattern.compile("SIM-([0-9]*):UMTS-AUTH((:[0-9a-f]+)+) needed for SSID (.+)");
+    /**
+     * Regex pattern for extracting SSIDs from request identity string.
+     * Matches a strings like the following:<pre>
      * CTRL-REQ-IDENTITY-xx:Identity needed for SSID XXXX</pre>
      */
     private static Pattern mRequestIdentityPattern =
@@ -1219,7 +1231,18 @@ public class WifiMonitor {
                 data.challenges = match.group(2).split(":");
                 mStateMachine.sendMessage(SUP_REQUEST_SIM_AUTH, data);
             } else {
-                Log.e(TAG, "couldn't parse SIM auth request - " + requestName);
+                match = mRequestUmtsAuthPattern.matcher(requestName);
+                if (match.find()) {
+                    WifiStateMachine.SimAuthRequestData data =
+                        new WifiStateMachine.SimAuthRequestData();
+                    data.networkId = Integer.parseInt(match.group(1));
+                    data.protocol = WifiEnterpriseConfig.Eap.AKA;
+                    data.ssid = match.group(3);
+                    data.challenges = match.group(2).split(":");
+                    mStateMachine.sendMessage(SUP_REQUEST_SIM_AUTH, data);
+                } else {
+                    Log.e(TAG, "couldn't parse SIM auth request - " + requestName);
+                }
             }
 
         } else {

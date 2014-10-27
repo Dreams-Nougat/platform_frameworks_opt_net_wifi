@@ -125,6 +125,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * Track the state of Wifi connectivity. All event handling is done here,
  * and all changes in connectivity state are initiated here.
@@ -8627,6 +8629,9 @@ public class WifiStateMachine extends StateMachine {
             StringBuilder sb = new StringBuilder();
             for (String challenge : requestData.challenges) {
 
+                if (challenge.length() == 0) {
+                    continue;
+                }
                 logd("RAND = " + challenge);
 
                 byte[] rand = null;
@@ -8672,6 +8677,153 @@ public class WifiStateMachine extends StateMachine {
     }
 
     void handle3GAuthRequest(SimAuthRequestData requestData) {
+        if (targetWificonfiguration == null
+                || targetWificonfiguration.networkId == requestData.networkId) {
+            logd("id matches targetWifiConfiguration");
+        } else {
+            logd("id does not match targetWifiConfiguration");
+            return;
+        }
 
+        boolean rsp_success = false;
+
+        TelephonyManager tm = (TelephonyManager)
+                mContext.getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (tm != null) {
+            StringBuilder sb = new StringBuilder();
+
+            if (requestData.challenges.length < 3
+                    || requestData.challenges.length == 0) {
+                logd("Insufficient data for AKA authentication");
+                return;
+            } else {
+                String base64Challenge = "";
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                int index = 0;
+
+                for (String challenge : requestData.challenges) {
+                    if (challenge.length() == 0) {
+                        index++;
+                        continue;
+                    }
+                    logd((((index & 1) != 0)? "RAND: " : "AUTN: ") + challenge);
+                    byte[] rand = null;
+                    try {
+                        rand = parseHex(challenge);
+                        stream.write(rand, 0, rand.length);
+                    } catch (NumberFormatException e) {
+                        loge("malformed challenge");
+                        return;
+                    }
+                    index++;
+                }
+
+                base64Challenge += android.util.Base64.encodeToString(
+                        stream.toByteArray(), android.util.Base64.NO_WRAP);
+
+                /*
+                 * appType = 1 => SIM, 2 => USIM according to
+                 * com.android.internal.telephony.PhoneConstants#APPTYPE_xxx
+                 */
+                int appType = 2;
+                String tmResponse = tm.getIccSimChallengeResponse(appType,
+                        base64Challenge);
+
+                if (tmResponse != null && tmResponse.length() > 4) {
+                    byte[] result = android.util.Base64.decode(tmResponse,
+                            android.util.Base64.DEFAULT);
+
+                    logv("Hex response: " + makeHex(result));
+
+                    byte tag = result[0];
+                    String sep = ":";
+
+                    if (tag == (byte) 0xDB) {
+                        // Authentication succeeds - parse RES, CK, IK, Kc
+                        int res_offset, res_len;
+                        int ck_offset, ck_len;
+                        int ik_offset, ik_len;
+                        int kc_offset, kc_len;
+
+                        res_offset = 1;
+                        res_len = result[res_offset];
+                        if (res_len > 16) {
+                            loge("invalid RES len " + res_len);
+                            return;
+                        }
+
+                        ck_offset = 1 + res_offset + res_len;
+                        if (ck_offset >= result.length) {
+                            loge("malformed result - no CK");
+                            return;
+                        }
+
+                        ck_len = result[ck_offset];
+                        if (ck_len != 16) {
+                            loge("invalid CK len " + ck_len);
+                            return;
+                        }
+
+                        ik_offset = 1 + ck_offset + ck_len;
+                        if (ik_offset >= result.length) {
+                            loge("malformed result - no IK");
+                            return;
+                        }
+
+                        ik_len = result[ik_offset];
+                        if (ik_len != 16) {
+                            loge("invalid IK len " + ik_len);
+                            return;
+                        }
+
+                        kc_offset = 1 + ik_offset + ik_len;
+                        if (kc_offset >= result.length) {
+                            loge("malformed result - no Kc");
+                            return;
+                        }
+
+                        kc_len = result[kc_offset];
+                        if (kc_len != 8) {
+                            loge("invalid Kc len " + kc_len);
+                            return;
+                        }
+
+                        String res = makeHex(result, 1 + res_offset, res_len);
+                        String ck = makeHex(result, 1 + ck_offset, ck_len);
+                        String ik = makeHex(result, 1 + ik_offset, ik_len);
+                        String kc = makeHex(result, 1 + kc_offset, kc_len);
+
+                        sb.append(sep + ik + sep + ck + sep + res);
+                        rsp_success = true;
+                        logv("res: " + res + ", ck: " + ck + ", ik: " + ik);
+                    } else if (tag == (byte) 0xDC) {
+                        // Synchronization failure - parse AUTS
+                        int auts_len = result[1];
+
+                        if (auts_len != 14) {
+                            loge("invalid AUTS len " + auts_len);
+                            return;
+                        }
+
+                        String auts = makeHex(result, 2, auts_len);
+
+                        sb.append(sep + auts);
+                        rsp_success = false;
+                        logv("auts: " + auts);
+                    } else {
+                        loge("Unknown tag: " + tag);
+                    }
+                } else {
+                    loge("bad raw response: " + tmResponse);
+                }
+            }
+
+            String response = sb.toString();
+            logv("Supplicant Response - " + response);
+            mWifiNative.sim3GAuthResponse(requestData.networkId, response, rsp_success);
+        } else {
+            loge("could not get telephony manager");
+        }
     }
 }

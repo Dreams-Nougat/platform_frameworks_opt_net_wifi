@@ -703,6 +703,11 @@ public class WifiNative {
     public boolean simIdentityResponse(int id, String response) {
         synchronized (mLock) {
             return doBooleanCommand("CTRL-RSP-IDENTITY-" + id + ":" + response);
+
+    public boolean sim3GAuthResponse(int id, String response, boolean success) {
+        synchronized (mLock) {
+            String mesg = success ? ":UMTS-AUTH" : ":UMTS-AUTS";
+            return doBooleanCommand("CTRL-RSP-SIM-" + id + mesg + response);
         }
     }
 
