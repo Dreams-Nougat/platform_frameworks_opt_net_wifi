@@ -1919,6 +1919,8 @@ public final class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                                                                   dhcpResults.getRoutes(iface));
                         } catch (RemoteException e) {
                             loge("Failed to add iface to local network " + e);
+                        } catch (IllegalArgumentException e) {
+                            loge("Failed to add iface to local network " + e);
                         }
                     } else {
                         loge("DHCP failed");
