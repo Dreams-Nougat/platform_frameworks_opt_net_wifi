@@ -598,6 +598,9 @@ public class WifiStateMachine extends StateMachine {
 
     static final int CMD_ASSOCIATED_BSSID                = BASE + 147;
 
+    /* Update (enable/disable) ICC related networks */
+    static final int CMD_UPDATE_ICC_NETWORKS              = BASE + 148;
+
     /* Wifi state machine modes of operation */
     /* CONNECT_MODE - connect to any 'known' AP when it becomes available */
     public static final int CONNECT_MODE                   = 1;
@@ -1999,6 +2002,22 @@ public class WifiStateMachine extends StateMachine {
     public int syncAddOrUpdateNetwork(AsyncChannel channel, WifiConfiguration config) {
         Message resultMsg = channel.sendMessageSynchronously(CMD_ADD_OR_UPDATE_NETWORK, config);
         int result = resultMsg.arg1;
+        resultMsg.recycle();
+        return result;
+    }
+
+    /**
+     * Update all ICC related network (which use EAP-SIM/AKA) synchronously
+     * @param enable: true/false to enable/disable networks that use security
+     *        related to ICC (EAP-SIM or EAP-AKA)
+     *
+     * @return {@code true} if the operation succeeds, {@code false} otherwise
+     * @hide
+     */
+    public boolean syncUpdateIccNetworks(AsyncChannel channel, boolean enable) {
+        Message resultMsg = channel.sendMessageSynchronously(CMD_UPDATE_ICC_NETWORKS,
+                enable ? 1 : 0);
+        boolean result = resultMsg.arg1 != FAILURE;
         resultMsg.recycle();
         return result;
     }
@@ -4501,6 +4520,7 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_ADD_OR_UPDATE_NETWORK:
                 case CMD_REMOVE_NETWORK:
                 case CMD_SAVE_CONFIG:
+                case CMD_UPDATE_ICC_NETWORKS:
                     replyToMessage(message, message.what, FAILURE);
                     break;
                 case CMD_GET_CAPABILITY_FREQ:
@@ -5876,6 +5896,9 @@ public class WifiStateMachine extends StateMachine {
             case CMD_DISCONNECTING_WATCHDOG_TIMER:
                 s = "CMD_DISCONNECTING_WATCHDOG_TIMER";
                 break;
+            case CMD_UPDATE_ICC_NETWORKS:
+                s = "CMD_UPDATE_ICC_NETWORKS";
+                break;
             default:
                 s = "what:" + Integer.toString(what);
                 break;
@@ -6082,6 +6105,11 @@ public class WifiStateMachine extends StateMachine {
                         }
                     }
                     replyToMessage(message, CMD_ADD_OR_UPDATE_NETWORK, res);
+                    break;
+                case CMD_UPDATE_ICC_NETWORKS:
+                    int enable = (int) message.arg1;
+                    mWifiConfigStore.updateIccNetworks(enable == 1 ? true : false);
+                    replyToMessage(message, CMD_UPDATE_ICC_NETWORKS, SUCCESS);
                     break;
                 case CMD_REMOVE_NETWORK:
                     ok = mWifiConfigStore.removeNetwork(message.arg1);
