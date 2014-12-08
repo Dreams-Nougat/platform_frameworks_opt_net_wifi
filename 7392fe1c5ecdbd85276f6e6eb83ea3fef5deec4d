@@ -1,0 +1,11 @@
+Revision: 7392fe1c5ecdbd85276f6e6eb83ea3fef5deec4d
+Patch-set: 1
+File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
+
+2332:15-2332:40
+Mon Dec 08 22:24:30 2014 +0000
+Author: Robert Greenwalt <1002609@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c488eee4_b6b41e43
+Bytes: 81
+please do this before create is called, in the manner of the other ".set*" calls.
+
