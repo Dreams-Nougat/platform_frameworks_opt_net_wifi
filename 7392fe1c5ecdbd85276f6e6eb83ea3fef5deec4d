@@ -9,3 +9,11 @@ UUID: c488eee4_b6b41e43
 Bytes: 81
 please do this before create is called, in the manner of the other ".set*" calls.
 
+2332
+Tue Dec 09 01:09:59 2014 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: c488eee4_b6b41e43
+UUID: 84927610_827afc5a
+Bytes: 184
+Thanks Robert for your review. However, we cannot call setCanceledOnTouchOutside() before create() is called because this is not a method of AlertDialog.Builder but a method of Dialog.
+
