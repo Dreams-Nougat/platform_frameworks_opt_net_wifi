@@ -790,7 +790,7 @@ public class WifiStateMachine extends StateMachine {
         int protocol;
         String ssid;
         // EAP-SIM: data[] contains the 3 rand, one for each of the 3 challenges
-        // EAP-AKA: data[] contains rand & authn couple for the single challenge
+        // EAP-AKA/AKA': data[] contains rand & authn couple for the single challenge
         String[] data;
     }
 
@@ -2129,9 +2129,9 @@ public class WifiStateMachine extends StateMachine {
     }
 
     /**
-     * Update all ICC related network (which use EAP-SIM/AKA) synchronously
+     * Update all ICC related network (which use EAP-SIM/AKA/AKA') synchronously
      * @param enable: true/false to enable/disable networks that use security
-     *        related to ICC (EAP-SIM or EAP-AKA)
+     *        related to ICC (EAP-SIM or EAP-AKA or EAP-AKA')
      *
      * @return {@code true} if the operation succeeds, {@code false} otherwise
      * @hide
@@ -6445,13 +6445,14 @@ public class WifiStateMachine extends StateMachine {
                         eapMethod = targetWificonfiguration.enterpriseConfig.getEapMethod();
                     }
 
-                    // For SIM & AKA EAP method Only, get identity from ICC
+                    // For SIM & AKA/AKA' EAP method Only, get identity from ICC
                     if (targetWificonfiguration != null
                             && targetWificonfiguration.networkId == networkId
                             && targetWificonfiguration.allowedKeyManagement
                                     .get(WifiConfiguration.KeyMgmt.IEEE8021X)
                             &&  (eapMethod == WifiEnterpriseConfig.Eap.SIM
-                            || eapMethod == WifiEnterpriseConfig.Eap.AKA)) {
+                            || eapMethod == WifiEnterpriseConfig.Eap.AKA
+                            || eapMethod == WifiEnterpriseConfig.Eap.AKA_PRIME)) {
                         TelephonyManager tm = (TelephonyManager)
                                 mContext.getSystemService(Context.TELEPHONY_SERVICE);
                         if (tm != null) {
@@ -6492,7 +6493,8 @@ public class WifiStateMachine extends StateMachine {
                     if (requestData != null) {
                         if (requestData.protocol == WifiEnterpriseConfig.Eap.SIM) {
                             handleGsmAuthRequest(requestData);
-                        } else if (requestData.protocol == WifiEnterpriseConfig.Eap.AKA) {
+                        } else if (requestData.protocol == WifiEnterpriseConfig.Eap.AKA
+                            || requestData.protocol == WifiEnterpriseConfig.Eap.AKA_PRIME) {
                             handle3GAuthRequest(requestData);
                         }
                     } else {
@@ -6925,6 +6927,8 @@ public class WifiStateMachine extends StateMachine {
             prefix = "1";
         else if (eapMethod == WifiEnterpriseConfig.Eap.AKA)
             prefix = "0";
+        else if (eapMethod == WifiEnterpriseConfig.Eap.AKA_PRIME)
+            prefix = "6";
         else  // not a valide EapMethod
             return "";
 
