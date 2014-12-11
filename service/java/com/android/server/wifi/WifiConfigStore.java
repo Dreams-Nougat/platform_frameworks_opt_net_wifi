@@ -952,7 +952,7 @@ public class WifiConfigStore extends IpConfigStore {
     }
 
     /**
-     * update ICC networks (networks that use EAP-SIM/AKA methods).
+     * update ICC networks (networks that use EAP-SIM/AKA/AKA' methods).
      * This method is used to handle SIM card removal/insertion.
      *
      * @param enable: true/false to enable/disable ICC related networks
@@ -963,8 +963,9 @@ public class WifiConfigStore extends IpConfigStore {
         for (WifiConfiguration config : mConfiguredNetworks.values()) {
             if (config != null && config.enterpriseConfig != null
                     && (config.enterpriseConfig.getEapMethod() == Eap.SIM
-                    || config.enterpriseConfig.getEapMethod() == Eap.AKA)) {
-                if (enable) { /* enable EAP-SIM and EAP-AKA networks */
+                    || config.enterpriseConfig.getEapMethod() == Eap.AKA
+                    || config.enterpriseConfig.getEapMethod() == Eap.AKA_PRIME)) {
+                if (enable) { /* enable EAP-SIM and EAP-AKA/AKA' networks */
                     if (mWifiNative.enableNetwork(config.networkId, false)) {
                         networkUpdated = true;
                         config.status = Status.ENABLED;
@@ -973,7 +974,7 @@ public class WifiConfigStore extends IpConfigStore {
                     }
                 } else {
                     /**
-                     * Disable EAP-SIM and EAP-AKA networks
+                     * Disable EAP-SIM and EAP-AKA/AKA' networks
                      * For security purposes (SIM exchange), remove Identity and Anonymous
                      * Identity from configuration.
                      */
