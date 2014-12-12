@@ -1,0 +1,11 @@
+Revision: 5fa707c3157a5069ee4e448fe60a9e214acadbf2
+Patch-set: 1
+File: service/jni/com_android_server_wifi_WifiNative.cpp
+
+813
+Fri Dec 12 08:59:07 2014 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 24b54af8_a2c9da39
+Bytes: 206
+Is zero actually a valid value here?  If this value comes from if_nametoindex() or something like it then even 0 is not valid.  Or maybe that should be left to be caught by the next check a few lines later?
+
