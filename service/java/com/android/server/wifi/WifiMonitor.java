@@ -665,18 +665,22 @@ public class WifiMonitor {
                 }
             } else {
                 if (DBG) Log.d(TAG, "Sending to all monitors because there's no matching iface");
-                boolean done = false;
+                int countRunning = 0;
                 for (WifiMonitor monitor : mIfaceMap.values()) {
-                    if (monitor.mMonitoring && monitor.dispatchEvent(eventStr, iface)) {
-                        done = true;
+                    if (monitor.mMonitoring) {
+                        countRunning++;
+                        if (monitor.dispatchEvent(eventStr, iface)) {
+                            countRunning--;
+                        }
                     }
                 }
 
-                if (done) {
+                if (countRunning == 0) {
                     mConnected = false;
+                    return true;
                 }
 
-                return done;
+                return false;
             }
         }
     }
