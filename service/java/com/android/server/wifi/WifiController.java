@@ -468,6 +468,8 @@ class WifiController extends StateMachine {
     }
 
     class StaEnabledState extends State {
+        private int currentWifiState;
+
         @Override
         public void enter() {
             mWifiStateMachine.setSupplicantRunning(true);
@@ -476,12 +478,17 @@ class WifiController extends StateMachine {
         public boolean processMessage(Message msg) {
             switch (msg.what) {
                 case CMD_WIFI_TOGGLED:
+                    currentWifiState = mWifiStateMachine.syncGetWifiState();
                     if (! mSettingsStore.isWifiToggleEnabled()) {
                         if (mSettingsStore.isScanAlwaysAvailable()) {
                             transitionTo(mStaDisabledWithScanState);
                         } else {
                             transitionTo(mApStaDisabledState);
                         }
+                    } else if ((currentWifiState == WifiManager.WIFI_STATE_DISABLED) ||
+		               (currentWifiState == WifiManager.WIFI_STATE_UNKNOWN)) {
+                        deferMessage(msg);
+                        transitionTo(mApStaDisabledState);
                     }
                     break;
                 case CMD_AIRPLANE_TOGGLED:
@@ -592,6 +599,8 @@ class WifiController extends StateMachine {
     }
 
     class ApEnabledState extends State {
+        private int currentWifiApState;
+
         @Override
         public boolean processMessage(Message msg) {
             switch (msg.what) {
@@ -602,8 +611,13 @@ class WifiController extends StateMachine {
                     }
                     break;
                 case CMD_SET_AP:
+                    currentWifiApState = mWifiStateMachine.syncGetWifiApState();
                     if (msg.arg1 == 0) {
                         mWifiStateMachine.setHostApRunning(null, false);
+                        transitionTo(mApStaDisabledState);
+                    } else if ((currentWifiApState == WifiManager.WIFI_AP_STATE_DISABLED) ||
+		               (currentWifiApState == WifiManager.WIFI_AP_STATE_FAILED)) {
+                        deferMessage(msg);
                         transitionTo(mApStaDisabledState);
                     }
                     break;
