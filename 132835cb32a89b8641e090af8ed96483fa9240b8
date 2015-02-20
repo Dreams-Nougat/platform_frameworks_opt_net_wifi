@@ -1,0 +1,11 @@
+Revision: 132835cb32a89b8641e090af8ed96483fa9240b8
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+6212
+Fri Feb 20 20:09:04 2015 +0000
+Author: Vinit Deshpande <1022138@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 48d97a6e_0e144be4
+Bytes: 93
+Do you need to blacklist this BSSID? I am not certain it is filed in correctly at this point.
+
