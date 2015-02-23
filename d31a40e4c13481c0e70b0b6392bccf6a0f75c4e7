@@ -1,0 +1,11 @@
+Revision: d31a40e4c13481c0e70b0b6392bccf6a0f75c4e7
+Patch-set: 1
+File: service/tools/halutil/halutil.cpp
+
+112
+Mon Feb 23 21:18:30 2015 +0000
+Author: Elliott Hughes <1003224@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e81cee53_83323eec
+Bytes: 68
+there's some weirdness on L90, but this is definitely a step forwar.
+
