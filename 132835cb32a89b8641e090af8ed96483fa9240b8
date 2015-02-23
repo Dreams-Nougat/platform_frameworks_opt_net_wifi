@@ -9,3 +9,16 @@ UUID: 48d97a6e_0e144be4
 Bytes: 93
 Do you need to blacklist this BSSID? I am not certain it is filed in correctly at this point.
 
+6212
+Mon Feb 23 09:33:07 2015 +0000
+Author: HonoreX Tricot <1054433@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 48d97a6e_0e144be4
+UUID: 6869de73_47efae86
+Bytes: 361
+You're right, it's too aggressive to blacklist the BSSID at this point just because we are not able to get identity from SIM.
+
+So I will just blacklist the network.
+
+However, it look like adding the BSSID here as no effect here ( "no identity" error case I mean) because BSSID string is only used in case of "DHCP FAILURE" in handleSSIDStateChange.
+Am I right ?
+
