@@ -2512,7 +2512,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         pw.println("mOperationalMode " + mOperationalMode);
         pw.println("mUserWantsSuspendOpt " + mUserWantsSuspendOpt);
         pw.println("mSuspendOptNeedsDisabled " + mSuspendOptNeedsDisabled);
-        pw.println("Supplicant status " + mWifiNative.status(true));
         pw.println("mLegacyPnoEnabled " + mLegacyPnoEnabled);
         pw.println("mSetCountryCode " + mSetCountryCode);
         pw.println("mDriverSetCountryCode " + mDriverSetCountryCode);
