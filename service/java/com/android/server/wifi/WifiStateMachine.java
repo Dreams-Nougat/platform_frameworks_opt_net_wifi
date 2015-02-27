@@ -5541,9 +5541,18 @@ public class WifiStateMachine extends StateMachine {
 
                         mOperationalMode = CONNECT_MODE;
                         transitionTo(mDisconnectedState);
-                    } else {
-                        // Nothing to do
-                        return HANDLED;
+                    } else if (message.arg1 == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+                        if (mLastOperationMode == SCAN_ONLY_MODE) {
+                            mWifiP2pChannel.sendMessage(CMD_DISABLE_P2P_REQ);
+                            setWifiState(WIFI_STATE_DISABLED);
+                        }
+                        mLastOperationMode = mOperationalMode = message.arg1;
+                    } else if (message.arg1 == SCAN_ONLY_MODE) {
+                        if (mLastOperationMode == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+                            mWifiP2pChannel.sendMessage(CMD_ENABLE_P2P);
+                            setWifiState(WIFI_STATE_ENABLED);
+                        }
+                        mLastOperationMode = mOperationalMode = message.arg1;
                     }
                     break;
                 // Handle scan. All the connection related commands are
