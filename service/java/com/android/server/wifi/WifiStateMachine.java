@@ -4517,6 +4517,18 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         transitionTo(mDisconnectedState);
                     } else if (message.arg1 == DISABLED_MODE) {
                         transitionTo(mSupplicantStoppingState);
+                    } else if (message.arg1 == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+                        if (mLastOperationMode == SCAN_ONLY_MODE) {
+                            mWifiP2pChannel.sendMessage(CMD_DISABLE_P2P_REQ);
+                            setWifiState(WIFI_STATE_DISABLED);
+                        }
+                        mLastOperationMode = mOperationalMode = message.arg1;
+                    } else if (message.arg1 == SCAN_ONLY_MODE) {
+                        if (mLastOperationMode == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+                            mWifiP2pChannel.sendMessage(CMD_ENABLE_P2P);
+                            setWifiState(WIFI_STATE_ENABLED);
+                        }
+                        mLastOperationMode = mOperationalMode = message.arg1;
                     }
                     // Nothing to do
                     break;
