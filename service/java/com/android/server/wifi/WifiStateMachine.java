@@ -4164,13 +4164,13 @@ public class WifiStateMachine extends StateMachine {
 
         /* Reset data structures */
         mBadLinkspeedcount = 0;
-        mWifiInfo.reset();
         linkDebouncing = false;
         /* Reset roaming parameters */
         mAutoRoaming = WifiAutoJoinController.AUTO_JOIN_IDLE;
         fullBandConnectedTimeIntervalMilli = 20 * 1000; // Start scans at 20 seconds interval
 
         setNetworkDetailedState(DetailedState.DISCONNECTED);
+        mWifiInfo.reset();
         if (mNetworkAgent != null) {
             mNetworkAgent.sendNetworkInfo(mNetworkInfo);
             mNetworkAgent = null;
