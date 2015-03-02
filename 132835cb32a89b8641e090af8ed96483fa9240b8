@@ -22,3 +22,11 @@ So I will just blacklist the network.
 However, it look like adding the BSSID here as no effect here ( "no identity" error case I mean) because BSSID string is only used in case of "DHCP FAILURE" in handleSSIDStateChange.
 Am I right ?
 
+6212
+Mon Mar 02 20:00:06 2015 +0000
+Author: Vinit Deshpande <1022138@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6869de73_47efae86
+UUID: 92672631_d538dc53
+Bytes: 170
+Well .. that may change. I am also not sure we have the correct BSSID at this point - so it makes two unknowns. Lets not change the semantics where there may be unknowns.
+
