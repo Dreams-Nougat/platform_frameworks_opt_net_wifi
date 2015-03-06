@@ -61,6 +61,7 @@ import android.net.wifi.*;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WpsResult.Status;
 import android.net.wifi.p2p.IWifiP2pManager;
+import android.net.wifi.mesh.IWifiMeshManager;
 import android.os.BatteryStats;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -92,6 +93,7 @@ import com.android.server.net.BaseNetworkObserver;
 import com.android.server.net.NetlinkTracker;
 
 import com.android.server.wifi.p2p.WifiP2pServiceImpl;
+import com.android.server.wifi.mesh.WifiMeshServiceImpl;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -157,6 +159,7 @@ public class WifiStateMachine extends StateMachine {
     private ConnectivityManager mCm;
 
     private final boolean mP2pSupported;
+    private final int mIfaceType;
     private final AtomicBoolean mP2pConnected = new AtomicBoolean(false);
     private boolean mTemporarilyDisconnectWifi = false;
     private final String mPrimaryDeviceType;
@@ -379,6 +382,10 @@ public class WifiStateMachine extends StateMachine {
 
     // Used to initiate a connection with WifiP2pService
     private AsyncChannel mWifiP2pChannel;
+
+    private WifiMeshServiceImpl mWifiMeshServiceImpl;
+    private AsyncChannel mWifiMeshChannel;
+
     private AsyncChannel mWifiApConfigChannel;
 
     private WifiNetworkFactory mNetworkFactory;
@@ -598,6 +605,20 @@ public class WifiStateMachine extends StateMachine {
 
     static final int CMD_ASSOCIATED_BSSID                = BASE + 147;
 
+    /* Enable mesh mode */
+    static final int CMD_START_MESH                       = BASE + 148;
+    /* Indicates mesh start succeeded */
+    static final int CMD_START_MESH_SUCCESS               = BASE + 149;//TODO unnecessary?
+    /* Indicates mesh start failed */
+    static final int CMD_START_MESH_FAILURE               = BASE + 150;//TODO unnecessary?
+    /* Disable mesh mode */
+    static final int CMD_STOP_MESH                        = BASE + 151;
+
+    public static final int CMD_ENABLE_MESH_REQ           = BASE + 152;
+    public static final int CMD_ENABLE_MESH_RSP           = BASE + 153;
+    public static final int CMD_DISABLE_MESH_REQ          = BASE + 154;
+    public static final int CMD_DISABLE_MESH_RSP          = BASE + 155;
+
     /* Wifi state machine modes of operation */
     /* CONNECT_MODE - connect to any 'known' AP when it becomes available */
     public static final int CONNECT_MODE                   = 1;
@@ -605,6 +626,10 @@ public class WifiStateMachine extends StateMachine {
     public static final int SCAN_ONLY_MODE                 = 2;
     /* SCAN_ONLY_WITH_WIFI_OFF - scan, but don't connect to any APs */
     public static final int SCAN_ONLY_WITH_WIFI_OFF_MODE   = 3;
+
+    public static final int IFACE_TYPE_NORMAL = 0;
+    public static final int IFACE_TYPE_P2P    = 1;
+    public static final int IFACE_TYPE_MESH   = 2;
 
     private static final int SUCCESS = 1;
     private static final int FAILURE = -1;
@@ -740,6 +765,13 @@ public class WifiStateMachine extends StateMachine {
     /* Waiting for untether confirmation before stopping soft Ap */
     private State mUntetheringState = new UntetheringState();
 
+    /* Mesh is starting up */
+    private final State mMeshStartingState = new MeshStartingState();
+    /* Mesh is stopping up */
+    private final State mMeshStoppingState = new MeshStoppingState();
+    /* Mesh is running */
+    private final State mMeshStartedState = new MeshStartedState();
+
     private class TetherStateChange {
         ArrayList<String> available;
         ArrayList<String> active;
@@ -847,8 +879,11 @@ public class WifiStateMachine extends StateMachine {
         IBinder b = ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);
         mNwService = INetworkManagementService.Stub.asInterface(b);
 
-        mP2pSupported = mContext.getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_WIFI_DIRECT);
+        //mP2pSupported = mContext.getPackageManager().hasSystemFeature(
+        //        PackageManager.FEATURE_WIFI_DIRECT);
+        //TODO: force disabling p2p to use infra_mode with mesh temporarily
+        mP2pSupported = false;
+        mIfaceType = (mP2pSupported) ? IFACE_TYPE_P2P : IFACE_TYPE_NORMAL;
 
         mWifiNative = new WifiNative(mInterfaceName);
         mWifiConfigStore = new WifiConfigStore(context, mWifiNative);
@@ -862,6 +897,8 @@ public class WifiStateMachine extends StateMachine {
 
         IBinder s1 = ServiceManager.getService(Context.WIFI_P2P_SERVICE);
         mWifiP2pServiceImpl = (WifiP2pServiceImpl)IWifiP2pManager.Stub.asInterface(s1);
+        IBinder s2 = ServiceManager.getService(Context.WIFI_MESH_SERVICE);
+        mWifiMeshServiceImpl = (WifiMeshServiceImpl)IWifiMeshManager.Stub.asInterface(s2);
 
         mNetworkInfo.setIsAvailable(false);
         mLastBssid = null;
@@ -1018,6 +1055,9 @@ public class WifiStateMachine extends StateMachine {
                 addState(mTetheringState, mSoftApStartedState);
                 addState(mTetheredState, mSoftApStartedState);
                 addState(mUntetheringState, mSoftApStartedState);
+            addState(mMeshStartingState, mDefaultState);
+            addState(mMeshStoppingState, mDefaultState);
+            addState(mMeshStartedState, mDefaultState);
 
         setInitialState(mInitialState);
 
@@ -1836,6 +1876,20 @@ public class WifiStateMachine extends StateMachine {
             sendMessage(CMD_START_SUPPLICANT);
         } else {
             sendMessage(CMD_STOP_SUPPLICANT);
+        }
+    }
+
+    /**
+     * Start or Stop Mesh mode.
+     * @param enable
+     */
+    public void setMeshRunning(boolean enable) {
+        logi("call setMeshRunning(" + enable + ")");
+        if (enable) {
+            //TODO implement wifi.c where driver parameters are decided.
+            sendMessage(CMD_START_MESH);
+        } else {
+            sendMessage(CMD_STOP_MESH);
         }
     }
 
@@ -4195,7 +4249,7 @@ public class WifiStateMachine extends StateMachine {
         /* Socket connection can be lost when we do a graceful shutdown
         * or when the driver is hung. Ensure supplicant is stopped here.
         */
-        mWifiMonitor.killSupplicant(mP2pSupported);
+        mWifiMonitor.killSupplicant(mIfaceType);
         mWifiNative.closeSupplicantConnection();
         sendSupplicantConnectionChangedBroadcast(false);
         setWifiState(WIFI_STATE_DISABLED);
@@ -4484,6 +4538,12 @@ public class WifiStateMachine extends StateMachine {
                         } else {
                             loge("WifiP2pService connection failure, error=" + message.arg1);
                         }
+                    } else if (ac == mWifiMeshChannel) {
+                        if (message.arg1 == AsyncChannel.STATUS_SUCCESSFUL) {
+                            mWifiMeshChannel.sendMessage(AsyncChannel.CMD_CHANNEL_FULL_CONNECTION);
+                        } else {
+                            loge("WifiMeshService connection failure, error=" + message.arg1);
+                        }
                     } else {
                         loge("got HALF_CONNECTED for unknown channel");
                     }
@@ -4579,6 +4639,10 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_START_AP_SUCCESS:
                 case CMD_START_AP_FAILURE:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_START_MESH_SUCCESS:
+                case CMD_START_MESH_FAILURE:
+                case CMD_STOP_MESH:
                 case CMD_TETHER_STATE_CHANGE:
                 case CMD_TETHER_NOTIFICATION_TIMED_OUT:
                 case CMD_DISCONNECT:
@@ -4720,6 +4784,12 @@ public class WifiStateMachine extends StateMachine {
                     mWifiP2pServiceImpl.getP2pStateMachineMessenger());
             }
 
+            if (mWifiMeshChannel == null) {
+                mWifiMeshChannel = new AsyncChannel();
+                mWifiMeshChannel.connect(mContext, getHandler(),
+                    mWifiMeshServiceImpl.getMessenger());
+            }
+
             if (mWifiApConfigChannel == null) {
                 mWifiApConfigChannel = new AsyncChannel();
                 WifiApConfigStore wifiApConfigStore = WifiApConfigStore.makeWifiApConfigStore(
@@ -4729,9 +4799,11 @@ public class WifiStateMachine extends StateMachine {
                         wifiApConfigStore.getMessenger());
             }
         }
+
         @Override
         public boolean processMessage(Message message) {
             logStateAndMessage(message, getClass().getSimpleName());
+
             switch (message.what) {
                 case CMD_START_SUPPLICANT:
                     if (mWifiNative.loadDriver()) {
@@ -4769,8 +4841,8 @@ public class WifiStateMachine extends StateMachine {
                         * Avoids issues with drivers that do not handle interface down
                         * on a running supplicant properly.
                         */
-                        mWifiMonitor.killSupplicant(mP2pSupported);
-                        if(mWifiNative.startSupplicant(mP2pSupported)) {
+                        mWifiMonitor.killSupplicant(mIfaceType);
+                        if(mWifiNative.startSupplicant(mIfaceType)) {
                             setWifiState(WIFI_STATE_ENABLING);
                             if (DBG) log("Supplicant start successful");
                             mWifiMonitor.startMonitoring();
@@ -4788,6 +4860,13 @@ public class WifiStateMachine extends StateMachine {
                         transitionTo(mSoftApStartingState);
                     } else {
                         loge("Failed to load driver for softap");
+                    }
+                    break;
+                case CMD_START_MESH:
+                    if (mWifiNative.loadDriver()) {
+                        transitionTo(mMeshStartingState);
+                    } else {
+                        loge("Failed to load driver for mesh");
                     }
                 default:
                     return NOT_HANDLED;
@@ -4861,7 +4940,7 @@ public class WifiStateMachine extends StateMachine {
                 case WifiMonitor.SUP_DISCONNECTION_EVENT:
                     if (++mSupplicantRestartCount <= SUPPLICANT_RESTART_TRIES) {
                         loge("Failed to setup control channel, restart supplicant");
-                        mWifiMonitor.killSupplicant(mP2pSupported);
+                        mWifiMonitor.killSupplicant(mIfaceType);
                         transitionTo(mInitialState);
                         sendMessageDelayed(CMD_START_SUPPLICANT, SUPPLICANT_RESTART_INTERVAL_MSECS);
                     } else {
@@ -4876,6 +4955,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:
@@ -4964,6 +5045,10 @@ public class WifiStateMachine extends StateMachine {
                     loge("Failed to start soft AP with a running supplicant");
                     setWifiApState(WIFI_AP_STATE_FAILED);
                     break;
+                    /* Cannot start mesh while in client mode */
+                case CMD_START_MESH:
+                    loge("Failed to start soft Mesh with a running supplicant");
+                    break;
                 case CMD_SET_OPERATIONAL_MODE:
                     mOperationalMode = message.arg1;
                     break;
@@ -5036,6 +5121,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:
@@ -5432,6 +5519,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:
@@ -7870,6 +7959,127 @@ public class WifiStateMachine extends StateMachine {
         }
     }
 
+    class MeshStartingState extends State {
+        @Override
+        public void enter() {
+            logi("enter " + getName());
+            final Message message = getCurrentMessage();
+            if (message.what == CMD_START_MESH) {
+                mWifiMeshChannel.sendMessage(CMD_ENABLE_MESH_REQ);
+            } else {
+                throw new RuntimeException("Illegal transition to MeshStartingState: " + message);
+            }
+        }
+
+        @Override
+        public boolean processMessage(Message message) {
+            switch(message.what) {
+                case CMD_START_SUPPLICANT:
+                case CMD_STOP_SUPPLICANT:
+                case CMD_START_AP:
+                case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
+                case CMD_START_DRIVER:
+                case CMD_STOP_DRIVER:
+                case CMD_SET_OPERATIONAL_MODE:
+                case CMD_SET_COUNTRY_CODE:
+                case CMD_SET_FREQUENCY_BAND:
+                case CMD_START_PACKET_FILTERING:
+                case CMD_STOP_PACKET_FILTERING:
+                case CMD_TETHER_STATE_CHANGE:
+                    deferMessage(message);
+                    break;
+                case CMD_ENABLE_MESH_RSP:
+                    logi("CMD_ENABLE_MESH_RSP arg1=" + message.arg1);
+                    if (message.arg1 != 0) {
+                        transitionTo(mInitialState);
+                    } else {
+                        setCountryCode();
+                        transitionTo(mMeshStartedState);
+                    }
+                    break;
+                default:
+                    return NOT_HANDLED;
+            }
+            return HANDLED;
+        }
+    }
+
+    class MeshStoppingState extends State {
+        @Override
+        public void enter() {
+            logi("enter " + getName());
+            final Message message = getCurrentMessage();
+            if (message.what == CMD_STOP_MESH) {
+                mWifiMeshChannel.sendMessage(CMD_DISABLE_MESH_REQ);
+            } else {
+                throw new RuntimeException("Illegal transition to MeshStartingState: " + message);
+            }
+        }
+
+        @Override
+        public boolean processMessage(Message message) {
+            switch(message.what) {
+                case CMD_START_SUPPLICANT:
+                case CMD_STOP_SUPPLICANT:
+                case CMD_START_AP:
+                case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
+                case CMD_START_DRIVER:
+                case CMD_STOP_DRIVER:
+                case CMD_SET_OPERATIONAL_MODE:
+                case CMD_SET_COUNTRY_CODE:
+                case CMD_SET_FREQUENCY_BAND:
+                case CMD_START_PACKET_FILTERING:
+                case CMD_STOP_PACKET_FILTERING:
+                case CMD_TETHER_STATE_CHANGE:
+                    deferMessage(message);
+                    break;
+                case CMD_DISABLE_MESH_RSP:
+                    logi("CMD_DISABLE_MESH_RSP");
+                    transitionTo(mInitialState);
+                    break;
+                default:
+                    return NOT_HANDLED;
+            }
+            return HANDLED;
+        }
+    }
+
+    class MeshStartedState extends State {
+        @Override
+        public void enter() {
+            logi("enter " + getName());
+        }
+
+        @Override
+        public boolean processMessage(Message message) {
+            switch(message.what) {
+                case CMD_STOP_MESH:
+                    if (DBG) log("Stopping Mesh");
+                    transitionTo(mMeshStoppingState);
+                    break;
+                case CMD_START_MESH:
+                    // Ignore a start on a running mesh
+                    break;
+                    /* Fail client mode operation when mesh is enabled */
+                case CMD_START_SUPPLICANT:
+                    loge("Cannot start supplicant with a running mesh");
+                    setWifiState(WIFI_STATE_UNKNOWN);
+                    break;
+                case CMD_START_AP:
+                    loge("Cannot start soft ap with a running mesh");
+                    setWifiState(WIFI_STATE_UNKNOWN);
+                    break;
+                default:
+                    return NOT_HANDLED;
+            }
+            return HANDLED;
+        }
+    }
+
     class SoftApStartingState extends State {
         @Override
         public void enter() {
@@ -7896,6 +8106,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:
@@ -7955,6 +8167,10 @@ public class WifiStateMachine extends StateMachine {
                     loge("Cannot start supplicant with a running soft AP");
                     setWifiState(WIFI_STATE_UNKNOWN);
                     break;
+                case CMD_START_MESH:
+                    loge("Cannot start mesh with a running soft AP");
+                    setWifiState(WIFI_STATE_UNKNOWN);
+                    break;
                 case CMD_TETHER_STATE_CHANGE:
                     TetherStateChange stateChange = (TetherStateChange) message.obj;
                     if (startTethering(stateChange.available)) {
@@ -7998,6 +8214,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:
@@ -8074,6 +8292,8 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
+                case CMD_START_MESH:
+                case CMD_STOP_MESH:
                 case CMD_START_DRIVER:
                 case CMD_STOP_DRIVER:
                 case CMD_SET_OPERATIONAL_MODE:

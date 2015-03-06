@@ -37,6 +37,7 @@ import android.os.SystemClock;
 import android.os.WorkSource;
 import android.provider.Settings;
 import android.util.Slog;
+import android.util.Log;
 
 import com.android.internal.util.Protocol;
 import com.android.internal.util.State;
@@ -114,12 +115,14 @@ class WifiController extends StateMachine {
     static final int CMD_SET_AP                     = BASE + 10;
     static final int CMD_DEFERRED_TOGGLE            = BASE + 11;
     static final int CMD_USER_PRESENT               = BASE + 12;
+    static final int CMD_SET_MESH                   = BASE + 13;
 
     private DefaultState mDefaultState = new DefaultState();
     private StaEnabledState mStaEnabledState = new StaEnabledState();
-    private ApStaDisabledState mApStaDisabledState = new ApStaDisabledState();
+    private AllDisabledState mAllDisabledState = new AllDisabledState();
     private StaDisabledWithScanState mStaDisabledWithScanState = new StaDisabledWithScanState();
     private ApEnabledState mApEnabledState = new ApEnabledState();
+    private MeshEnabledState mMeshEnabledState = new MeshEnabledState();
     private DeviceActiveState mDeviceActiveState = new DeviceActiveState();
     private DeviceInactiveState mDeviceInactiveState = new DeviceInactiveState();
     private ScanOnlyLockHeldState mScanOnlyLockHeldState = new ScanOnlyLockHeldState();
@@ -140,7 +143,7 @@ class WifiController extends StateMachine {
         mIdleIntent = PendingIntent.getBroadcast(mContext, IDLE_REQUEST, idleIntent, 0);
 
         addState(mDefaultState);
-            addState(mApStaDisabledState, mDefaultState);
+            addState(mAllDisabledState, mDefaultState);
             addState(mStaEnabledState, mDefaultState);
                 addState(mDeviceActiveState, mStaEnabledState);
                 addState(mDeviceInactiveState, mStaEnabledState);
@@ -150,6 +153,7 @@ class WifiController extends StateMachine {
                     addState(mNoLockHeldState, mDeviceInactiveState);
             addState(mStaDisabledWithScanState, mDefaultState);
             addState(mApEnabledState, mDefaultState);
+            addState(mMeshEnabledState, mDefaultState);
             addState(mEcmState, mDefaultState);
 
         boolean isAirplaneModeOn = mSettingsStore.isAirplaneModeOn();
@@ -163,7 +167,7 @@ class WifiController extends StateMachine {
         if (isScanningAlwaysAvailable) {
             setInitialState(mStaDisabledWithScanState);
         } else {
-            setInitialState(mApStaDisabledState);
+            setInitialState(mAllDisabledState);
         }
 
         setLogRecSize(100);
@@ -365,6 +369,10 @@ class WifiController extends StateMachine {
 
                     mPluggedType = pluggedType;
                     break;
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH in DefaultState. arg1=" + msg.arg1
+                            + " state=" + getCurrentState().getName());
+                    break;
                 case CMD_SET_AP:
                 case CMD_SCAN_ALWAYS_MODE_CHANGED:
                 case CMD_LOCKS_CHANGED:
@@ -386,7 +394,7 @@ class WifiController extends StateMachine {
 
     }
 
-    class ApStaDisabledState extends State {
+    class AllDisabledState extends State {
         private int mDeferredEnableSerialNumber = 0;
         private boolean mHaveDeferredEnable = false;
         private long mDisabledTimestamp;
@@ -432,6 +440,13 @@ class WifiController extends StateMachine {
                         mWifiStateMachine.setHostApRunning((WifiConfiguration) msg.obj,
                                 true);
                         transitionTo(mApEnabledState);
+                    }
+                    break;
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH. arg1=" + msg.arg1);
+                    if (msg.arg1 == 1) {
+                        mWifiStateMachine.setMeshRunning(true);
+                        transitionTo(mMeshEnabledState);
                     }
                     break;
                 case CMD_DEFERRED_TOGGLE:
@@ -480,7 +495,7 @@ class WifiController extends StateMachine {
                         if (mSettingsStore.isScanAlwaysAvailable()) {
                             transitionTo(mStaDisabledWithScanState);
                         } else {
-                            transitionTo(mApStaDisabledState);
+                            transitionTo(mAllDisabledState);
                         }
                     }
                     break;
@@ -489,7 +504,7 @@ class WifiController extends StateMachine {
                     * disable entirely (including scan)
                     */
                     if (! mSettingsStore.isWifiToggleEnabled()) {
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                     break;
                 case CMD_EMERGENCY_MODE_CHANGED:
@@ -497,6 +512,13 @@ class WifiController extends StateMachine {
                         transitionTo(mEcmState);
                         break;
                     }
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH in StaEnabledState. arg1=" + msg.arg1);
+                    if (msg.arg1 == 1) {
+                        deferMessage(msg);
+                        transitionTo(mAllDisabledState);
+                    }
+                    break;
                 default:
                     return NOT_HANDLED;
 
@@ -544,20 +566,28 @@ class WifiController extends StateMachine {
                 case CMD_AIRPLANE_TOGGLED:
                     if (mSettingsStore.isAirplaneModeOn() &&
                             ! mSettingsStore.isWifiToggleEnabled()) {
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                 case CMD_SCAN_ALWAYS_MODE_CHANGED:
                     if (! mSettingsStore.isScanAlwaysAvailable()) {
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                     break;
                 case CMD_SET_AP:
                     // Before starting tethering, turn off supplicant for scan mode
                     if (msg.arg1 == 1) {
                         deferMessage(msg);
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                     break;
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH in StaDisabledWithScanState. arg1=" + msg.arg1);
+                    // Before starting mesh, turn off supplicant for scan mode
+                    if (msg.arg1 == 1) {
+                        deferMessage(msg);
+                        transitionTo(mAllDisabledState);
+                     }
+                     break;
                 case CMD_DEFERRED_TOGGLE:
                     if (msg.arg1 != mDeferredEnableSerialNumber) {
                         log("DEFERRED_TOGGLE ignored due to serial mismatch");
@@ -598,15 +628,45 @@ class WifiController extends StateMachine {
                 case CMD_AIRPLANE_TOGGLED:
                     if (mSettingsStore.isAirplaneModeOn()) {
                         mWifiStateMachine.setHostApRunning(null, false);
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                     break;
                 case CMD_SET_AP:
                     if (msg.arg1 == 0) {
                         mWifiStateMachine.setHostApRunning(null, false);
-                        transitionTo(mApStaDisabledState);
+                        transitionTo(mAllDisabledState);
                     }
                     break;
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH in ApEnabledState. arg1=" + msg.arg1);
+                    mWifiStateMachine.setHostApRunning(null, false);
+                    transitionTo(mAllDisabledState);
+                    deferMessage(msg);
+                    break;
+                default:
+                    return NOT_HANDLED;
+            }
+            return HANDLED;
+        }
+    }
+
+    class MeshEnabledState extends State {
+        @Override
+        public boolean processMessage(Message msg) {
+            switch (msg.what) {
+                case CMD_AIRPLANE_TOGGLED:
+                    if (mSettingsStore.isAirplaneModeOn()) {
+                        mWifiStateMachine.setMeshRunning(false);
+                        transitionTo(mAllDisabledState);
+                    }
+                    break;
+                case CMD_SET_MESH:
+                    Log.i(TAG, "receive CMD_SET_MESH in MeshEnabledState. arg1=" + msg.arg1);
+                    if (msg.arg1 == 0) {
+                        mWifiStateMachine.setMeshRunning(false);
+                        transitionTo(mAllDisabledState);
+                   }
+                   break;
                 default:
                     return NOT_HANDLED;
             }
@@ -632,7 +692,7 @@ class WifiController extends StateMachine {
                 } else if (mSettingsStore.isScanAlwaysAvailable()) {
                     transitionTo(mStaDisabledWithScanState);
                 } else {
-                    transitionTo(mApStaDisabledState);
+                    transitionTo(mAllDisabledState);
                 }
                 return HANDLED;
             } else {
