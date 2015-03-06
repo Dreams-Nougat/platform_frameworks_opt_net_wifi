@@ -105,6 +105,7 @@ import static com.android.server.wifi.WifiController.CMD_SCAN_ALWAYS_MODE_CHANGE
 import static com.android.server.wifi.WifiController.CMD_SCREEN_OFF;
 import static com.android.server.wifi.WifiController.CMD_SCREEN_ON;
 import static com.android.server.wifi.WifiController.CMD_SET_AP;
+import static com.android.server.wifi.WifiController.CMD_SET_MESH;
 import static com.android.server.wifi.WifiController.CMD_USER_PRESENT;
 import static com.android.server.wifi.WifiController.CMD_WIFI_TOGGLED;
 /**
@@ -622,6 +623,16 @@ public final class WifiServiceImpl extends IWifiManager.Stub {
     public int getWifiEnabledState() {
         enforceAccessPermission();
         return mWifiStateMachine.syncGetWifiState();
+    }
+
+     /**
+     * see {@link android.net.wifi.WifiManager#setWifiMeshEnabled(boolean)}
+     * @param enabled true to enable and false to disable
+     */
+    public void setWifiMeshEnabled(boolean enabled) {
+        enforceChangePermission();
+        Log.i(TAG, "setWifiMeshEnabled in wifi service :" + enabled);
+        mWifiController.obtainMessage(CMD_SET_MESH, enabled ? 1 : 0, 0, null).sendToTarget();
     }
 
     /**

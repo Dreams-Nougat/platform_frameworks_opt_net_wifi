@@ -82,6 +82,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.WpsResult;
 import android.net.wifi.WpsResult.Status;
 import android.net.wifi.p2p.IWifiP2pManager;
+import android.net.wifi.mesh.IWifiMeshManager;
 import android.os.BatteryStats;
 import android.os.Binder;
 import android.os.Bundle;
@@ -116,6 +117,7 @@ import com.android.server.wifi.hotspot2.NetworkDetail;
 import com.android.server.wifi.hotspot2.SupplicantBridge;
 import com.android.server.wifi.hotspot2.Utils;
 import com.android.server.wifi.p2p.WifiP2pServiceImpl;
+import com.android.server.wifi.mesh.WifiMeshServiceImpl;
 
 import java.io.BufferedReader;
 import java.io.FileDescriptor;
@@ -197,6 +199,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
     private DummyWifiLogger mWifiLogger;
     private WifiApConfigStore mWifiApConfigStore;
     private final boolean mP2pSupported;
+    private final boolean mMeshSupported;
+    private State mTransitionToStateMesh = null;
     private final AtomicBoolean mP2pConnected = new AtomicBoolean(false);
     private boolean mTemporarilyDisconnectWifi = false;
     private final String mPrimaryDeviceType;
@@ -565,6 +569,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
     // Used to initiate a connection with WifiP2pService
     private AsyncChannel mWifiP2pChannel;
+
+    private WifiMeshServiceImpl mWifiMeshServiceImpl;
+    private AsyncChannel mWifiMeshChannel;
+
     private AsyncChannel mWifiApConfigChannel;
 
     private WifiScanner mWifiScanner;
@@ -837,6 +845,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
     /* used to indicated RSSI threshold breach in hw */
     static final int CMD_RSSI_THRESHOLD_BREACH                          = BASE + 164;
 
+    public static final int CMD_ENABLE_MESH_REQ                         = BASE + 165;
+    public static final int CMD_ENABLE_MESH_RSP                         = BASE + 166;
+    public static final int CMD_DISABLE_MESH_REQ                        = BASE + 167;
+    public static final int CMD_DISABLE_MESH_RSP                        = BASE + 168;
 
 
     /* Wifi state machine modes of operation */
@@ -954,6 +966,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
      * before transitioning to another state.
      */
     private State mWaitForP2pDisableState = new WaitForP2pDisableState();
+    /* Wait until mesh is disabled
+     * This is a special state which is entered right after we exit out of DriverStartedState
+     * before transitioning to another state.
+     */
+    private State mWaitForMeshDisableState = new WaitForMeshDisableState();
     /* Driver stopping */
     private State mDriverStoppingState = new DriverStoppingState();
     /* Driver stopped */
@@ -1118,6 +1135,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
         mP2pSupported = mContext.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_WIFI_DIRECT);
+        mMeshSupported = mContext.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_WIFI_MESH);
+        loge("mP2pSupported=" + mP2pSupported + " mMeshSupported=" + mMeshSupported);
 
         mWifiNative = new WifiNative(mInterfaceName);
         mWifiConfigStore = new WifiConfigStore(context,this,  mWifiNative);
@@ -1143,6 +1163,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         mWifiP2pServiceImpl = (WifiP2pServiceImpl) IWifiP2pManager.Stub.asInterface(s1);
 
         IBinder s2 = ServiceManager.getService(Context.WIFI_PASSPOINT_SERVICE);
+
+        IBinder s3 = ServiceManager.getService(Context.WIFI_MESH_SERVICE);
+        mWifiMeshServiceImpl = (WifiMeshServiceImpl)IWifiMeshManager.Stub.asInterface(s3);
 
         mNetworkInfo.setIsAvailable(false);
         mLastBssid = null;
@@ -1327,6 +1350,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                         addState(mDisconnectedState, mConnectModeState);
                         addState(mWpsRunningState, mConnectModeState);
                 addState(mWaitForP2pDisableState, mSupplicantStartedState);
+                addState(mWaitForMeshDisableState, mSupplicantStartedState);
                 addState(mDriverStoppingState, mSupplicantStartedState);
                 addState(mDriverStoppedState, mSupplicantStartedState);
             addState(mSupplicantStoppingState, mDefaultState);
@@ -5031,7 +5055,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         * or when the driver is hung. Ensure supplicant is stopped here.
         */
         if (killSupplicant) {
-            mWifiMonitor.killSupplicant(mP2pSupported);
+            mWifiMonitor.killSupplicant(mP2pSupported, mMeshSupported);
         }
         mWifiNative.closeSupplicantConnection();
         sendSupplicantConnectionChangedBroadcast(false);
@@ -5543,6 +5567,12 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                         } else {
                             loge("WifiP2pService connection failure, error=" + message.arg1);
                         }
+                    } else if (ac == mWifiMeshChannel) {
+                        if (message.arg1 == AsyncChannel.STATUS_SUCCESSFUL) {
+                            mWifiMeshChannel.sendMessage(AsyncChannel.CMD_CHANNEL_FULL_CONNECTION);
+                        } else {
+                            loge("WifiMeshService connection failure, error=" + message.arg1);
+                        }
                     } else {
                         loge("got HALF_CONNECTED for unknown channel");
                     }
@@ -5802,6 +5832,12 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     mWifiP2pServiceImpl.getP2pStateMachineMessenger());
             }
 
+            if (mWifiMeshChannel == null) {
+                mWifiMeshChannel = new AsyncChannel();
+                mWifiMeshChannel.connect(mContext, getHandler(),
+                    mWifiMeshServiceImpl.getMessenger());
+            }
+
             if (mWifiApConfigChannel == null) {
                 mWifiApConfigChannel = new AsyncChannel();
                 mWifiApConfigStore = WifiApConfigStore.makeWifiApConfigStore(
@@ -5856,14 +5892,14 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                         * Avoids issues with drivers that do not handle interface down
                         * on a running supplicant properly.
                         */
-                        mWifiMonitor.killSupplicant(mP2pSupported);
+                        mWifiMonitor.killSupplicant(mP2pSupported, mMeshSupported);
 
                         if (WifiNative.startHal() == false) {
                             /* starting HAL is optional */
                             loge("Failed to start HAL");
                         }
 
-                        if (mWifiNative.startSupplicant(mP2pSupported)) {
+                        if(mWifiNative.startSupplicant(mP2pSupported, mMeshSupported)) {
                             setWifiState(WIFI_STATE_ENABLING);
                             if (DBG) log("Supplicant start successful");
                             mWifiMonitor.startMonitoring();
@@ -5960,7 +5996,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                 case WifiMonitor.SUP_DISCONNECTION_EVENT:
                     if (++mSupplicantRestartCount <= SUPPLICANT_RESTART_TRIES) {
                         loge("Failed to setup control channel, restart supplicant");
-                        mWifiMonitor.killSupplicant(mP2pSupported);
+                        mWifiMonitor.killSupplicant(mP2pSupported, mMeshSupported);
                         transitionTo(mInitialState);
                         sendMessageDelayed(CMD_START_SUPPLICANT, SUPPLICANT_RESTART_INTERVAL_MSECS);
                     } else {
@@ -6027,6 +6063,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                 case CMD_STOP_SUPPLICANT:   /* Supplicant stopped by user */
                     if (mP2pSupported) {
                         transitionTo(mWaitForP2pDisableState);
+                    } else if (mMeshSupported) {
+                        transitionTo(mWaitForMeshDisableState);
                     } else {
                         transitionTo(mSupplicantStoppingState);
                     }
@@ -6038,6 +6076,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     mSupplicantStateTracker.sendMessage(CMD_RESET_SUPPLICANT_STATE);
                     if (mP2pSupported) {
                         transitionTo(mWaitForP2pDisableState);
+                    } else if (mMeshSupported) {
+                        transitionTo(mWaitForMeshDisableState);
                     } else {
                         transitionTo(mInitialState);
                     }
@@ -6347,6 +6387,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     // keep it disabled.
                 }
             }
+            if (mMeshSupported) {
+                mWifiMeshChannel.sendMessage(CMD_ENABLE_MESH_REQ);
+            }
 
             final Intent intent = new Intent(WifiManager.WIFI_SCAN_AVAILABLE);
             intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
@@ -6449,6 +6492,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     mWakeLock.release();
                     if (mP2pSupported) {
                         transitionTo(mWaitForP2pDisableState);
+                    } else if (mMeshSupported) {
+                        transitionTo(mWaitForMeshDisableState);
                     } else {
                         transitionTo(mDriverStoppingState);
                     }
@@ -6545,6 +6590,12 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     mTransitionToState = mDriverStoppingState;
                     break;
             }
+            if (mMeshSupported) {
+                mTransitionToStateMesh = mTransitionToState;
+                mTransitionToState = mWaitForMeshDisableState;
+            } else {
+                mTransitionToStateMesh = null;
+            }
             mWifiP2pChannel.sendMessage(WifiStateMachine.CMD_DISABLE_P2P_REQ);
         }
         @Override
@@ -6553,6 +6604,65 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
             switch(message.what) {
                 case WifiStateMachine.CMD_DISABLE_P2P_RSP:
+                    transitionTo(mTransitionToState);
+                    break;
+                /* Defer wifi start/shut and driver commands */
+                case WifiMonitor.SUPPLICANT_STATE_CHANGE_EVENT:
+                case CMD_START_SUPPLICANT:
+                case CMD_STOP_SUPPLICANT:
+                case CMD_START_AP:
+                case CMD_STOP_AP:
+                case CMD_START_DRIVER:
+                case CMD_STOP_DRIVER:
+                case CMD_SET_OPERATIONAL_MODE:
+                case CMD_SET_COUNTRY_CODE:
+                case CMD_SET_FREQUENCY_BAND:
+                case CMD_START_PACKET_FILTERING:
+                case CMD_STOP_PACKET_FILTERING:
+                case CMD_START_SCAN:
+                case CMD_DISCONNECT:
+                case CMD_REASSOCIATE:
+                case CMD_RECONNECT:
+                    messageHandlingStatus = MESSAGE_HANDLING_STATUS_DEFERRED;
+                    deferMessage(message);
+                    break;
+                default:
+                    return NOT_HANDLED;
+            }
+            return HANDLED;
+        }
+    }
+
+    class WaitForMeshDisableState extends State {
+        private State mTransitionToState;
+        @Override
+        public void enter() {
+            switch (getCurrentMessage().what) {
+                case WifiMonitor.SUP_DISCONNECTION_EVENT:
+                    mTransitionToState = mInitialState;
+                    break;
+                case CMD_DELAYED_STOP_DRIVER:
+                    mTransitionToState = mDriverStoppingState;
+                    break;
+                case CMD_STOP_SUPPLICANT:
+                    mTransitionToState = mSupplicantStoppingState;
+                    break;
+                case CMD_DISABLE_P2P_RSP:
+                    mTransitionToState = mTransitionToStateMesh;
+                    mTransitionToStateMesh = null;
+                    break;
+                default:
+                    mTransitionToState = mDriverStoppingState;
+                    break;
+            }
+            mWifiMeshChannel.sendMessage(CMD_DISABLE_MESH_REQ);
+        }
+        @Override
+        public boolean processMessage(Message message) {
+            logStateAndMessage(message, getClass().getSimpleName());
+
+            switch(message.what) {
+                case CMD_DISABLE_MESH_RSP:
                     transitionTo(mTransitionToState);
                     break;
                 /* Defer wifi start/shut and driver commands */
