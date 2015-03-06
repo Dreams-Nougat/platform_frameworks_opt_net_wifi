@@ -26,6 +26,8 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pProvDiscEvent;
 import android.net.wifi.p2p.nsd.WifiP2pServiceResponse;
+import android.net.NetworkInfo.DetailedState;
+import android.net.wifi.mesh.WifiMeshGroup;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -391,6 +393,17 @@ public class WifiMonitor {
      */
     private static final String P2P_SERV_DISC_RESP_STR = "P2P-SERV-DISC-RESP";
 
+    /** mesh events */
+    private static final String MESH_EVENT_PREFIX_STR = "MESH";
+    /* MESH-GROUP-STARTED wlan0 ssid="bazooka" id=0 */
+    private static final String MESH_GROUP_STARTED_STR = "MESH-GROUP-STARTED";
+    /* MESH-GROUP-REMOVED wlan0 */
+    private static final String MESH_GROUP_STOPPED_STR = "MESH-GROUP-REMOVED";
+    /* MESH-PEER-CONNECTED 11:22:33:44:55:66:77 */
+    private static final String MESH_PEER_CONNECTED_STR = "MESH-PEER-CONNECTED";
+    /* MESH-PEER-DISCONNECTED 11:22:33:44:55:66:77 reason=0 */
+    private static final String MESH_PEER_DISCONNECTED_STR = "MESH-PEER-DISCONNECTED";
+
     private static final String HOST_AP_EVENT_PREFIX_STR = "AP";
     /* AP-STA-CONNECTED 42:fc:89:a8:96:09 dev_addr=02:90:4c:a0:92:54 */
     private static final String AP_STA_CONNECTED_STR = "AP-STA-CONNECTED";
@@ -462,6 +475,12 @@ public class WifiMonitor {
 
     /* Indicates assoc reject event */
     public static final int ASSOCIATION_REJECTION_EVENT          = BASE + 43;
+
+    /* Mesh events */
+    public static final int MESH_GROUP_STARTED                   = BASE + 44;
+    public static final int MESH_GROUP_STOPPED                   = BASE + 45;
+    public static final int MESH_PEER_CONNECTED                  = BASE + 46;
+    public static final int MESH_PEER_DISCONNECTED               = BASE + 47;
 
     /* hotspot 2.0 ANQP events */
     public static final int GAS_QUERY_START_EVENT                = BASE + 51;
@@ -536,8 +555,8 @@ public class WifiMonitor {
         WifiMonitorSingleton.sInstance.stopSupplicant();
     }
 
-    public void killSupplicant(boolean p2pSupported) {
-        WifiMonitorSingleton.sInstance.killSupplicant(p2pSupported);
+    public void killSupplicant(int ifaceType) {
+        WifiMonitorSingleton.sInstance.killSupplicant(ifaceType);
     }
 
     private static class WifiMonitorSingleton {
@@ -615,8 +634,8 @@ public class WifiMonitor {
             mWifiNative.stopSupplicant();
         }
 
-        public synchronized void killSupplicant(boolean p2pSupported) {
-            WifiNative.killSupplicant(p2pSupported);
+        public synchronized void killSupplicant(int ifaceType) {
+            WifiNative.killSupplicant(ifaceType);
             mConnected = false;
             for (WifiMonitor m : mIfaceMap.values()) {
                 m.mMonitoring = false;
@@ -741,6 +760,8 @@ public class WifiMonitor {
                 mStateMachine.sendMessage(WPS_TIMEOUT_EVENT);
             } else if (eventStr.startsWith(P2P_EVENT_PREFIX_STR)) {
                 handleP2pEvents(eventStr);
+            } else if (eventStr.startsWith(MESH_EVENT_PREFIX_STR)) {
+                handleMeshEvents(eventStr);
             } else if (eventStr.startsWith(HOST_AP_EVENT_PREFIX_STR)) {
                 handleHostApEvents(eventStr);
             } else if (eventStr.startsWith(GAS_QUERY_PREFIX_STR)) {
@@ -1087,6 +1108,35 @@ public class WifiMonitor {
             } else {
                 Log.e(TAG, "Null service resp " + dataString);
             }
+        }
+    }
+
+    private void handleMeshEvents(String dataString) {
+
+        Matcher matcher;
+        Pattern macPattern = Pattern.compile(
+                "((?:[0-9a-f]{2}:){5}[0-9a-f]{2})");
+
+        if (dataString.startsWith(MESH_GROUP_STARTED_STR)) {
+            mStateMachine.sendMessage(MESH_GROUP_STARTED, new WifiMeshGroup(dataString));
+        } else if (dataString.startsWith(MESH_GROUP_STOPPED_STR)) {
+            mStateMachine.sendMessage(MESH_GROUP_STOPPED);
+        } else if (dataString.startsWith(MESH_PEER_CONNECTED_STR)) {
+            matcher = macPattern.matcher(dataString);
+            if (!matcher.find()) {
+                Log.e(TAG, "Malformed event: " + dataString);
+                return;
+            }
+            mStateMachine.sendMessage(MESH_PEER_CONNECTED, 0, 0,
+                    matcher.group(0));
+        } else if (dataString.startsWith(MESH_PEER_DISCONNECTED_STR)) {
+            matcher = macPattern.matcher(dataString);
+            if (!matcher.find()) {
+                Log.e(TAG, "Malformed event: " + dataString);
+                return;
+            }
+            mStateMachine.sendMessage(MESH_PEER_DISCONNECTED, 0, 0,
+                    matcher.group(0));
         }
     }
 

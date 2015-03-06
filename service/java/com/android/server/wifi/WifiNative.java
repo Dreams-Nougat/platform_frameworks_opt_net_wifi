@@ -81,11 +81,11 @@ public class WifiNative {
 
     public native static boolean unloadDriver();
 
-    public native static boolean startSupplicant(boolean p2pSupported);
+    public native static boolean startSupplicant(int ifaceType);
 
     /* Sends a kill signal to supplicant. To be used when we have lost connection
        or when the supplicant is hung */
-    public native static boolean killSupplicant(boolean p2pSupported);
+    public native static boolean killSupplicant(int ifaceType);
 
     private native boolean connectToSupplicantNative();
 
@@ -228,6 +228,10 @@ public class WifiNative {
         return doStringCommand("GET_CAPABILITY freq");
     }
 
+    public boolean scan() {
+        return doBooleanCommand("SCAN");
+    }
+
     public boolean scan(int type, String freqList) {
         if (type == SCAN_WITHOUT_CONNECTION_SETUP) {
             if (freqList == null) return doBooleanCommand("SCAN TYPE=ONLY");
@@ -356,7 +360,11 @@ public class WifiNative {
      * MASK=<N> see wpa_supplicant/src/common/wpa_ctrl.h for details
      */
     public String scanResults(int sid) {
-        return doStringCommandWithoutLogging("BSS RANGE=" + sid + "- MASK=0x21987");
+        return scanResults(sid, "0x21987");
+    }
+
+    public String scanResults(int sid, String mask) {
+        return doStringCommandWithoutLogging("BSS RANGE=" + sid + "- MASK=" + mask);
     }
 
     /**
@@ -1129,6 +1137,14 @@ public class WifiNative {
 
     public boolean fetchAnqp(String bssid, String subtypes) {
         return doBooleanCommand("ANQP_GET " + bssid + " " + subtypes);
+    }
+
+    public boolean meshGroupAdd(int netId) {
+        return doBooleanCommand("MESH_GROUP_ADD " + netId);
+    }
+
+    public boolean meshGroupRemove() {
+        return doBooleanCommand("MESH_GROUP_REMOVE " + mInterfaceName);
     }
 
     /* WIFI HAL support */
