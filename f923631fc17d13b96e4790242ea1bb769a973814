@@ -1,0 +1,59 @@
+Revision: f923631fc17d13b96e4790242ea1bb769a973814
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiController.java
+
+373:20-373:23
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9759d8ea_457eca31
+Bytes: 29
+Should not exceed 100 columns
+
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+629:0-629:4
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7758e4e5_c4695e7b
+Bytes: 21
+trailing white spaces
+
+4789:64-4789:65
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 37ae6cfa_12302ceb
+Bytes: 21
+trailing white spaces
+
+File: service/java/com/android/server/wifi/mesh/WifiMeshService.java
+
+2:17-2:21
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 37ae6cfa_d21d0462
+Bytes: 14
+should be 2015
+
+File: service/java/com/android/server/wifi/mesh/WifiMeshServiceImpl.java
+
+2:27-2:38
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9759d8ea_8573626b
+Bytes: 27
+Cannot put Sony's copyright
+
+3:17-3:21
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7758e4e5_0433f6a8
+Bytes: 14
+should be 2015
+
+641:14-641:15
+Mon Mar 09 21:29:06 2015 +0000
+Author: Takeshi Aimi <1017042@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7758e4e5_64366a9a
+Bytes: 21
+trailing white spaces
+
