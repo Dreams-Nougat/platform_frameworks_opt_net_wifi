@@ -1778,11 +1778,15 @@ public class WifiStateMachine extends StateMachine {
                 && callingUid != SCAN_ALARM_SOURCE)
                 || workSource != null)) {
             mScanWorkSource = workSource != null ? workSource : new WorkSource(callingUid);
-            try {
-                mBatteryStats.noteWifiScanStartedFromSource(mScanWorkSource);
-            } catch (RemoteException e) {
-                log(e.toString());
-            }
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        mBatteryStats.noteWifiScanStartedFromSource(mScanWorkSource);
+                    } catch (RemoteException e) {
+                        log(e.toString());
+                    }
+                }
+            }).start();
         }
     }
 
