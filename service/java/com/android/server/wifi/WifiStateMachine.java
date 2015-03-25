@@ -7236,6 +7236,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                             handleNetworkDisconnect();
                         }
                         log("Detected an interface down, restart driver");
+                        mWifiP2pChannel.sendMessage(CMD_DISABLE_P2P_REQ);
                         transitionTo(mDriverStoppedState);
                         sendMessage(CMD_START_DRIVER);
                         break;
