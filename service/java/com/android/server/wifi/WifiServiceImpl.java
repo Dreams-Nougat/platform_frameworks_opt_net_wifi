@@ -359,7 +359,7 @@ public final class WifiServiceImpl extends IWifiManager.Stub {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         if (mSettingsStore.handleAirplaneModeToggled()) {
-                            mWifiController.sendMessage(CMD_AIRPLANE_TOGGLED);
+                            mWifiController.sendMessage(CMD_AIRPLANE_TOGGLED, mSettingsStore.isAirplaneModeOn()? 0: 1, 0);
                         }
                         if (mSettingsStore.isAirplaneModeOn()) {
                             Log.d(TAG, "resetting country code because Airplane mode is ON");
@@ -611,7 +611,7 @@ public final class WifiServiceImpl extends IWifiManager.Stub {
             Binder.restoreCallingIdentity(ident);
         }
 
-        mWifiController.sendMessage(CMD_WIFI_TOGGLED);
+        mWifiController.sendMessage(CMD_WIFI_TOGGLED, enable? 1: 0, 0);
         return true;
     }
 

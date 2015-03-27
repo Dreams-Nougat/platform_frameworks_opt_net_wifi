@@ -422,7 +422,10 @@ class WifiController extends StateMachine {
                 case CMD_WIFI_TOGGLED:
                 case CMD_AIRPLANE_TOGGLED:
                     if (mSettingsStore.isWifiToggleEnabled()) {
-                        if (doDeferEnable(msg)) {
+                        if (mHaveDeferredEnable && msg.arg1 == 1) {
+                            log("ApStaDisabledState : CMD_WIFI_TOGGLED enable message again");
+                            break;
+                        } else if (doDeferEnable(msg)) {
                             if (mHaveDeferredEnable) {
                                 //  have 2 toggles now, inc serial number an ignore both
                                 mDeferredEnableSerialNumber++;
@@ -460,6 +463,7 @@ class WifiController extends StateMachine {
                         log("DEFERRED_TOGGLE ignored due to serial mismatch");
                         break;
                     }
+                    mHaveDeferredEnable = false;
                     log("DEFERRED_TOGGLE handled");
                     sendMessage((Message)(msg.obj));
                     break;
@@ -558,7 +562,10 @@ class WifiController extends StateMachine {
             switch (msg.what) {
                 case CMD_WIFI_TOGGLED:
                     if (mSettingsStore.isWifiToggleEnabled()) {
-                        if (doDeferEnable(msg)) {
+                        if (mHaveDeferredEnable && msg.arg1 == 1) {
+                            log("StaDisabledWithScanState : CMD_WIFI_TOGGLED enable message again");
+                            break;
+                        } else if (doDeferEnable(msg)) {
                             if (mHaveDeferredEnable) {
                                 // have 2 toggles now, inc serial number and ignore both
                                 mDeferredEnableSerialNumber++;
@@ -597,6 +604,7 @@ class WifiController extends StateMachine {
                         log("DEFERRED_TOGGLE ignored due to serial mismatch");
                         break;
                     }
+                    mHaveDeferredEnable = false;
                     logd("DEFERRED_TOGGLE handled");
                     sendMessage((Message)(msg.obj));
                     break;
