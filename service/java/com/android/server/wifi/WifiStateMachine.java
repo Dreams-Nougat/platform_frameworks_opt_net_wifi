@@ -8546,7 +8546,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     replyToMessage(message, WifiManager.RSSI_PKTCNT_FETCH_SUCCEEDED, info);
                     break;
                 case CMD_DELAYED_NETWORK_DISCONNECT:
-                    if (!linkDebouncing && mWifiConfigStore.enableLinkDebouncing) {
+                    if (!linkDebouncing) {
 
                         // Ignore if we are not debouncing
                         logd("CMD_DELAYED_NETWORK_DISCONNECT and not debouncing - ignore "
@@ -9094,7 +9094,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                                 WifiLogger.REPORT_REASON_UNEXPECTED_DISCONNECT);
                     }
                     config = getCurrentWifiConfiguration();
-                    if (mScreenOn
+                    if (mWifiConfigStore.enableLinkDebouncing
+                            && mScreenOn
                             && !linkDebouncing
                             && config != null
                             && config.autoJoinStatus == WifiConfiguration.AUTO_JOIN_ENABLED
