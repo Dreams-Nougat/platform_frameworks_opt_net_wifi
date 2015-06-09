@@ -13,3 +13,12 @@ mWifiInfo.getSSID() != null && !mWifiInfo.getSSID().equals(WifiSsid.NONE)
 
 which will prevent a crash here if getSSID() ever were to return null for some reason.
 
+4236:51-4236:93
+Tue Jun 09 22:14:04 2015 +0000
+Author: Robert Greenwalt <1002609@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b9d41838_b54a12d6
+UUID: 99fcb4c6_e4f35a9b
+Bytes: 44
+or
+WifiSsid.NONE.equals(mWifiInfo.getSSID())
+
