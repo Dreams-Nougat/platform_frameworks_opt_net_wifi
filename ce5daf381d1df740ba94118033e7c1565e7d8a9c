@@ -22,3 +22,11 @@ Bytes: 44
 or
 WifiSsid.NONE.equals(mWifiInfo.getSSID())
 
+4236:51-4236:93
+Tue Jun 09 22:16:10 2015 +0000
+Author: Jeff Davidson <1006780@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 99fcb4c6_e4f35a9b
+UUID: 193e044a_6096521e
+Bytes: 132
+I actually thought about that, but this is subtly different - it will pass through if getSSID() returns null, which it shouldn't do.
+
