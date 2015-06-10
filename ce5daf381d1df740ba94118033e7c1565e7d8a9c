@@ -38,3 +38,25 @@ UUID: 193e044a_20136a14
 Bytes: 2
 ah
 
+4236:51-4236:93
+Wed Jun 10 02:34:20 2015 +0000
+Author: Zhangkai (Kyle) Wang <1074423@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b9d41838_b54a12d6
+UUID: b971781d_594433ec
+Bytes: 600
+Hi Jeff,
+
+Although WifiInfo#getSSID will never return null with current implementation like below, I agree with you that we can leave the null check just in case this function changes in future for some reason. I have updated the patch according to your comment.
+
+    public String getSSID() {
+        if (mWifiSsid != null) {
+            String unicode = mWifiSsid.toString();
+            if (!TextUtils.isEmpty(unicode)) {
+                return "\"" + unicode + "\"";
+            } else {
+                return mWifiSsid.getHexString();
+            }
+        }
+        return WifiSsid.NONE;
+    }
+
