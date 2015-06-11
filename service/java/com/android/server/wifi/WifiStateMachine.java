@@ -962,6 +962,7 @@ public class WifiStateMachine extends StateMachine {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         sScanAlarmIntentCount++; // Used for debug only
+                        mAlarmEnabled = false;
                         startScan(SCAN_ALARM_SOURCE, mDelayedScanCounter.incrementAndGet(), null, null);
                         if (VDBG)
                             loge("WiFiStateMachine SCAN ALARM -> " + mDelayedScanCounter.get());
@@ -1142,12 +1143,6 @@ public class WifiStateMachine extends StateMachine {
             loge("setScanAlarm " + enabled
                     + " period " + mDefaultFrameworkScanIntervalMs
                     + " mBackgroundScanSupported " + mBackgroundScanSupported);
-        }
-        if (mBackgroundScanSupported == false) {
-            // Scan alarm is only used for background scans if they are not
-            // offloaded to the wifi chipset, hence enable the scan alarm
-            // gicing us RTC_WAKEUP of backgroundScan is NOT supported
-            enabled = true;
         }
 
         if (enabled == mAlarmEnabled) return;
