@@ -1358,8 +1358,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
     PendingIntent getPrivateBroadcast(String action, int requestCode) {
         Intent intent = new Intent(action, null);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
-        // TODO: Find the correct value so this is not hard coded
-        intent.setPackage("android");
+        intent.setPackage(mContext.getPackageName());
         return PendingIntent.getBroadcast(mContext, requestCode, intent, 0);
     }
 
