@@ -7200,6 +7200,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                 case WifiMonitor.AUTHENTICATION_FAILURE_EVENT:
                     mWifiLogger.captureBugReportData(WifiLogger.REPORT_REASON_AUTH_FAILURE);
                     mSupplicantStateTracker.sendMessage(WifiMonitor.AUTHENTICATION_FAILURE_EVENT);
+                    mWifiConfigStore.handleSSIDStateChange(mLastNetworkId, false, "",
+                        mWifiInfo.getBSSID());
                     break;
                 case WifiMonitor.SSID_TEMP_DISABLED:
                 case WifiMonitor.SSID_REENABLED:

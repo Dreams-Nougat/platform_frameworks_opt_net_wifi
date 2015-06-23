@@ -4210,7 +4210,7 @@ public class WifiConfigStore extends IpConfigStore {
                     // This is a network we self added, and we never succeeded,
                     // the user did not create this network and never entered its credentials,
                     // so we want to be very aggressive in disabling it completely.
-                    removeConfigAndSendBroadcastIfNeeded(config.networkId);
+                    forgetNetwork(config.networkId);
                 } else {
                     if (message != null) {
                         if (message.contains("no identity")) {
