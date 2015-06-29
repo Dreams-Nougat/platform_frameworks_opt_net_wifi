@@ -1240,44 +1240,7 @@ public class WifiAutoJoinController {
         return false;
     }
 
-    /**
-     * attemptAutoJoin() function implements the core of the a network switching algorithm
-     * Return false if no acceptable networks were found.
-     */
-    boolean attemptAutoJoin() {
-        boolean found = false;
-        didOverride = false;
-        didBailDueToWeakRssi = false;
-        int networkSwitchType = AUTO_JOIN_IDLE;
-
-        long now = System.currentTimeMillis();
-
-        String lastSelectedConfiguration = mWifiConfigStore.getLastSelectedConfiguration();
-
-        // Reset the currentConfiguration Key, and set it only if WifiStateMachine and
-        // supplicant agree
-        mCurrentConfigurationKey = null;
-        WifiConfiguration currentConfiguration = mWifiStateMachine.getCurrentWifiConfiguration();
-
-        WifiConfiguration candidate = null;
-
-        // Obtain the subset of recently seen networks
-        List<WifiConfiguration> list =
-                mWifiConfigStore.getRecentConfiguredNetworks(mScanResultAutoJoinAge, false);
-        if (list == null) {
-            if (VDBG)  logDbg("attemptAutoJoin nothing known=" +
-                    mWifiConfigStore.getconfiguredNetworkSize());
-            return false;
-        }
-
-        // Find the currently connected network: ask the supplicant directly
-        String val = mWifiNative.status(true);
-        String status[] = val.split("\\r?\\n");
-        if (VDBG) {
-            logDbg("attemptAutoJoin() status=" + val + " split="
-                    + Integer.toString(status.length));
-        }
-
+    private int getSupplicantNetId(String status[]) {
         int supplicantNetId = -1;
         for (String key : status) {
             if (key.regionMatches(0, "id=", 0, 3)) {
@@ -1319,23 +1282,14 @@ public class WifiAutoJoinController {
                 // mWifiNative.status() command, which allow us to know that
                 // supplicant has started association process, even though we didnt yet get the
                 // SUPPLICANT_STATE_CHANGE message.
-                return false;
+                return -1;
             }
         }
-        if (DBG) {
-            String conf = "";
-            String last = "";
-            if (currentConfiguration != null) {
-                conf = " current=" + currentConfiguration.configKey();
-            }
-            if (lastSelectedConfiguration != null) {
-                last = " last=" + lastSelectedConfiguration;
-            }
-            logDbg("attemptAutoJoin() num recent config " + Integer.toString(list.size())
-                    + conf + last
-                    + " ---> suppNetId=" + Integer.toString(supplicantNetId));
-        }
+        return supplicantNetId;
+    }
 
+    private boolean setupCurrentConfigurationKey(WifiConfiguration currentConfiguration,
+                                                 int supplicantNetId) {
         if (currentConfiguration != null) {
             if (supplicantNetId != currentConfiguration.networkId
                     // https://b.corp.google.com/issue?id=16484607
@@ -1359,6 +1313,7 @@ public class WifiAutoJoinController {
                 return false;
             } else {
                 mCurrentConfigurationKey = currentConfiguration.configKey();
+                return true;
             }
         } else {
             if (supplicantNetId != WifiConfiguration.INVALID_NETWORK_ID) {
@@ -1366,19 +1321,18 @@ public class WifiAutoJoinController {
                 return false;
             }
         }
+        return true;
+    }
 
-        int currentNetId = -1;
-        if (currentConfiguration != null) {
-            // If we are associated to a configuration, it will
-            // be compared thru the compareNetwork function
-            currentNetId = currentConfiguration.networkId;
-        }
-
-        /**
-         * Run thru all visible configurations without looking at the one we
-         * are currently associated to
-         * select Best Network candidate from known WifiConfigurations
-         */
+    /**
+     * Run thru all visible configurations without looking at the one we
+     * are currently associated to
+     * select Best Network candidate from known WifiConfigurations
+     */
+    private WifiConfiguration selectBestNetworkCandidate(
+		    List<WifiConfiguration> list, long now, int currentNetId,
+		    WifiConfiguration currentConfiguration, String lastSelectedConfiguration) {
+        WifiConfiguration candidate = null;
         for (WifiConfiguration config : list) {
             if (config.SSID == null) {
                 continue;
@@ -1646,6 +1600,118 @@ public class WifiAutoJoinController {
                 }
             }
         }
+	return candidate;
+    }
+
+    private ScanResult selectBestUntrustedCandidate(WifiConfiguration currentConfiguration) {
+        ScanResult untrustedCandidate = null;
+        // Get current date
+        long nowMs = System.currentTimeMillis();
+        int currentScore = -10000;
+        for (ScanResult result : scanResultCache.values()) {
+            // We look only at untrusted networks with a valid SSID
+            // A trusted result would have been looked at thru it's Wificonfiguration
+            if (TextUtils.isEmpty(result.SSID) || !result.untrusted ||
+                    !isOpenNetwork(result)) {
+                continue;
+            }
+            String quotedSSID = "\"" + result.SSID + "\"";
+            if (mWifiConfigStore.mDeletedEphemeralSSIDs.contains(quotedSSID)) {
+                // SSID had been Forgotten by user, then don't score it
+                continue;
+            }
+            if ((nowMs - result.seen) < mScanResultAutoJoinAge) {
+                // Increment usage count for the network
+                mWifiConnectionStatistics.incrementOrAddUntrusted(quotedSSID, 0, 1);
+
+                boolean isActiveNetwork = currentConfiguration != null
+                        && currentConfiguration.SSID.equals(quotedSSID);
+                int score = mNetworkScoreCache.getNetworkScore(result, isActiveNetwork);
+                if (score != WifiNetworkScoreCache.INVALID_NETWORK_SCORE
+                        && score > currentScore) {
+                    // Highest score: Select this candidate
+                    currentScore = score;
+                    untrustedCandidate = result;
+                    if (VDBG) {
+                        logDbg("AutoJoinController: found untrusted candidate "
+                                + result.SSID
+                        + " RSSI=" + result.level
+                        + " freq=" + result.frequency
+                        + " score=" + score);
+                    }
+                }
+            }
+        }
+	return untrustedCandidate;
+    }
+
+    /**
+     * attemptAutoJoin() function implements the core of the a network switching algorithm
+     * Return false if no acceptable networks were found.
+     */
+    boolean attemptAutoJoin() {
+        boolean found = false;
+        didOverride = false;
+        didBailDueToWeakRssi = false;
+        int networkSwitchType = AUTO_JOIN_IDLE;
+
+        long now = System.currentTimeMillis();
+
+        String lastSelectedConfiguration = mWifiConfigStore.getLastSelectedConfiguration();
+
+        // Reset the currentConfiguration Key, and set it only if WifiStateMachine and
+        // supplicant agree
+        mCurrentConfigurationKey = null;
+        WifiConfiguration currentConfiguration = mWifiStateMachine.getCurrentWifiConfiguration();
+
+        WifiConfiguration candidate = null;
+
+        // Obtain the subset of recently seen networks
+        List<WifiConfiguration> list =
+                mWifiConfigStore.getRecentConfiguredNetworks(mScanResultAutoJoinAge, false);
+        if (list == null) {
+            if (VDBG)  logDbg("attemptAutoJoin nothing known=" +
+                    mWifiConfigStore.getconfiguredNetworkSize());
+            return false;
+        }
+
+        // Find the currently connected network: ask the supplicant directly
+        String val = mWifiNative.status(true);
+        String status[] = val.split("\\r?\\n");
+        if (VDBG) {
+            logDbg("attemptAutoJoin() status=" + val + " split="
+                    + Integer.toString(status.length));
+        }
+
+        int supplicantNetId = getSupplicantNetId(status);
+	if (supplicantNetId < 0)
+		return false;
+
+        if (DBG) {
+            String conf = "";
+            String last = "";
+            if (currentConfiguration != null) {
+                conf = " current=" + currentConfiguration.configKey();
+            }
+            if (lastSelectedConfiguration != null) {
+                last = " last=" + lastSelectedConfiguration;
+            }
+            logDbg("attemptAutoJoin() num recent config " + Integer.toString(list.size())
+                    + conf + last
+                    + " ---> suppNetId=" + Integer.toString(supplicantNetId));
+        }
+
+        if (!setupCurrentConfigurationKey(currentConfiguration, supplicantNetId))
+                return false;
+
+        int currentNetId = -1;
+        if (currentConfiguration != null) {
+            // If we are associated to a configuration, it will
+            // be compared thru the compareNetwork function
+            currentNetId = currentConfiguration.networkId;
+        }
+
+	candidate = selectBestNetworkCandidate(list, now, currentNetId, currentConfiguration, lastSelectedConfiguration);
 
         // Now, go thru scan result to try finding a better untrusted network
         if (mNetworkScoreCache != null && mAllowUntrustedConnections) {
@@ -1656,48 +1722,12 @@ public class WifiAutoJoinController {
                 rssi24 = candidate.visibility.rssi24;
             }
 
-            // Get current date
-            long nowMs = System.currentTimeMillis();
-            int currentScore = -10000;
             // The untrusted network with highest score
             ScanResult untrustedCandidate = null;
             // Look for untrusted scored network only if the current candidate is bad
-            if (isBadCandidate(rssi24, rssi5)) {
-                for (ScanResult result : scanResultCache.values()) {
-                    // We look only at untrusted networks with a valid SSID
-                    // A trusted result would have been looked at thru it's Wificonfiguration
-                    if (TextUtils.isEmpty(result.SSID) || !result.untrusted ||
-                            !isOpenNetwork(result)) {
-                        continue;
-                    }
-                    String quotedSSID = "\"" + result.SSID + "\"";
-                    if (mWifiConfigStore.mDeletedEphemeralSSIDs.contains(quotedSSID)) {
-                        // SSID had been Forgotten by user, then don't score it
-                        continue;
-                    }
-                    if ((nowMs - result.seen) < mScanResultAutoJoinAge) {
-                        // Increment usage count for the network
-                        mWifiConnectionStatistics.incrementOrAddUntrusted(quotedSSID, 0, 1);
+            if (isBadCandidate(rssi24, rssi5))
+	        untrustedCandidate = selectBestUntrustedCandidate(currentConfiguration);
 
-                        boolean isActiveNetwork = currentConfiguration != null
-                                && currentConfiguration.SSID.equals(quotedSSID);
-                        int score = mNetworkScoreCache.getNetworkScore(result, isActiveNetwork);
-                        if (score != WifiNetworkScoreCache.INVALID_NETWORK_SCORE
-                                && score > currentScore) {
-                            // Highest score: Select this candidate
-                            currentScore = score;
-                            untrustedCandidate = result;
-                            if (VDBG) {
-                                logDbg("AutoJoinController: found untrusted candidate "
-                                        + result.SSID
-                                + " RSSI=" + result.level
-                                + " freq=" + result.frequency
-                                + " score=" + score);
-                            }
-                        }
-                    }
-                }
-            }
             if (untrustedCandidate != null) {
                 // At this point, we have an untrusted network candidate.
                 // Create the new ephemeral configuration and see if we should switch over
