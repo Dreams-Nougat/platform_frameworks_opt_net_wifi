@@ -1346,6 +1346,17 @@ public class WifiConfigStore extends IpConfigStore {
     }
 
     /**
+     * Fetch static DNS servers for a given network id.
+     */
+    ArrayList<InetAddress> getStaticDnsServers(int netId) {
+        WifiConfiguration config = mConfiguredNetworks.get(netId);
+        if (config != null) {
+            return config.getStaticDnsServers();
+        }
+        return null;
+    }
+
+    /**
      * set default GW MAC address
      */
     void setDefaultGwMacAddress(int netId, String macAddress) {
@@ -1378,6 +1389,19 @@ public class WifiConfigStore extends IpConfigStore {
     boolean isUsingStaticIp(int netId) {
         WifiConfiguration config = mConfiguredNetworks.get(netId);
         if (config != null && config.getIpAssignment() == IpAssignment.STATIC) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return if the specified network is using static DNS.
+     * @param netId network id
+     * @return {@code true} if using static DNS for netId
+     */
+    boolean isUsingStaticDns(int netId) {
+        WifiConfiguration config = mConfiguredNetworks.get(netId);
+        if (config != null && config.getIpAssignment() == IpAssignment.STATIC_DNS) {
             return true;
         }
         return false;
@@ -3432,13 +3456,13 @@ public class WifiConfigStore extends IpConfigStore {
             WifiConfiguration currentConfig,
             WifiConfiguration newConfig) {
         boolean ipChanged = false;
+        boolean dnsChanged = false;
         boolean proxyChanged = false;
 
         if (VDBG) {
             loge("writeIpAndProxyConfigurationsOnChange: " + currentConfig.SSID + " -> " +
                     newConfig.SSID + " path: " + ipConfigFile);
         }
-
 
         switch (newConfig.getIpAssignment()) {
             case STATIC:
@@ -3453,6 +3477,11 @@ public class WifiConfigStore extends IpConfigStore {
             case DHCP:
                 if (currentConfig.getIpAssignment() != newConfig.getIpAssignment()) {
                     ipChanged = true;
+                }
+                break;
+            case STATIC_DNS:
+                if (currentConfig.getStaticDnsServers() != newConfig.getStaticDnsServers()) {
+                    dnsChanged = true;
                 }
                 break;
             case UNASSIGNED:
@@ -3498,6 +3527,12 @@ public class WifiConfigStore extends IpConfigStore {
             }
         }
 
+        if (dnsChanged) {
+            log("Updating static DNS servers.");
+            currentConfig.setIpAssignment(newConfig.getIpAssignment());
+            currentConfig.setStaticDnsServers(newConfig.getStaticDnsServers());
+        }
+
         if (proxyChanged) {
             currentConfig.setProxySettings(newConfig.getProxySettings());
             currentConfig.setHttpProxy(newConfig.getHttpProxy());
@@ -3507,12 +3542,12 @@ public class WifiConfigStore extends IpConfigStore {
             }
         }
 
-        if (ipChanged || proxyChanged) {
+        if (ipChanged || proxyChanged || dnsChanged) {
             writeIpAndProxyConfigurations();
             sendConfiguredNetworksChangedBroadcast(currentConfig,
                     WifiManager.CHANGE_REASON_CONFIG_CHANGE);
         }
-        return new NetworkUpdateResult(ipChanged, proxyChanged);
+        return new NetworkUpdateResult(ipChanged, dnsChanged, proxyChanged);
     }
 
     /** Returns true if a particular config key needs to be quoted when passed to the supplicant. */

@@ -21,18 +21,21 @@ import static android.net.wifi.WifiConfiguration.INVALID_NETWORK_ID;
 class NetworkUpdateResult {
     int netId;
     boolean ipChanged;
+    boolean dnsChanged;
     boolean proxyChanged;
     boolean isNewNetwork = false;
 
     public NetworkUpdateResult(int id) {
         netId = id;
         ipChanged = false;
+        dnsChanged = false;
         proxyChanged = false;
     }
 
-    public NetworkUpdateResult(boolean ip, boolean proxy) {
+    public NetworkUpdateResult(boolean ip, boolean dns, boolean proxy) {
         netId = INVALID_NETWORK_ID;
         ipChanged = ip;
+        dnsChanged = dns;
         proxyChanged = proxy;
     }
 
@@ -50,6 +53,14 @@ class NetworkUpdateResult {
 
     public boolean hasIpChanged() {
         return ipChanged;
+    }
+
+    public void setDnsChanged(boolean dns) {
+        dnsChanged = dns;
+    }
+
+    public boolean hasDnsChanged() {
+        return dnsChanged;
     }
 
     public void setProxyChanged(boolean proxy) {

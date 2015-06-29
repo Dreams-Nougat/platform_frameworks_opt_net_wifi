@@ -46,6 +46,7 @@ import android.net.ConnectivityManager;
 import android.net.DhcpResults;
 import android.net.DhcpStateMachine;
 import android.net.InterfaceConfiguration;
+import android.net.IpConfiguration.IpAssignment;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.NetworkAgent;
@@ -140,7 +141,7 @@ public class WifiStateMachine extends StateMachine {
 
     private static final String NETWORKTYPE = "WIFI";
     private static final String NETWORKTYPE_UNTRUSTED = "WIFI_UT";
-    private static boolean DBG = false;
+    private static boolean DBG = true;
     private static boolean VDBG = false;
     private static boolean VVDBG = false;
     private static boolean mLogMessages = false;
@@ -6729,11 +6730,11 @@ public class WifiStateMachine extends StateMachine {
                     result = mWifiConfigStore.saveNetwork(config, -1);
                     if (result.getNetworkId() != WifiConfiguration.INVALID_NETWORK_ID) {
                         if (mWifiInfo.getNetworkId() == result.getNetworkId()) {
-                            if (result.hasIpChanged()) {
+                            if (result.hasIpChanged() || result.hasDnsChanged()) {
                                 // The currently connection configuration was changed
                                 // We switched from DHCP to static or from static to DHCP, or the
                                 // static IP address has changed.
-                                log("Reconfiguring IP on connection");
+                                log("Reconfiguring IP/DNS on connection");
                                 // TODO: clear addresses and disable IPv6
                                 // to simplify obtainingIpState.
                                 transitionTo(mObtainingIpState);
@@ -7357,6 +7358,7 @@ public class WifiStateMachine extends StateMachine {
                         + " " + key + " "
                         + " roam=" + mAutoRoaming
                         + " static=" + mWifiConfigStore.isUsingStaticIp(mLastNetworkId)
+                        + " static_dns=" + mWifiConfigStore.isUsingStaticDns(mLastNetworkId)
                         + " watchdog= " + obtainingIpWatchdogCount);
             }
 
@@ -7369,7 +7371,7 @@ public class WifiStateMachine extends StateMachine {
 
             // We must clear the config BSSID, as the wifi chipset may decide to roam
             // from this point on and having the BSSID specified in the network block would
-            // cause the roam to faile and the device to disconnect
+            // cause the roam to fail and the device to disconnect
             clearCurrentConfigBSSID("ObtainingIpAddress");
 
             try {
@@ -7380,7 +7382,16 @@ public class WifiStateMachine extends StateMachine {
                 loge("Failed to enable IPv6: " + e);
             }
 
-            if (!mWifiConfigStore.isUsingStaticIp(mLastNetworkId)) {
+            IpAssignment ipMode = null;
+            if (mWifiConfigStore.isUsingStaticIp(mLastNetworkId)) {
+                ipMode = IpAssignment.STATIC;
+            } else if (mWifiConfigStore.isUsingStaticDns(mLastNetworkId)) {
+                ipMode = IpAssignment.STATIC_DNS;
+            } else {
+                ipMode = IpAssignment.DHCP;
+            }
+
+            if (ipMode == IpAssignment.DHCP) {
                 if (isRoaming()) {
                     renewDhcp();
                 } else {
@@ -7396,6 +7407,19 @@ public class WifiStateMachine extends StateMachine {
                 getWifiLinkLayerStats(true);
                 sendMessageDelayed(obtainMessage(CMD_OBTAINING_IP_ADDRESS_WATCHDOG_TIMER,
                         obtainingIpWatchdogCount, 0), OBTAINING_IP_ADDRESS_GUARD_TIMER_MSEC);
+            } else if (ipMode == IpAssignment.STATIC_DNS) {
+                // Use DHCP for configuring our IP, gateway, but use a fixed set of DNS servers.
+                ArrayList<InetAddress> dnsServers = mWifiConfigStore.getStaticDnsServers(mLastNetworkId);
+                if (isRoaming()) {
+                    renewDhcp();
+                } else {
+                    clearIPv4Address(mInterfaceName);
+                    startDhcp();
+                }
+                // Set the DNS servers to the ones we want, and update the LinkProperties object.
+                loge("Updating link properties to use static DNS");
+                mNetlinkTracker.setStaticDnsServers(dnsServers);
+                updateLinkProperties(CMD_UPDATE_LINKPROPERTIES);
             } else {
                 // stop any running dhcp before assigning static IP
                 stopDhcp();
@@ -7423,6 +7447,7 @@ public class WifiStateMachine extends StateMachine {
                 }
             }
         }
+
       @Override
       public boolean processMessage(Message message) {
           logStateAndMessage(message, getClass().getSimpleName());
