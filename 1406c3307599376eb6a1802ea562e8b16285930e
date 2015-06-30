@@ -1,0 +1,20 @@
+Revision: 1406c3307599376eb6a1802ea562e8b16285930e
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConfigStore.java
+
+3531
+Tue Jun 30 06:45:53 2015 +0000
+Author: Rayhaan Jaufeerally <1059423@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b367d930_180c4977
+Bytes: 47
+Add what the servers are and wrap in if (VDBG).
+
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+144
+Tue Jun 30 06:45:53 2015 +0000
+Author: Rayhaan Jaufeerally <1059423@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d3ae0d65_094ced45
+Bytes: 21
+Change back to false.
+
