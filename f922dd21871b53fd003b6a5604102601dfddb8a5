@@ -1,0 +1,11 @@
+Revision: f922dd21871b53fd003b6a5604102601dfddb8a5
+Patch-set: 2
+File: service/jni/com_android_server_wifi_WifiNative.cpp
+
+542
+Fri Jul 03 12:04:48 2015 +0000
+Author: Narayan Kamath <1014443@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 931655ff_77506a54
+Bytes: 193
+FYI: You're changing the semantics of this method. we will now throw an NPE if macAddrString == null. That's probably a good thing, but do callers expect us to return false if that's the case ?
+
