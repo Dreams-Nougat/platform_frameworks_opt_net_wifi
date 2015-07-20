@@ -8059,19 +8059,12 @@ public class WifiStateMachine extends StateMachine {
                         messageHandlingStatus = MESSAGE_HANDLING_STATUS_REFUSED;
                         return HANDLED;
                     }
-                    /* Disable background scan temporarily during a regular scan */
-                    if (mEnableBackgroundScan) {
-                        enableBackgroundScan(false);
-                    }
-                    if (message.arg1 == SCAN_ALARM_SOURCE) {
+                    if (message.arg1 == SCAN_ALARM_SOURCE && mP2pConnected.get()) {
                         // Check if the CMD_START_SCAN message is obsolete (and thus if it should
                         // not be processed) and restart the scan
-                        int period =  mDisconnectedScanPeriodMs;
-                        if (mP2pConnected.get()) {
-                           period = (int)Settings.Global.getLong(mContext.getContentResolver(),
+                        int period = (int)Settings.Global.getLong(mContext.getContentResolver(),
                                     Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
                                     mDisconnectedScanPeriodMs);
-                        }
                         if (!checkAndRestartDelayedScan(message.arg2,
                                 true, period, null, null)) {
                             messageHandlingStatus = MESSAGE_HANDLING_STATUS_OBSOLETE;
@@ -8081,9 +8074,17 @@ public class WifiStateMachine extends StateMachine {
                                     + " -> obsolete");
                             return HANDLED;
                         }
+                        /* Disable background scan temporarily during a regular scan */
+                        if (mEnableBackgroundScan) {
+                             enableBackgroundScan(false);
+                        }
                         handleScanRequest(WifiNative.SCAN_WITHOUT_CONNECTION_SETUP, message);
                         ret = HANDLED;
                     } else {
+                        /* Disable background scan temporarily during a regular scan */
+                        if (mEnableBackgroundScan) {
+                             enableBackgroundScan(false);
+                        }
                         ret = NOT_HANDLED;
                     }
                     break;
