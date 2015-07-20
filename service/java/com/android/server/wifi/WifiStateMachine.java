@@ -531,9 +531,6 @@ public class WifiStateMachine extends StateMachine {
     static final int CMD_SET_SUSPEND_OPT_ENABLED          = BASE + 86;
     /* Delayed NETWORK_DISCONNECT */
     static final int CMD_DELAYED_NETWORK_DISCONNECT       = BASE + 87;
-    /* When there are no saved networks, we do a periodic scan to notify user of
-     * an open network */
-    static final int CMD_NO_NETWORKS_PERIODIC_SCAN        = BASE + 88;
     /* Test network Disconnection NETWORK_DISCONNECT */
     static final int CMD_TEST_NETWORK_DISCONNECT          = BASE + 89;
     private int testNetworkDisconnectCounter = 0;
@@ -4825,7 +4822,6 @@ public class WifiStateMachine extends StateMachine {
                 case CMD_RESPONSE_AP_CONFIG:
                 case WifiWatchdogStateMachine.POOR_LINK_DETECTED:
                 case WifiWatchdogStateMachine.GOOD_LINK_DETECTED:
-                case CMD_NO_NETWORKS_PERIODIC_SCAN:
                 case CMD_DISABLE_P2P_RSP:
                 case WifiMonitor.SUP_REQUEST_IDENTITY:
                 case CMD_TEST_NETWORK_DISCONNECT:
@@ -5967,9 +5963,6 @@ public class WifiStateMachine extends StateMachine {
                 break;
             case CMD_SET_SUSPEND_OPT_ENABLED:
                 s = "CMD_SET_SUSPEND_OPT_ENABLED";
-                break;
-            case CMD_NO_NETWORKS_PERIODIC_SCAN:
-                s = "CMD_NO_NETWORKS_PERIODIC_SCAN";
                 break;
             case CMD_SET_BATCHED_SCAN:
                 s = "CMD_SET_BATCHED_SCAN";
@@ -7987,42 +7980,30 @@ public class WifiStateMachine extends StateMachine {
                 }
             }
 
-            /**
-             * If we have no networks saved, the supplicant stops doing the periodic scan.
-             * The scans are useful to notify the user of the presence of an open network.
-             * Note that these are not wake up scans.
-             */
-            if (!mP2pConnected.get() && mWifiConfigStore.getConfiguredNetworks().size() == 0) {
-                sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
-                        ++mPeriodicScanToken, 0), mSupplicantScanIntervalMs);
-            }
-
             mDisconnectedTimeStamp = System.currentTimeMillis();
 
         }
         @Override
         public boolean processMessage(Message message) {
             boolean ret = HANDLED;
+            long scanIntervalMs = 0;
+
+            if (mWifiConfigStore.getConfiguredNetworks().size() == 0) {
+                scanIntervalMs = mSupplicantScanIntervalMs;
+            } else {
+                scanIntervalMs = mDisconnectedScanPeriodMs;
+            }
 
             logStateAndMessage(message, getClass().getSimpleName());
 
             switch (message.what) {
-                case CMD_NO_NETWORKS_PERIODIC_SCAN:
-                    if (mP2pConnected.get()) break;
-                    if (message.arg1 == mPeriodicScanToken &&
-                            mWifiConfigStore.getConfiguredNetworks().size() == 0) {
-                        startScan(UNKNOWN_SCAN_SOURCE, -1, null, null);
-                        sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
-                                    ++mPeriodicScanToken, 0), mSupplicantScanIntervalMs);
-                    }
-                    break;
                 case WifiManager.FORGET_NETWORK:
                 case CMD_REMOVE_NETWORK:
                     // Set up a delayed message here. After the forget/remove is handled
                     // the handled delayed message will determine if there is a need to
                     // scan and continue
-                    sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
-                                ++mPeriodicScanToken, 0), mSupplicantScanIntervalMs);
+                    sendMessageDelayed(obtainMessage(CMD_START_SCAN,
+                                ++mPeriodicScanToken, 0), scanIntervalMs);
                     ret = NOT_HANDLED;
                     break;
                 case CMD_SET_OPERATIONAL_MODE:
@@ -8066,14 +8047,13 @@ public class WifiStateMachine extends StateMachine {
                     if (message.arg1 == SCAN_ALARM_SOURCE) {
                         // Check if the CMD_START_SCAN message is obsolete (and thus if it should
                         // not be processed) and restart the scan
-                        int period =  mDisconnectedScanPeriodMs;
                         if (mP2pConnected.get()) {
-                           period = (int)Settings.Global.getLong(mContext.getContentResolver(),
+                            scanIntervalMs = (int)Settings.Global.getLong(mContext.getContentResolver(),
                                     Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
                                     mDisconnectedScanPeriodMs);
                         }
                         if (!checkAndRestartDelayedScan(message.arg2,
-                                true, period, null, null)) {
+                                true, (int)scanIntervalMs null, null)) {
                             messageHandlingStatus = MESSAGE_HANDLING_STATUS_OBSOLETE;
                             loge("WifiStateMachine Disconnected CMD_START_SCAN source "
                                     + message.arg1
@@ -8101,20 +8081,14 @@ public class WifiStateMachine extends StateMachine {
                     if (mP2pConnected.get()) {
                         int defaultInterval = mContext.getResources().getInteger(
                                 R.integer.config_wifi_scan_interval_p2p_connected);
-                        long scanIntervalMs = Settings.Global.getLong(mContext.getContentResolver(),
+                        scanIntervalMs = Settings.Global.getLong(mContext.getContentResolver(),
                                 Settings.Global.WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS,
                                 defaultInterval);
                         mWifiNative.setScanInterval((int) scanIntervalMs/1000);
-                    } else if (mWifiConfigStore.getConfiguredNetworks().size() == 0) {
-                        if (DBG) log("Turn on scanning after p2p disconnected");
-                        sendMessageDelayed(obtainMessage(CMD_NO_NETWORKS_PERIODIC_SCAN,
-                                    ++mPeriodicScanToken, 0), mSupplicantScanIntervalMs);
                     } else {
-                        // If P2P is not connected and there are saved networks, then restart
-                        // scanning at the normal period. This is necessary because scanning might
-                        // have been disabled altogether if WIFI_SCAN_INTERVAL_WHEN_P2P_CONNECTED_MS
-                        // was set to zero.
-                        startDelayedScan(mDisconnectedScanPeriodMs, null, null);
+                        if (DBG) log("Turn on scanning after p2p disconnected");
+                        sendMessageDelayed(obtainMessage(CMD_START_SCAN,
+                                    ++mPeriodicScanToken, 0), scanIntervalMs);
                     }
                 case CMD_RECONNECT:
                 case CMD_REASSOCIATE:
