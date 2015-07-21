@@ -1,0 +1,11 @@
+Revision: 9d70bc50e0786328fe161773b539763a23bb5370
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+8062:58-8062:79
+Tue Jul 21 07:56:27 2015 +0000
+Author: JeanX Trivelly <1067908@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0d432251_cfc35d7c
+Bytes: 41
+BTW, Why did you check if P2P connected ?
+
