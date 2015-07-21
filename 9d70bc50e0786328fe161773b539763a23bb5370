@@ -9,3 +9,11 @@ UUID: 0d432251_cfc35d7c
 Bytes: 41
 BTW, Why did you check if P2P connected ?
 
+8062:58-8062:79
+Tue Jul 21 08:06:57 2015 +0000
+Author: Alice Liu <1052234@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0d432251_cfc35d7c
+UUID: 6d849ecc_c2f4824b
+Bytes: 394
+When the message CMD_NO_NETWORKS_PERIODIC_SCAN is processed in DisconnectedState, if p2p is connected, it will not do the scan as the supplicant scan interval 15s. So if p2p is not connected, it doesn't need to do the scan as the disconnected scan interval 10s when the message CMD_START_SCAN is processed in DisconnectedState. We should not permit the both scan periods exist at the same time.
+
