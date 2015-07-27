@@ -17,3 +17,13 @@ UUID: 6d849ecc_c2f4824b
 Bytes: 394
 When the message CMD_NO_NETWORKS_PERIODIC_SCAN is processed in DisconnectedState, if p2p is connected, it will not do the scan as the supplicant scan interval 15s. So if p2p is not connected, it doesn't need to do the scan as the disconnected scan interval 10s when the message CMD_START_SCAN is processed in DisconnectedState. We should not permit the both scan periods exist at the same time.
 
+8062:58-8062:79
+Mon Jul 27 08:18:44 2015 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6d849ecc_c2f4824b
+UUID: cdd4aa39_2d94ad14
+Bytes: 247
+This seems like a likely source of future confusion.
+
+If we want to know whether a scan is already in progress or not, perhaps we need to track it directly somehow (perhaps track the last scan interval value, setting to -1 when there is no scan?).
+
