@@ -4112,11 +4112,15 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         transitionTo(mInitialState);
                     }
                     break;
+                case CMD_SET_OPERATIONAL_MODE:
+                    mOperationalMode = message.arg1;
+                    mWifiConfigManager.setAndEnableLastSelectedConfiguration(
+                            WifiConfiguration.INVALID_NETWORK_ID);
+                    break;
                 case CMD_START_SUPPLICANT:
                 case CMD_STOP_SUPPLICANT:
                 case CMD_START_AP:
                 case CMD_STOP_AP:
-                case CMD_SET_OPERATIONAL_MODE:
                     messageHandlingStatus = MESSAGE_HANDLING_STATUS_DEFERRED;
                     deferMessage(message);
                     break;
