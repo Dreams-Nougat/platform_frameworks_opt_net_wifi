@@ -27,3 +27,11 @@ This seems like a likely source of future confusion.
 
 If we want to know whether a scan is already in progress or not, perhaps we need to track it directly somehow (perhaps track the last scan interval value, setting to -1 when there is no scan?).
 
+8062:58-8062:79
+Mon Aug 03 07:47:46 2015 +0000
+Author: Alice Liu <1052234@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cdd4aa39_2d94ad14
+UUID: 0a56a845_d7245c3a
+Bytes: 376
+Erik, in my opinion, if setting the scan interval to -1 when there is no scan, we have to reset the interval to the original value before starting scan. It will make the code complicated. Another thinking is setting a flag to mark it is doing period scan. But we have to clear this flag accurately when the period scan is stopped. It will make the code logic more complicated.
+
