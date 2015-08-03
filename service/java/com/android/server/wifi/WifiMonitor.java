@@ -596,7 +596,7 @@ public class WifiMonitor {
         }
 
         public synchronized void registerInterfaceMonitor(String iface, WifiMonitor m) {
-            if (DBG) Log.d(TAG, "registerInterface(" + iface + "+" + m.mStateMachine + ")");
+            if (DBG) Log.d(TAG, "registerInterface(" + iface + "+" + m.mStateMachine.getName() + ")");
             mIfaceMap.put(iface, m);
             if (mWifiNative == null) {
                 mWifiNative = m.mWifiNative;
