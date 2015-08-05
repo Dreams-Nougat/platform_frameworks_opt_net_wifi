@@ -7969,10 +7969,14 @@ public class WifiStateMachine extends StateMachine {
                  */
                 startDelayedScan(mDisconnectedScanPeriodMs, null, null);
             } else {
-                /**
-                 * screen dark and PNO supported => scan alarm disabled
-                 */
-                if (mEnableBackgroundScan) {
+                // Screen Off and Disconnected and chipset doesn't support scan offload
+                //              => start scan alarm
+                // Screen Off and Disconnected and chipset does support scan offload
+                //              => will use scan offload (i.e. background scan)
+                if (!mBackgroundScanSupported) {
+                    setScanAlarm(true);
+                } else {
+                    mEnableBackgroundScan = true;
                     /* If a regular scan result is pending, do not initiate background
                      * scan until the scan results are returned. This is needed because
                      * initiating a background scan will cancel the regular scan and
@@ -7982,8 +7986,6 @@ public class WifiStateMachine extends StateMachine {
                     if (!mIsScanOngoing) {
                         enableBackgroundScan(true);
                     }
-                } else {
-                    setScanAlarm(true);
                 }
             }
 
