@@ -198,6 +198,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
     private WifiApConfigStore mWifiApConfigStore;
     private final boolean mP2pSupported;
     private final AtomicBoolean mP2pConnected = new AtomicBoolean(false);
+    private final AtomicBoolean mP2pConnecting = new AtomicBoolean(false);
     private boolean mTemporarilyDisconnectWifi = false;
     private final String mPrimaryDeviceType;
 
@@ -1960,9 +1961,43 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
         }
     }
 
+    private boolean discardScanWhenP2pConnected() {
+
+        if (!mContext.getResources().getBoolean(
+                 R.bool.config_discard_scan_when_p2p_connected)) {
+            if (VDBG) logi("config_discard_scan_when_p2p_connected is not set");
+            return false;
+        }
+
+        if (mP2pConnected.get() || mP2pConnecting.get()) {
+            if (VDBG) logi("mP2pConnected = " + mP2pConnected.get()
+                    + " mP2pConnecting = " + mP2pConnecting.get());
+            return true;
+        }
+
+        return false;
+    }
+
     private void handleScanRequest(int type, Message message) {
         ScanSettings settings = null;
         WorkSource workSource = null;
+        int callingUid = message.arg1;
+
+        // check if scan is allowed
+        if (discardScanWhenP2pConnected()) {
+            if (callingUid == SCAN_ALARM_SOURCE) {
+                return;
+            }
+            try {
+                int googleAppsUid = mContext.getPackageManager().getPackageInfo(
+                        "com.google.android.gms", 0).applicationInfo.uid;
+                if (callingUid == googleAppsUid) {
+                    return;
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                loge("Unable to find com.google.android.gms package");
+            }
+        }
 
         // unbundle parameters
         Bundle bundle = (Bundle) message.obj;
@@ -5718,6 +5753,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                 case WifiP2pServiceImpl.P2P_CONNECTION_CHANGED:
                     NetworkInfo info = (NetworkInfo) message.obj;
                     mP2pConnected.set(info.isConnected());
+                    mP2pConnecting.set(info.getState() == NetworkInfo.State.CONNECTING);
                     break;
                 case WifiP2pServiceImpl.DISCONNECT_WIFI_REQUEST:
                     mTemporarilyDisconnectWifi = (message.arg1 == 1);
@@ -9528,6 +9564,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                 case WifiP2pServiceImpl.P2P_CONNECTION_CHANGED:
                     NetworkInfo info = (NetworkInfo) message.obj;
                     mP2pConnected.set(info.isConnected());
+                    mP2pConnecting.set(info.getState() == NetworkInfo.State.CONNECTING);
                     if (mP2pConnected.get()) {
                         int defaultInterval = mContext.getResources().getInteger(
                                 R.integer.config_wifi_scan_interval_p2p_connected);
