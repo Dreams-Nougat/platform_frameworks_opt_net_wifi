@@ -1816,7 +1816,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
     WifiLinkLayerStats getWifiLinkLayerStats(boolean dbg) {
         WifiLinkLayerStats stats = null;
-        if (mWifiLinkLayerStatsSupported > 0) {
+        if (mIsRunning && mWifiLinkLayerStatsSupported > 0) {
             String name = "wlan0";
             stats = mWifiNative.getWifiLinkLayerStats(name);
             if (name != null && stats == null && mWifiLinkLayerStatsSupported > 0) {
