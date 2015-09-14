@@ -1361,8 +1361,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
     PendingIntent getPrivateBroadcast(String action, int requestCode) {
         Intent intent = new Intent(action, null);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
-        // TODO: Find the correct value so this is not hard coded
-        intent.setPackage("android");
+        intent.setPackage(mContext.getPackageName());
         return PendingIntent.getBroadcast(mContext, requestCode, intent, 0);
     }
 
@@ -6416,7 +6415,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
                     /* send regular delayed shut down */
                     Intent driverStopIntent = new Intent(ACTION_DELAYED_DRIVER_STOP, null);
-                    driverStopIntent.setPackage("android");
+                    driverStopIntent.setPackage(mContext.getPackageName());
                     driverStopIntent.putExtra(DELAYED_STOP_COUNTER, mDelayedStopCounter);
                     mDriverStopIntent = PendingIntent.getBroadcast(mContext,
                             DRIVER_STOP_REQUEST, driverStopIntent,
