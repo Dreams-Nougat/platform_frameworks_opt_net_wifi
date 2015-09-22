@@ -596,7 +596,7 @@ public class WifiMonitor {
         }
 
         public synchronized void registerInterfaceMonitor(String iface, WifiMonitor m) {
-            if (DBG) Log.d(TAG, "registerInterface(" + iface + "+" + m.mStateMachine + ")");
+            if (DBG) Log.d(TAG, "registerInterface(" + iface + ")");
             mIfaceMap.put(iface, m);
             if (mWifiNative == null) {
                 mWifiNative = m.mWifiNative;
@@ -608,7 +608,7 @@ public class WifiMonitor {
             // objects will remain in the mIfaceMap; and won't ever get deleted
 
             WifiMonitor m = mIfaceMap.remove(iface);
-            if (DBG) Log.d(TAG, "unregisterInterface(" + iface + "+" + m.mStateMachine + ")");
+            if (DBG) Log.d(TAG, "unregisterInterface(" + iface + ")");
         }
 
         public synchronized void stopSupplicant() {
