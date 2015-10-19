@@ -110,6 +110,7 @@ import com.android.internal.util.AsyncChannel;
 import com.android.internal.util.Protocol;
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
+import com.android.internal.telephony.PhoneConstants;
 import com.android.server.net.NetlinkTracker;
 import com.android.server.wifi.hotspot2.NetworkDetail;
 import com.android.server.wifi.hotspot2.SupplicantBridge;
@@ -9920,7 +9921,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             TelephonyManager tm = (TelephonyManager)
                     mContext.getSystemService(Context.TELEPHONY_SERVICE);
             if (tm != null) {
-                int appType = 2; // 2 => USIM
+                int appType = PhoneConstants.APPTYPE_USIM;
                 tmResponse = tm.getIccSimChallengeResponse(appType, base64Challenge);
                 logv("Raw Response - " + tmResponse);
             } else {
@@ -9935,17 +9936,47 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             byte tag = result[0];
             if (tag == (byte) 0xdb) {
                 logv("successful 3G authentication ");
-                int res_len = result[1];
-                String res = makeHex(result, 2, res_len);
-                int ck_len = result[res_len + 2];
-                String ck = makeHex(result, res_len + 3, ck_len);
-                int ik_len = result[res_len + ck_len + 3];
-                String ik = makeHex(result, res_len + ck_len + 4, ik_len);
+                int res_offset, res_len;
+                int ck_offset, ck_len;
+                int ik_offset, ik_len;
+                res_offset = 1;
+                res_len = result[res_offset];
+                if (res_len > 16) {
+                    loge("invalid RES len " + res_len);
+                    return;
+                }
+                ck_offset = 1 + res_offset + res_len;
+                if (ck_offset >= result.length) {
+                    loge("malformed response - no CK");
+                    return;
+                }
+                ck_len = result[ck_offset];
+                if (ck_len != 16) {
+                    loge("invalid CK len " + ck_len);
+                    return;
+                }
+                ik_offset = 1 + ck_offset + ck_len;
+                if (ik_offset >= result.length) {
+                    loge("malformed response - no IK");
+                    return;
+                }
+                ik_len = result[ik_offset];
+                if (ik_len != 16) {
+                    loge("invalid IK len " + ik_len);
+                    return;
+                }
+                String res = makeHex(result, 1 + res_offset, res_len);
+                String ck = makeHex(result, 1 + ck_offset, ck_len);
+                String ik = makeHex(result, 1 + ik_offset, ik_len);
                 sb.append(":" + ik + ":" + ck + ":" + res);
                 logv("ik:" + ik + "ck:" + ck + " res:" + res);
             } else if (tag == (byte) 0xdc) {
                 loge("synchronisation failure");
                 int auts_len = result[1];
+                if (auts_len != 14) {
+                    loge("invalid AUTS len " + auts_len);
+                    return;
+                }
                 String auts = makeHex(result, 2, auts_len);
                 res_type = "UMTS-AUTS";
                 sb.append(":" + auts);
