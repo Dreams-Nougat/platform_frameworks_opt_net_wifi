@@ -236,6 +236,8 @@ class SupplicantStateTracker extends StateMachine {
                     transitionOnSupplicantStateChange(stateChangeResult);
                     break;
                 case WifiStateMachine.CMD_RESET_SUPPLICANT_STATE:
+                    sendSupplicantStateChangedBroadcast(SupplicantState.UNINITIALIZED,
+                        mAuthFailureInSupplicantBroadcast);
                     transitionTo(mUninitializedState);
                     break;
                 case WifiManager.CONNECT_NETWORK:
