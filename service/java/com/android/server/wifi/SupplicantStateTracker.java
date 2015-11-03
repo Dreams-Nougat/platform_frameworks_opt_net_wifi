@@ -232,6 +232,12 @@ public class SupplicantStateTracker extends StateMachine {
                     transitionOnSupplicantStateChange(stateChangeResult);
                     break;
                 case WifiStateMachine.CMD_RESET_SUPPLICANT_STATE:
+                    try {
+                        mBatteryStats.noteWifiSupplicantStateChanged(
+                            BatteryStats.WIFI_SUPPL_STATE_UNINITIALIZED, false);
+                    } catch (RemoteException e) {
+                        // Won't happen.
+                    }
                     transitionTo(mUninitializedState);
                     break;
                 case WifiManager.CONNECT_NETWORK:
