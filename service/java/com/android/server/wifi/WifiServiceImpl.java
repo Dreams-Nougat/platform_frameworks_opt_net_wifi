@@ -1643,6 +1643,8 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     @Override
     public void factoryReset() {
         enforceConnectivityInternalPermission();
+        enforceAccessPermission();
+        enforceChangePermission();
 
         if (mUserManager.hasUserRestriction(UserManager.DISALLOW_NETWORK_RESET)) {
             return;
@@ -1657,12 +1659,10 @@ public class WifiServiceImpl extends IWifiManager.Stub {
             // Enable wifi
             setWifiEnabled(true);
             // Delete all Wifi SSIDs
-            List<WifiConfiguration> networks = getConfiguredNetworks();
-            if (networks != null) {
-                for (WifiConfiguration config : networks) {
-                    removeNetwork(config.networkId);
-                }
-                saveConfiguration();
+            if (mWifiStateMachineChannel != null) {
+                mWifiStateMachineChannel.sendMessage(WifiStateMachine.CMD_FACTORY_RESET);
+            } else {
+                Slog.e(TAG, "mWifiStateMachineChannel is not initialized");
             }
         }
     }
