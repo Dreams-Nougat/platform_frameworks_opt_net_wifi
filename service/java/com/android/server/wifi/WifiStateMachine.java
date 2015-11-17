@@ -660,6 +660,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     /* Enable/Disable AutoJoin when associated */
     static final int CMD_ENABLE_AUTOJOIN_WHEN_ASSOCIATED                = BASE + 167;
 
+    /* Factory reset */
+    static final int CMD_FACTORY_RESET                                  = BASE + 168;
+
     /**
      * Used to handle messages bounced between WifiStateMachine and IpManager.
      */
@@ -3975,6 +3978,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     // for no WiFi related work.
                     transitionTo(mInitialState);
                     break;
+                case CMD_FACTORY_RESET:
+                    removeDeferredMessages(CMD_FACTORY_RESET);
+                    deferMessage(message);
+                    break;
                 default:
                     loge("Error! unhandled message" + message);
                     break;
@@ -5373,6 +5380,12 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 case CMD_MATCH_PROVIDER_NETWORK:
                     // TODO(b/31065385): Passpoint config management.
                     replyToMessage(message, message.what, 0);
+                    break;
+                case CMD_FACTORY_RESET:
+                    // Delete all saved networks.
+                    for (WifiConfiguration network : mWifiConfigManager.getSavedNetworks()) {
+                        mWifiConfigManager.removeNetwork(network.networkId, message.sendingUid);
+                    }
                     break;
                 default:
                     return NOT_HANDLED;
