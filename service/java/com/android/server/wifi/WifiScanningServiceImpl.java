@@ -986,7 +986,7 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                 channels = getChannelsForBand(settings.band);
             }
 
-            if (channels == null) {
+            if (channels == null || channels.length == 0) {
                 // still no channels; then there's nothing to scan
                 loge("No channels to scan!!");
                 return -1;
@@ -1050,7 +1050,7 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                     || desiredChannels.length == 0) {
                 // set channels based on band
                 desiredChannels = getChannelsForBand(settings.band);
-                if (desiredChannels == null) {
+                if (desiredChannels == null || desiredChannels.length == 0) {
                     // still no channels; then there's nothing to scan
                     loge("No channels to scan!!");
                     return -1;
@@ -1869,7 +1869,9 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
     }
 
     private static ChannelSpec[] getChannelsForBand(int band) {
-        initChannels();
+        if (!initChannels()) {
+            return new ChannelSpec[0];
+        }
 
         if (band < WifiScanner.WIFI_BAND_24_GHZ || band > WifiScanner.WIFI_BAND_BOTH_WITH_DFS)
             /* invalid value for band */
