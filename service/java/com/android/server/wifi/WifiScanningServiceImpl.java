@@ -693,6 +693,10 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                 desiredChannels = getChannelsForBand(settings.band);
             }
 
+            if (results == null) {
+                results = new ScanData[0];
+            }
+
             // check the channels this client asked for ..
             int num_results = 0;
             for (ScanData result : results) {
