@@ -93,6 +93,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -178,7 +179,7 @@ public class WifiConfigStore extends IpConfigStore {
      * map supplicant config to IP configuration. */
 
     /* Stores a map of NetworkId to ScanCache */
-    private HashMap<Integer, ScanDetailCache> mScanDetailCaches;
+    private ConcurrentHashMap<Integer, ScanDetailCache> mScanDetailCaches;
 
     /**
      * Framework keeps a list of (the CRC32 hashes of) all SSIDs that where deleted by user,
@@ -677,7 +678,7 @@ public class WifiConfigStore extends IpConfigStore {
         mMOManager = new MOManager(new File(PPS_FILE), hs2on);
         mAnqpCache = new AnqpCache();
         mSupplicantBridge = new SupplicantBridge(mWifiNative, this);
-        mScanDetailCaches = new HashMap<>();
+        mScanDetailCaches = new ConcurrentHashMap<>();
 
         mSIMAccessor = new SIMAccessor(mContext);
     }
