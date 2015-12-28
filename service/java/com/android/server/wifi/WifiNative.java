@@ -1762,7 +1762,8 @@ public class WifiNative {
                 }
 
                 sSignificantWifiChangeHandler = handler;
-                if (trackSignificantWifiChangeNative(sWlan0Index, sScanCmdId, settings) == false) {
+                if (trackSignificantWifiChangeNative(sWlan0Index, sSignificantWifiChangeCmdId,
+                                                     settings) == false) {
                     sSignificantWifiChangeHandler = null;
                     return false;
                 }
