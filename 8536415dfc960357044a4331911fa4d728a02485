@@ -1,0 +1,18 @@
+Revision: 8536415dfc960357044a4331911fa4d728a02485
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiScanningServiceImpl.java
+
+989
+Fri Jan 15 05:51:00 2016 +0000
+Author: Daichi Ueura <1022730@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 27e49e25_6c5f5bc5
+Bytes: 37
+This leads to test case fails in GTS.
+
+1053
+Fri Jan 15 05:51:00 2016 +0000
+Author: Daichi Ueura <1022730@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 07df9a57_cbee356d
+Bytes: 37
+This leads to test case fails in GTS.
+
