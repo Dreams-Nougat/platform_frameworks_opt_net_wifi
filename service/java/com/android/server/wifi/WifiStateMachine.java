@@ -1531,22 +1531,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
             String state;
             if (enabled) state = "enabled"; else state = "disabled";
             logd("setScanAlarm " + state
-                    + " defaultperiod " + mDefaultFrameworkScanIntervalMs
-                    + " mBackgroundScanSupported " + mBackgroundScanSupported);
-        }
-        if (mBackgroundScanSupported == false) {
-            // Scan alarm is only used for background scans if they are not
-            // offloaded to the wifi chipset, hence enable the scan alarm
-            // gicing us RTC_WAKEUP of backgroundScan is NOT supported
-            enabled = true;
+                    + " defaultperiod " + mDefaultFrameworkScanIntervalMs);
         }
 
         if (enabled == mAlarmEnabled) return;
         if (enabled) {
             /* Set RTC_WAKEUP alarms if PNO is not supported - because no one is */
             /* going to wake up the host processor to look for access points */
-            mAlarmManager.set(AlarmManager.RTC_WAKEUP,
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis() + mDefaultFrameworkScanIntervalMs,
+                    mDefaultFrameworkScanIntervalMs,
                     mScanIntent);
             mAlarmEnabled = true;
         } else {
@@ -9317,7 +9311,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     /**
                      * screen lit and => start scan immediately
                      */
-                    startScan(UNKNOWN_SCAN_SOURCE, 0, null, null);
+                    startScan(SCAN_ALARM_SOURCE,
+                            mDelayedScanCounter.incrementAndGet(), null, null);
                 } else {
                     /**
                      * screen dark and PNO supported => scan alarm disabled
@@ -9333,7 +9328,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                             enableBackgroundScan(true);
                         }
                     } else {
-                        setScanAlarm(true);
+                        /**
+                         * start scan immediately
+                         */
+                        startScan(SCAN_ALARM_SOURCE,
+                                mDelayedScanCounter.incrementAndGet(), null, null);
                     }
                 }
             }
