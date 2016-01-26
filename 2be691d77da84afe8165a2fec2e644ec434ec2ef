@@ -1,0 +1,18 @@
+Revision: 2be691d77da84afe8165a2fec2e644ec434ec2ef
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+1538
+Tue Jan 26 22:25:33 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f49a3677_66fdd6d0
+Bytes: 117
+Shall we do "if (enabled && mBackgroundScanSupported == false)" so RTC alarm is fired only when PNO is not supported?
+
+1541
+Tue Jan 26 22:25:33 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 14beeac6_edf0c9f5
+Bytes: 136
+Can you elaborate why we change from mAlarmManager.set() to mAlarmManager.setRepeating()? What's the issue with existing implementation?
+

@@ -1,0 +1,18 @@
+Revision: 9e381327ade4d93b5b98e254427887f793045477
+Base-for-patch-set: 4
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+1537
+Tue Jan 26 22:25:33 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f49a3677_e63e2661
+Bytes: 116
+I had the same concern on this logic when reading the code this morning. The change in this block makes sense to me.
+
+1537
+Tue Jan 26 22:25:33 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b4afde8e_5226b460
+Bytes: 91
+I had the same question on this piece of logic. The change of this block makes sense to me.
+
