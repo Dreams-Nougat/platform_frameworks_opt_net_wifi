@@ -47,3 +47,16 @@ At least when in DisconnectedState, we re-enable the alarm when receiving a scan
                 case WifiMonitor.SCAN_FAILED_EVENT:
                     /* Re-enable background scan when a pending scan result is received */
 
+1541
+Thu Jan 28 01:16:23 2016 +0000
+Author: xin He <1056283@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 34fdaec1_a409e20c
+UUID: 14beeac6_6bcadca1
+Bytes: 395
+It is not right.
+mScanIntent-->ACTION_START_SCAN which will call startScan
+Startscan will send message CMD_START_SCAN, which should be handled in L2ConnectedState and here checkAndRestartDelayedScan is called to trigger another scan.
+As rangdy mentioned, both disconnected and connected state will be covered.
+
+With your change, both scan mechanism will run. This will cause too many scans then.
+
