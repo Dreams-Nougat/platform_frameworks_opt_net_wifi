@@ -35,3 +35,15 @@ When mScanIntent trigger, you need to re-enable scanAlarm, but mAlarmEnabled is 
 if (enabled == mAlarmEnabled) return;
 Therefore, scanAlarm can only be triggered once.
 
+1541
+Thu Jan 28 00:53:58 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 34fdaec1_a409e20c
+UUID: f4b5d6da_f7941766
+Bytes: 348
+At least when in DisconnectedState, we re-enable the alarm when receiving a scan result. I am adding Xin who knows more about the history of this code.
+
+                case WifiMonitor.SCAN_RESULTS_EVENT:
+                case WifiMonitor.SCAN_FAILED_EVENT:
+                    /* Re-enable background scan when a pending scan result is received */
+
