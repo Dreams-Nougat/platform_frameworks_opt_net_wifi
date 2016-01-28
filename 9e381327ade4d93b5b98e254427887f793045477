@@ -16,3 +16,24 @@ UUID: b4afde8e_5226b460
 Bytes: 91
 I had the same question on this piece of logic. The change of this block makes sense to me.
 
+Base-for-patch-set: 5
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+1544:8-1544:45
+Thu Jan 28 03:11:23 2016 +0000
+Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 14f8aad1_630e42c3
+Bytes: 568
+Hi, Xin:
+mScanIntent-->ACTION_START_SCAN-->startScan.
+Startscan will send message CMD_START_SCAN, which should be handled in DisConnectedState and here checkAndRestartDelayedScan is called to trigger another scan.
+checkAndRestartDelayedScan --> startDelayedScan --> setScanAlarm(true);
+but mAlarmEnabled is true.
+
+Hi, Randy:
+                case WifiMonitor.SCAN_RESULTS_EVENT:
+                case WifiMonitor.SCAN_FAILED_EVENT:
+                    /* Re-enable background scan when a pending scan result is received */
+
+Here handle "BackgroundScanSupported == true".
+
