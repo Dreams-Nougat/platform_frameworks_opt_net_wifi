@@ -37,3 +37,14 @@ Hi, Randy:
 
 Here handle "BackgroundScanSupported == true".
 
+1544:8-1544:45
+Mon Feb 08 19:07:48 2016 +0000
+Author: xin He <1056283@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 14f8aad1_630e42c3
+UUID: 3d53d428_06903a37
+Bytes: 426
+Looks to me, the only bug is when we get WifiMonitor.SCAN_RESULTS_EVENT / WifiMonitor.SCAN_FAILED_EVENT
+if it is SCAN_ALARM_SOURCE, turn mAlarmEnabled  to false. Then the checkAndRestartDelayedScan --> startDelayedScan --> setScanAlarm(true) can go through. This change is smaller and safter
+
+We can not remove if (mBackgroundScanSupported == false) since if PNO support, we need use PNO scan when disconnected and screen off.
+
