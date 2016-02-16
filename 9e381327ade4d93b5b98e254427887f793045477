@@ -64,6 +64,15 @@ UUID: dd255844_73f06083
 Bytes: 89
 If PNO support, you should use PNO when disconnected and screen off instead of scan alarm
 
+1544:8-1544:45
+Tue Feb 16 08:36:23 2016 +0000
+Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: dd255844_73f06083
+UUID: 9d86802c_fe95c5f5
+Bytes: 173
+OK, "if PNO support, should use PNO" is correct. So,setScanAlarm is only used when mBackgroundScanSupported == false. 
+And if setScanAlarm(false), then enabled is also true.
+
 9424:24-9424:25
 Tue Feb 16 06:18:14 2016 +0000
 Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
