@@ -19,6 +19,14 @@ I had the same question on this piece of logic. The change of this block makes s
 Base-for-patch-set: 5
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
+1541:12-1541:19
+Tue Feb 16 09:25:15 2016 +0000
+Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: bd6b4469_6a7397b8
+Bytes: 175
+If mBackgroundScanSupported == false, then enable always is true, when call setScanAlarm(false), enable will become true,
+so, you can not successfully call setScanAlarm(fase).
+
 1544:8-1544:45
 Thu Jan 28 03:11:23 2016 +0000
 Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
