@@ -48,3 +48,19 @@ if it is SCAN_ALARM_SOURCE, turn mAlarmEnabled  to false. Then the checkAndResta
 
 We can not remove if (mBackgroundScanSupported == false) since if PNO support, we need use PNO scan when disconnected and screen off.
 
+1544:8-1544:45
+Tue Feb 16 06:18:14 2016 +0000
+Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3d53d428_06903a37
+UUID: 3d775410_af7239b1
+Bytes: 47
+If PNO support, scan alarm will not be enabled.
+
+9424:24-9424:25
+Tue Feb 16 06:18:14 2016 +0000
+Author: Shuxiao Zhang <1090168@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7d170cd9_d82f0d86
+Bytes: 109
+Hi, Xin, "if it is SCAN_ALARM_SOURCE, turn mAlarmEnabled  to false."
+Here is the mAlaramEnabled set to false?
+
