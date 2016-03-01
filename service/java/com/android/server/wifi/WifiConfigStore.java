@@ -242,6 +242,7 @@ public class WifiConfigStore extends IpConfigStore {
     private static final String SCORER_OVERRIDE_AND_SWITCH_KEY = "SCORER_OVERRIDE_AND_SWITCH";
     private static final String VALIDATED_INTERNET_ACCESS_KEY = "VALIDATED_INTERNET_ACCESS";
     private static final String NO_INTERNET_ACCESS_REPORTS_KEY = "NO_INTERNET_ACCESS_REPORTS";
+    private static final String NO_INTERNET_ACCESS_EXPECTED_KEY = "NO_INTERNET_ACCESS_EXPECTED";
     private static final String EPHEMERAL_KEY = "EPHEMERAL";
     private static final String NUM_ASSOCIATION_KEY = "NUM_ASSOCIATION";
     private static final String DELETED_CRC32_KEY = "DELETED_CRC32";
@@ -2143,6 +2144,8 @@ public class WifiConfigStore extends IpConfigStore {
                             Integer.toString(config.numNoInternetAccessReports) + NL);
                     out.writeUTF(VALIDATED_INTERNET_ACCESS_KEY + SEPARATOR +
                             Boolean.toString(config.validatedInternetAccess) + NL);
+                    out.writeUTF(NO_INTERNET_ACCESS_EXPECTED_KEY + SEPARATOR +
+                            Boolean.toString(config.noInternetAccessExpected) + NL);
                     out.writeUTF(EPHEMERAL_KEY + SEPARATOR +
                             Boolean.toString(config.ephemeral) + NL);
                     if (config.creationTime != null) {
@@ -2385,6 +2388,9 @@ public class WifiConfigStore extends IpConfigStore {
                             break;
                         case VALIDATED_INTERNET_ACCESS_KEY:
                             config.validatedInternetAccess = Boolean.parseBoolean(value);
+                            break;
+                        case NO_INTERNET_ACCESS_EXPECTED_KEY:
+                            config.noInternetAccessExpected = Boolean.parseBoolean(value);
                             break;
                         case CREATION_TIME_KEY:
                             config.creationTime = value;
