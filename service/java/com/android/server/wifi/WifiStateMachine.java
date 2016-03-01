@@ -9065,6 +9065,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     config = getCurrentWifiConfiguration();
                     if (config != null) {
                         config.noInternetAccessExpected = accept;
+                        config.dirty = true;
+                        mWifiConfigStore.writeKnownNetworkHistory(false);
                     }
                     return HANDLED;
                 case CMD_TEST_NETWORK_DISCONNECT:
