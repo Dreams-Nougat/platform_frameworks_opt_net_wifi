@@ -9,3 +9,12 @@ UUID: 02feade5_14d59abc
 Bytes: 120
 I can understand going to provisionDiscoveryState - but why remove the INFOMRMATION_IS_CURRENTLY_UNAVAILABLE processing?
 
+1723
+Thu Mar 03 09:05:11 2016 +0000
+Author: RiadhX Khaldi <1097698@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 02feade5_14d59abc
+UUID: a2b881d5_93bbf4a0
+Bytes: 70
+This was removing by mistake in the porting process !
+I will fix that.
+
