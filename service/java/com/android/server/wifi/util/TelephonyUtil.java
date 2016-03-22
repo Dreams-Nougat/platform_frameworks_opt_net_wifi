@@ -128,6 +128,10 @@ public class TelephonyUtil {
     }
 
     private static byte[] parseHex(String hex) {
+        return parseHex(hex, true);
+    }
+
+    private static byte[] parseHex(String hex, boolean needLength) {
         /* This only works for good input; don't throw bad data at it */
         if (hex == null) {
             return new byte[0];
@@ -137,12 +141,22 @@ public class TelephonyUtil {
             throw new NumberFormatException(hex + " is not a valid hex string");
         }
 
-        byte[] result = new byte[(hex.length()) / 2 + 1];
-        result[0] = (byte) ((hex.length()) / 2);
+        byte[] result = null;
+        if (needLength) {
+            result = new byte[(hex.length()) / 2 + 1];
+            result[0] = (byte) ((hex.length()) / 2);
+        } else {
+            result = new byte[(hex.length()) / 2];
+        }
+
         for (int i = 0, j = 1; i < hex.length(); i += 2, j++) {
             int val = parseHex(hex.charAt(i)) * 16 + parseHex(hex.charAt(i + 1));
             byte b = (byte) (val & 0xFF);
-            result[j] = b;
+            if (needLength) {
+                result[j] = b;
+            } else {
+                result[j - 1] = b;
+            }
         }
 
         return result;
@@ -213,10 +227,37 @@ public class TelephonyUtil {
             // Try USIM first for authentication.
             String tmResponse = tm.getIccAuthentication(TelephonyManager.APPTYPE_USIM,
                     TelephonyManager.AUTHTYPE_EAP_SIM, base64Challenge);
+            boolean isLengthRequired = true;
             if (tmResponse == null) {
                 // Then, in case of failure, issue may be due to sim type, retry as a simple sim
                 tmResponse = tm.getIccAuthentication(TelephonyManager.APPTYPE_SIM,
                         TelephonyManager.AUTHTYPE_EAP_SIM, base64Challenge);
+
+                if (tmResponse == null) {
+                    /*
+                     * add a new app type to handle 2G autehtnication @ 3GPP TS 11.11:
+                     * Standard       Cellular_auth     Type Command
+                     *
+                     * 3GPP TS 31.102 3G_authentication [Length][RAND][Length][AUTN]
+                     *                         [Length][RES][Length][CK][Length][IK] and more
+                     *                2G_authentication [Length][RAND]
+                     *                         [Length][SRES][Length][Cipher Key Kc]
+                     * 3GPP TS 11.11  2G_authentication [RAND]
+                     *                         [SRES][Cipher Key Kc]
+                     */
+                    try {
+                        rand = parseHex(challenge, false);
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "malformed challenge");
+                        continue;
+                    }
+                    base64Challenge = Base64.encodeToString(
+                            rand, Base64.NO_WRAP);
+                    /* SIM, appType passed in should be APPTYPE_SIM */
+                    tmResponse = tm.getIccAuthentication(tm.APPTYPE_SIM,
+                            tm.AUTHTYPE_EAP_SIM, base64Challenge);
+                    isLengthRequired = false;
+                }
             }
             Log.v(TAG, "Raw Response - " + tmResponse);
 
@@ -227,25 +268,32 @@ public class TelephonyUtil {
 
             byte[] result = Base64.decode(tmResponse, Base64.DEFAULT);
             Log.v(TAG, "Hex Response -" + makeHex(result));
-            int sresLen = result[0];
-            if (sresLen >= result.length) {
-                Log.e(TAG, "malfomed response - " + tmResponse);
-                return null;
+            if (!isLengthRequired) {
+                String sres = makeHex(result, 0, 4);
+                String kc = makeHex(result, 4, 8);
+                sb.append(":" + kc + ":" + sres);
+                Log.v(TAG, "kc:" + kc + " sres:" + sres);
+            } else {
+                int sresLen = result[0];
+                if (sresLen >= result.length) {
+                    Log.e(TAG, "malfomed response - " + tmResponse);
+                    return null;
+                }
+                String sres = makeHex(result, 1, sresLen);
+                int kcOffset = 1 + sresLen;
+                if (kcOffset >= result.length) {
+                    Log.e(TAG, "malfomed response - " + tmResponse);
+                    return null;
+                }
+                int kcLen = result[kcOffset];
+                if (kcOffset + kcLen > result.length) {
+                    Log.e(TAG, "malfomed response - " + tmResponse);
+                    return null;
+                }
+                String kc = makeHex(result, 1 + kcOffset, kcLen);
+                sb.append(":" + kc + ":" + sres);
+                Log.v(TAG, "kc:" + kc + " sres:" + sres);
             }
-            String sres = makeHex(result, 1, sresLen);
-            int kcOffset = 1 + sresLen;
-            if (kcOffset >= result.length) {
-                Log.e(TAG, "malfomed response - " + tmResponse);
-                return null;
-            }
-            int kcLen = result[kcOffset];
-            if (kcOffset + kcLen > result.length) {
-                Log.e(TAG, "malfomed response - " + tmResponse);
-                return null;
-            }
-            String kc = makeHex(result, 1 + kcOffset, kcLen);
-            sb.append(":" + kc + ":" + sres);
-            Log.v(TAG, "kc:" + kc + " sres:" + sres);
         }
 
         return sb.toString();
