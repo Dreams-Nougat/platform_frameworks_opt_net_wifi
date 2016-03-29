@@ -8779,6 +8779,19 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                     return HANDLED;
                 case CMD_SET_OPERATIONAL_MODE:
                     if (message.arg1 != CONNECT_MODE) {
+                        if (message.arg1 == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+                            /**
+                             * To avoid getting stuck for a long time here when disabling Wi-Fi in
+                             * the case that Wi-Fi scanning is on and roaming is ongoing. When
+                             * received CMD_SET_OPERATIONAL_MODE with SCAN_ONLY_WITH_WIFI_OFF_MODE,
+                             * handle it as roaming failure
+                             */
+                            if (DBG) log("Stop roaming to disable Wi-Fi -> disconnect");
+                            mRoamFailCount++;
+                            handleNetworkDisconnect();
+                            mWifiNative.disconnect();
+                            transitionTo(mDisconnectedState);
+                        }
                         deferMessage(message);
                     }
                     break;
