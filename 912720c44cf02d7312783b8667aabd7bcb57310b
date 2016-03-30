@@ -1,0 +1,11 @@
+Revision: 912720c44cf02d7312783b8667aabd7bcb57310b
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+10343:17-10343:18
+Wed Mar 30 07:29:11 2016 +0000
+Author: Norman Liao <1100304@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f17a4d32_cbdad509
+Bytes: 21
+incorrect indentation
+
