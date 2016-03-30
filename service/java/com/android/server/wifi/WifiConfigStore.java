@@ -2879,6 +2879,16 @@ public class WifiConfigStore extends IpConfigStore {
                             break setVariables;
                         }
                 }
+
+                // Extend to multiple sim cards
+                if (config.simSlot != null &&
+                        !mWifiNative.setNetworkVariable(
+                        netId,
+                        WifiConfiguration.SIMSLOT_VAR_NAME,
+                        removeDoubleQuotes(config.simSlot))) {
+                    Log.e(TAG, "failed to set simSlot: " + config.simSlot);
+                    break setVariables;
+                }
             }
             updateFailed = false;
         } // End of setVariables
@@ -3742,6 +3752,13 @@ public class WifiConfigStore extends IpConfigStore {
 
         migrateCerts(config.enterpriseConfig);
         // initializeSoftwareKeystoreFlag(config.enterpriseConfig, mKeyStore);
+        // Extend to multiple sim cards
+        value = mWifiNative.getNetworkVariable(netId, WifiConfiguration.SIMSLOT_VAR_NAME);
+        if (!TextUtils.isEmpty(value)) {
+            config.simSlot = value;
+        } else {
+            config.simSlot = null;
+        }
     }
 
     private static String removeDoubleQuotes(String string) {
