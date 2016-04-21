@@ -152,8 +152,8 @@ public class WifiAutoJoinController {
         }
         long milli = System.currentTimeMillis();
         if (VDBG) {
-            logDbg("ageScanResultsOut delay " + Integer.valueOf(delay) + " size "
-                    + Integer.valueOf(scanResultCache.size()) + " now " + Long.valueOf(milli));
+            logDbg("ageScanResultsOut delay " + Integer.toString(delay) + " size "
+                    + Integer.toString(scanResultCache.size()) + " now " + Long.toString(milli));
         }
 
         Iterator<HashMap.Entry<String, ScanDetail>> iter = scanResultCache.entrySet().iterator();
