@@ -1,0 +1,11 @@
+Revision: 68997aabfea2967e4cbeb4c30687e1bb63a864a9
+Patch-set: 1
+File: /COMMIT_MSG
+
+9:22-9:26
+Fri Apr 22 14:25:43 2016 +0000
+Author: Neil Fuller <1038039@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e8a6e026_8ed07b47
+Bytes: 131
+This is another thing to be a comment on the gerrit review, not in the commit. If I say yes, you have to fix it and then re-review.
+
