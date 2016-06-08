@@ -1,0 +1,25 @@
+Revision: 8add67a26ff8b29e612f6c63ab3513d2bf6e665c
+Patch-set: 3
+File: service/java/com/android/server/wifi/SupplicantStateTracker.java
+
+105
+Wed Jun 08 14:26:29 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: a31df4f8_146c6c1d
+Bytes: 48
+Note that mScanState inherits from mDefaultState
+
+238
+Wed Jun 08 14:26:29 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: a31df4f8_745b6877
+Bytes: 58
+Note that DefaultState handles CMD_RESET_SUPPLICANT_STATE.
+
+315
+Wed Jun 08 14:26:29 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: a31df4f8_94587c7a
+Bytes: 43
+...therefore handling it here is redundant.
+
