@@ -16,10 +16,26 @@ UUID: a31df4f8_745b6877
 Bytes: 58
 Note that DefaultState handles CMD_RESET_SUPPLICANT_STATE.
 
+238
+Sat Jun 18 06:58:15 2016 +0000
+Author: Yafei Liu <1107918@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: a31df4f8_745b6877
+UUID: af94f8c1_fbac8fa1
+Bytes: 153
+CMD_RESET_SUPPLICANT_STATE here handled nothing but change state to UninitializedState, and UninitializedState does nothing about changing battery state.
+
 315
 Wed Jun 08 14:26:29 2016 +0000
 Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: a31df4f8_94587c7a
 Bytes: 43
 ...therefore handling it here is redundant.
+
+315
+Sat Jun 18 06:58:15 2016 +0000
+Author: Yafei Liu <1107918@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: a31df4f8_94587c7a
+UUID: af94f8c1_bbb207fe
+Bytes: 572
+Though DefaultState handles CMD_RESET_SUPPLICANT_STATE, it does nothing but change state to UninitializedState, which have no ability to handle battery state changing actions, this is right for most situations, but will cause problems like https://code.google.com/p/android/issues/detail?id=196120. Adding STATECMD_RESET_SUPPLICANT_STATE handler to ScanState make sure battery state will change to disconnect when WiFi has finished scanning but accessed to no WiFi net work, this is a particular situation, it needs special handle action, so I don't think it is redundant.
 
