@@ -24,6 +24,14 @@ UUID: af94f8c1_fbac8fa1
 Bytes: 153
 CMD_RESET_SUPPLICANT_STATE here handled nothing but change state to UninitializedState, and UninitializedState does nothing about changing battery state.
 
+238
+Mon Jun 20 16:25:38 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: af94f8c1_fbac8fa1
+UUID: 896bb469_6aef17bd
+Bytes: 125
+In this case, we should probably put the StateChangedBroadcast here instead, or perhaps in the onEnter for UninitializedState
+
 315
 Wed Jun 08 14:26:29 2016 +0000
 Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
