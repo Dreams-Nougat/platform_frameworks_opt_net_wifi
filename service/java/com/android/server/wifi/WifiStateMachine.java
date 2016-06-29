@@ -7665,9 +7665,20 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                             break;
                         }
 
-                        String configKey = config.configKey(true /* allowCached */);
-                        WifiConfiguration savedConfig =
-                                mWifiConfigStore.getWifiConfiguration(configKey);
+                        WifiConfiguration savedConfig = null;
+                        if (config.SSID != null) {
+                            String configKey = config.configKey(true /* allowCached */);
+                            savedConfig = mWifiConfigStore.getWifiConfiguration(configKey);
+                        } else {
+                            savedConfig = mWifiConfigStore.getWifiConfiguration(config.networkId);
+                            if (savedConfig == null) {
+                                // When connecting to an access point, if the ssid is null and networkid
+                                // is INVALID_NETWORK_ID, abandon connect.
+                                loge("Failed to connect config: " + config + " netId: " + config.networkId);
+                                replyToMessage(message, WifiManager.CONNECT_NETWORK_FAILED, WifiManager.ERROR);
+                                break;
+                            }
+                        }
                         if (savedConfig != null) {
                             // There is an existing config with this netId, but it wasn't exposed
                             // (either AUTO_JOIN_DELETED or ephemeral; see WifiConfigStore#
