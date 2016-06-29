@@ -7736,7 +7736,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
 
                     didDisconnect = false;
                     if (mLastNetworkId != WifiConfiguration.INVALID_NETWORK_ID
-                            && mLastNetworkId != netId) {
+                            && mLastNetworkId == netId) {
                         /** Supplicant will ignore the reconnect if we are currently associated,
                          * hence trigger a disconnect
                          */
