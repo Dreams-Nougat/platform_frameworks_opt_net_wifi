@@ -149,6 +149,14 @@ final class WifiNotificationController {
         mNotificationEnabledSettingObserver = new NotificationEnabledSettingObserver(
                 new Handler(looper));
         mNotificationEnabledSettingObserver.register();
+
+        mWifiStateMachine.registerScanResultsEventHandler(new Handler(looper) {
+            @Override
+            public void handleMessage(Message msg) {
+                checkAndSetNotification(mNetworkInfo,
+                        mWifiStateMachine.syncGetScanResultsList());
+            }
+        });
     }
 
     private synchronized void checkAndSetNotification(NetworkInfo networkInfo,

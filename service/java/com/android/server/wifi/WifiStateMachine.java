@@ -81,6 +81,7 @@ import android.net.wifi.p2p.IWifiP2pManager;
 import android.os.BatteryStats;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
 import android.os.Looper;
@@ -1071,6 +1072,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_SCAN_AVAILABLE, WIFI_STATE_DISABLED);
         mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+    }
+
+    void registerScanResultsEventHandler(Handler handler) {
+        mWifiMonitor.registerHandler(mInterfaceName, WifiMonitor.SCAN_RESULTS_EVENT, handler);
     }
 
     class IpManagerCallback extends IpManager.Callback {
