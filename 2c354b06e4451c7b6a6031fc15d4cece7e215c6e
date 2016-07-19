@@ -1,5 +1,14 @@
 Revision: 2c354b06e4451c7b6a6031fc15d4cece7e215c6e
 Patch-set: 1
+File: /COMMIT_MSG
+
+20
+Tue Jul 19 20:49:35 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0a425b4c_473989f8
+Bytes: 36
+Please put the bug id 30149515 here.
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 8790
