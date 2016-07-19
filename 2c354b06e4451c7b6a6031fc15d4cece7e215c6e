@@ -1,0 +1,24 @@
+Revision: 2c354b06e4451c7b6a6031fc15d4cece7e215c6e
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+8790
+Tue Jul 19 19:47:31 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0a425b4c_91ca0f72
+Bytes: 166
+We probably don't want to increment mRoamFailCount here as the roaming is cancelled. It didn't fail. The count is more for roaming watchdog to detect roaming failure.
+
+8795
+Tue Jul 19 19:47:31 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0a425b4c_ccdebe02
+Bytes: 266
+Do we still want to deferMessage() for the message.arg1 == SCAN_ONLY_WITH_WIFI_OFF_MODE case? If not, consider reorganizing the code to sth like
+
+if (message.arg1 == SCAN_ONLY_WITH_WIFI_OFF_MODE) {
+   ...
+} else if (message.arg1 != CONNECT_MODE) {
+  deferMessage()
+}
+
