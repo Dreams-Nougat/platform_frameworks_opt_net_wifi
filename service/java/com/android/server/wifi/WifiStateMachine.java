@@ -6542,7 +6542,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     }
                     break;
                 case CMD_DISCONNECT:
-                    if (mVerboseLoggingEnabled) log("Ignore CMD_DISCONNECT when already disconnected.");
+                    if (SupplicantState.isConnecting(mWifiInfo.getSupplicantState())) {
+                        if (mVerboseLoggingEnabled) {
+                            log("CMD_DISCONNECT when supplicant is connecting - do not ignore");
+                        }
+                        mWifiNative.disconnect();
+                        break;
+                    }
+                    if (mVerboseLoggingEnabled) {
+                        log("Ignore CMD_DISCONNECT when already disconnected.");
+		    }
                     break;
                 /* Ignore network disconnect */
                 case WifiMonitor.NETWORK_DISCONNECTION_EVENT:
