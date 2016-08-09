@@ -1,0 +1,11 @@
+Revision: 63ed9cc9689ba731a20c5089fe99c5361202642b
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiNative.java
+
+320
+Tue Aug 09 20:57:53 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f9c96b7a_3fb90b91
+Bytes: 46
+Should we also not log the anonymous identity?
+
