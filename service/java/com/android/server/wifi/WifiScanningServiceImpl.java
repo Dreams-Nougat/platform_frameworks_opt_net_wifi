@@ -678,6 +678,9 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
         }
 
         void reportScanResults(ScanData[] results) {
+            if (results == null) {
+                return;
+            }
             Iterator<Integer> it = mScanSettings.keySet().iterator();
             while (it.hasNext()) {
                 int handler = it.next();
