@@ -409,8 +409,11 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                         removeScanRequest(ci, msg.arg2);
                         break;
                     case WifiScanner.CMD_GET_SCAN_RESULTS:
-                        reportScanResults();
-                        replySucceeded(msg);
+                        if (reportScanResults()) {
+                            replySucceeded(msg);
+                        } else {
+                            replyFailed(msg, WifiScanner.REASON_UNSPECIFIED, "not implemented");
+                        }
                         break;
                     case WifiScanner.CMD_START_SINGLE_SCAN:
                         if (addSingleScanRequest(ci, msg.arg2, (ScanSettings) msg.obj)) {
@@ -1314,6 +1317,11 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
 
     boolean reportScanResults() {
         ScanData results[] = WifiNative.getScanResults(/* flush = */ true);
+        if (results == null) {
+            // nothing to report
+            Log.d(TAG,"The report scan results is null, maybe not implemented.");
+            return false;
+        }
         Collection<ClientInfo> clients = mClients.values();
         for (ClientInfo ci2 : clients) {
             ci2.reportScanResults(results);
