@@ -37,6 +37,7 @@ import com.android.internal.R;
 import com.android.server.am.BatteryStatsService;
 import com.android.server.net.DelayedDiskWrite;
 import com.android.server.net.IpConfigStore;
+import com.android.server.wifi.util.WifiPermissionsWrapper;
 
 import java.util.ArrayList;
 
@@ -84,6 +85,7 @@ public class WifiInjector {
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
     private WifiScanner mWifiScanner;
+    private WifiPermissionsWrapper mWifiPermissionsWrapper;
 
     private final boolean mUseRealLogger;
 
@@ -154,6 +156,7 @@ public class WifiInjector {
         mWifiLastResortWatchdog = new WifiLastResortWatchdog(mWifiController, mWifiMetrics);
         mWifiMulticastLockManager = new WifiMulticastLockManager(mWifiStateMachine,
                 BatteryStatsService.getService());
+        mWifiPermissionsWrapper = new WifiPermissionsWrapper(context);
     }
 
     /**
@@ -321,5 +324,8 @@ public class WifiInjector {
                     mWifiStateMachineHandlerThread.getLooper());
         }
         return mWifiScanner;
+    }
+    public WifiPermissionsWrapper getWifiPermissionsWrapper() {
+      return mWifiPermissionsWrapper;
     }
 }
