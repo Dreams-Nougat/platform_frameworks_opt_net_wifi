@@ -110,6 +110,10 @@ public class WifiInjector {
         mContext = context;
         mUseRealLogger = mContext.getResources().getBoolean(
                 R.bool.config_wifi_enable_wifi_firmware_debugging);
+        mSettingsStore = new WifiSettingsStore(mContext);
+        mWifiPermissionsWrapper = new WifiPermissionsWrapper(mContext);
+        mWifiPermissionsUtil = new WifiPermissionsUtil(mWifiPermissionsWrapper, mContext,
+                mSettingsStore, UserManager.get(mContext));
 
         // Now create and start handler threads
         mWifiServiceHandlerThread = new HandlerThread("WifiService");
@@ -146,13 +150,12 @@ public class WifiInjector {
         // Config Manager
         mWifiConfigManager = new WifiConfigManager(mContext, mFrameworkFacade, mClock,
                 UserManager.get(mContext), TelephonyManager.from(mContext),
-                mWifiKeyStore, mWifiConfigStore, mWifiConfigStoreLegacy);
+                mWifiKeyStore, mWifiConfigStore, mWifiConfigStoreLegacy, mWifiPermissionsWrapper);
         mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager, mClock);
 
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
                 mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
-        mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mWifiStateMachine,
@@ -163,9 +166,6 @@ public class WifiInjector {
         mWifiLastResortWatchdog = new WifiLastResortWatchdog(mWifiController, mWifiMetrics);
         mWifiMulticastLockManager = new WifiMulticastLockManager(mWifiStateMachine,
                 BatteryStatsService.getService());
-        mWifiPermissionsWrapper = new WifiPermissionsWrapper(mContext);
-        mWifiPermissionsUtil = new WifiPermissionsUtil(mWifiPermissionsWrapper, mContext,
-                mSettingsStore, UserManager.get(mContext));
         mPasspointManager = new PasspointManager(mContext, this);
     }
 
