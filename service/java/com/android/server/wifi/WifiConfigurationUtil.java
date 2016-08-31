@@ -139,23 +139,24 @@ public class WifiConfigurationUtil {
      *
      * @param existingConfig Existing WifiConfiguration object corresponding to the network.
      * @param newConfig      New WifiConfiguration object corresponding to the network.
-     * @return true if proxy parameters have changed, false otherwise.
+     * @return true if proxy parameters have changed, false if no existing config and proxy settings
+     * are NONE, false otherwise.
      */
     public static boolean hasProxyChanged(WifiConfiguration existingConfig,
             WifiConfiguration newConfig) {
-        if (existingConfig.getProxySettings() != newConfig.getProxySettings()) {
+        if (existingConfig == null) {
+            return newConfig.getProxySettings() != IpConfiguration.ProxySettings.NONE;
+        }
+        if (newConfig.getProxySettings() != existingConfig.getProxySettings()) {
             return true;
         }
-        if (newConfig.getProxySettings() == IpConfiguration.ProxySettings.PAC) {
-            ProxyInfo existingHttpProxy = existingConfig.getHttpProxy();
-            ProxyInfo newHttpProxy = newConfig.getHttpProxy();
-            if (existingHttpProxy != null) {
-                return !existingHttpProxy.equals(newHttpProxy);
-            } else {
-                return (newHttpProxy != null);
-            }
+        ProxyInfo existingHttpProxy = existingConfig.getHttpProxy();
+        ProxyInfo newHttpProxy = newConfig.getHttpProxy();
+        if (existingHttpProxy != null) {
+            return !existingHttpProxy.equals(newHttpProxy);
+        } else {
+            return (newHttpProxy != null);
         }
-        return false;
     }
 
     /**
