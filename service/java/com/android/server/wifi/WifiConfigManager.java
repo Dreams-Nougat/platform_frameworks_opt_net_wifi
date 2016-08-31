@@ -849,7 +849,13 @@ public class WifiConfigManager {
 
         return newInternalConfig;
     }
-
+    private void printProxyTest(WifiConfiguration conf, WifiConfiguration eConf, int uid) {
+        Log.e(TAG, "proxyTest: hasHttpProxy="
+                + (conf != null ? String.valueOf(hasHttpProxy(conf)) : "null")
+                + ", canModifyProxySettings=" + canModifyProxySettings(uid)
+                + ", existingHttp="
+                + (conf != null ? String.valueOf(hasHttpProxy(eConf)) : "null"));
+    }
     /**
      * Add a network or update a network configuration to our database.
      * If the supplied networkId is INVALID_NETWORK_ID, we create a new empty
@@ -869,6 +875,16 @@ public class WifiConfigManager {
         WifiConfiguration existingInternalConfig = getInternalConfiguredNetwork(config);
         // No existing network found. So, potentially a network add.
         if (existingInternalConfig == null) {
+            printProxyTest(config, existingInternalConfig, uid);
+            // Only add networks with proxy settings if the user has permission to
+            if (hasHttpProxy(config) && !canModifyProxySettings(uid)) {
+                Log.e(TAG, "proxyTest: NEW NETWORK:\n"
+                        + (config != null ? config.toString() : "null")
+                        + "\n--NEW NETWORK COMPLETE");
+                Log.e(TAG, "UID " + uid + " does not have permission to modify proxy Settings "
+                        + config.configKey());
+                return new NetworkUpdateResult(WifiConfiguration.INVALID_NETWORK_ID);
+            }
             newInternalConfig = createNewInternalWifiConfigurationFromExternal(config, uid);
             // Since the original config provided may have had an empty
             // {@link WifiConfiguration#allowedKeyMgmt} field, check again if we already have a
@@ -877,6 +893,18 @@ public class WifiConfigManager {
         }
         // Existing network found. So, a network update.
         if (existingInternalConfig != null) {
+            printProxyTest(config, existingInternalConfig, uid);
+            // Check the User has permission to modify proxy settings or no proxy modification is
+            // occurring, before we let it update this network
+            if (!(canModifyProxySettings(uid)
+                    || !hasHttpProxy(config) && !hasHttpProxy(existingInternalConfig))) {
+                Log.e(TAG, "proxyTest: EXISTING NETWORK:\n"
+                        + (config != null ? config.toString() : "null")
+                        + "\n--EXISTING NETWORK COMPLETE");
+                Log.e(TAG, "UID " + uid + " does not have permission to modify proxy Settings "
+                        + config.configKey());
+                return new NetworkUpdateResult(WifiConfiguration.INVALID_NETWORK_ID);
+            }
             // Check for the app's permission before we let it update this network.
             if (!canModifyNetwork(existingInternalConfig, uid, DISALLOW_LOCKDOWN_CHECK_BYPASS)) {
                 Log.e(TAG, "UID " + uid + " does not have permission to update configuration "
@@ -2500,5 +2528,33 @@ public class WifiConfigManager {
         pw.println("WifiConfigManager - Configured networks End ----");
         pw.println("WifiConfigManager - Next network ID to be allocated " + mNextNetworkId);
         pw.println("WifiConfigManager - Last selected network ID " + mLastSelectedNetworkId);
+    }
+
+    /**
+     * Returns true if given WifiConfiguration has http proxy settings set
+     */
+    private boolean hasHttpProxy(WifiConfiguration config) {
+        if (config == null) {
+            return false;
+        }
+        return config.getIpConfiguration() != null
+                && config.getProxySettings() != IpConfiguration.ProxySettings.UNASSIGNED;
+    }
+
+    /**
+     * Returns true if the given uid has permission to add or change proxy settings
+     */
+    private boolean canModifyProxySettings(int uid) {
+        final DevicePolicyManagerInternal dpmi = LocalServices.getService(
+                DevicePolicyManagerInternal.class);
+        final boolean isUidProfileOwner = dpmi != null && dpmi.isActiveAdminWithPolicy(uid,
+                DeviceAdminInfo.USES_POLICY_PROFILE_OWNER);
+        final boolean isUidDeviceOwner = dpmi != null && dpmi.isActiveAdminWithPolicy(uid,
+                DeviceAdminInfo.USES_POLICY_DEVICE_OWNER);
+        // If |uid| corresponds to the device owner, allow all modifications.
+        if (isUidDeviceOwner || isUidProfileOwner || (uid == mSystemUiUid)) {
+            return true;
+        }
+        return false;
     }
 }
