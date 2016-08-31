@@ -31,6 +31,7 @@ import static com.android.server.wifi.WifiController.CMD_WIFI_TOGGLED;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
+import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -42,9 +43,11 @@ import android.database.ContentObserver;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.DhcpResults;
+import android.net.IpConfiguration;
 import android.net.Network;
 import android.net.NetworkScorerAppManager;
 import android.net.NetworkUtils;
+import android.net.ProxyInfo;
 import android.net.Uri;
 import android.net.ip.IpManager;
 import android.net.wifi.IWifiManager;
@@ -211,6 +214,17 @@ public class WifiServiceImpl extends IWifiManager.Stub {
 
                     if (config != null && isValid(config)) {
                         if (DBG) Slog.d(TAG, "Connect with config" + config);
+                        // Only Device & Profile Owner can configure Http Proxy settings
+                        if (msg.what == WifiManager.SAVE_NETWORK) {
+                            if (hasHttpProxy(config) 
+                                    && !isCallerDeviceOrProfileOwner(msg.sendingUid)) {
+                                replyFailed(msg, WifiManager.SAVE_NETWORK_FAILED,
+                                        WifiManager.NOT_AUTHORIZED);
+                                Log.e(TAG, "Permission denial: Need to be Device Owner or Profile "
+                                        + "Owner to set Http proxy in WifiConfigurations.");
+                                break;
+                            }
+                        }
                         mWifiStateMachine.sendMessage(Message.obtain(msg));
                     } else if (config == null
                             && networkId != WifiConfiguration.INVALID_NETWORK_ID) {
@@ -838,9 +852,21 @@ public class WifiServiceImpl extends IWifiManager.Stub {
      */
     @Override
     public int addOrUpdateNetwork(WifiConfiguration config) {
+        Log.i(TAG, "addOrUpdateNetwork");
         enforceChangePermission();
         if (isValid(config) && isValidPasspoint(config)) {
-
+            // Only allow Device or Profile Owner to set Http Proxy in WifiConfigurations
+            if (hasHttpProxy(config)) {
+                if (!isCallerDeviceOrProfileOwner(Binder.getCallingUid())) {
+                    Log.e(TAG, "Permission denial: Need to be Device Owner or Profile Owner to set Http"
+                            + " proxy in WifiConfigurations.");
+                    return -1;
+                } else {
+                    Log.i(TAG, "ProxyTest: permissions GOOD to setHttpProxy");
+                }
+            } else {
+                Log.i(TAG, "ProxyTest: Config does not modify HttpProxy");
+            }
             WifiEnterpriseConfig enterpriseConfig = config.enterpriseConfig;
 
             if (config.isPasspoint() &&
@@ -1771,6 +1797,49 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         Log.e(TAG, "Permission denial: Need ACCESS_COARSE_LOCATION or ACCESS_FINE_LOCATION "
                 + "permission to get scan results");
         return false;
+    }
+
+    /**
+     * Returns whether the calling package is Device Owner or Profile Owner
+     * @param calllingPackage The name of the package making the call
+     */
+    private boolean isCallerDeviceOrProfileOwner(int callingUid) {
+        Log.i(TAG, "ProxyTest: Checking device/profile owner permission");
+        final PackageManager pm = mContext.getPackageManager();
+        String[] uidPackages = pm.getPackagesForUid(callingUid);
+        Log.i(TAG, "ProxyTest: uidPackages: " + Arrays.toString(uidPackages));
+        String callingPackage = mContext.getOpPackageName();
+        if (uidPackages == null) {
+            return false;
+        }
+        boolean uidMatchPackage = Arrays.asList(uidPackages).contains(callingPackage);
+        Log.i(TAG, "ProxyTest: " + (uidMatchPackage ? "calling UID Match!" : "calling UID no-match") + ". callingPackage: " + callingPackage);
+        final DevicePolicyManager dpm = mContext.getSystemService(DevicePolicyManager.class);
+        for (String packageName : uidPackages) {
+            Log.i(TAG, "ProxyTest: " + packageName
+                    + "isDeviceOwner=" + (dpm.isDeviceOwnerApp(packageName) ? "true" : "false") + ", "
+                    + "isProfileOwner=" + (dpm.isProfileOwnerApp(packageName) ? "true" : "false"));
+            if (dpm.isDeviceOwnerApp(packageName) || dpm.isProfileOwnerApp(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if given WifiConfiguration has a valid http proxy
+     */
+    private boolean hasHttpProxy(WifiConfiguration config) {
+        if (config == null) {
+            return false;
+        }
+        ProxyInfo proxyInfo = config.getHttpProxy();
+        if(proxyInfo != null) {
+            Log.i(TAG, "ProxyTest: " + (proxyInfo.isValid() ? "  VALID" : "INVALID") + proxyInfo.toString());
+        } else {
+            Log.i(TAG, "ProxyTest: null ProxyInfo");
+        }
+        return (proxyInfo != null && proxyInfo.isValid());
     }
 
     private boolean checkAppOppAllowed(int op, String callingPackage, int uid) {
