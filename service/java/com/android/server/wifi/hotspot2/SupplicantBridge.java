@@ -69,11 +69,6 @@ public class SupplicantBridge {
         void notifyIconFailed(long bssid);
     }
 
-    public static boolean isAnqpAttribute(String line) {
-        int split = line.indexOf('=');
-        return split >= 0 && sWpsNames.containsKey(line.substring(0, split));
-    }
-
     public SupplicantBridge(WifiNative supplicantHook, SupplicantBridgeCallbacks callbacks) {
         mSupplicantHook = supplicantHook;
         mCallbacks = callbacks;

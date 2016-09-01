@@ -564,7 +564,6 @@ public class WifiNative {
      *     WPA_BSS_MASK_TSF           (Bit 8)
      *     WPA_BSS_MASK_IE            (Bit 10)
      *     WPA_BSS_MASK_SSID          (Bit 12)
-     *     WPA_BSS_MASK_INTERNETW     (Bit 15) (adds ANQP info)
      *     WPA_BSS_MASK_DELIM         (Bit 17)
      *
      * See wpa_supplicant/src/common/wpa_ctrl.h for details.
@@ -610,7 +609,6 @@ public class WifiNative {
             String flags = "";
             WifiSsid wifiSsid = null;
             String infoElementsStr = null;
-            List<String> anqpLines = null;
 
             for (String line : lines) {
                 if (line.startsWith(BSS_ID_STR)) { // Will find the last id line
@@ -654,11 +652,6 @@ public class WifiNative {
                             line.substring(BSS_SSID_STR.length()));
                 } else if (line.startsWith(BSS_IE_STR)) {
                     infoElementsStr = line;
-                } else if (SupplicantBridge.isAnqpAttribute(line)) {
-                    if (anqpLines == null) {
-                        anqpLines = new ArrayList<>();
-                    }
-                    anqpLines.add(line);
                 } else if (line.startsWith(BSS_DELIMITER_STR) || line.startsWith(BSS_END_STR)) {
                     if (bssid != null) {
                         try {
@@ -675,7 +668,7 @@ public class WifiNative {
                                         Utils.hexToBytes(infoElementsStr.substring(seperator + 1)));
 
                             NetworkDetail networkDetail = new NetworkDetail(bssid,
-                                    infoElements, anqpLines, freq);
+                                    infoElements, null, freq);
                             String xssid = (wifiSsid != null) ? wifiSsid.toString() : WifiSsid.NONE;
                             if (!xssid.equals(networkDetail.getTrimmedSSID())) {
                                 Log.d(TAG, String.format(
@@ -695,7 +688,7 @@ public class WifiNative {
                             flags = InformationElementUtil.Capabilities.
                                 buildCapabilities(infoElements, beaconCapBits);
                             ScanDetail scan = new ScanDetail(networkDetail, wifiSsid, bssid, flags,
-                                    level, freq, tsf, infoElements, anqpLines);
+                                    level, freq, tsf, infoElements, null);
                             results.add(scan);
                         } catch (IllegalArgumentException iae) {
                             Log.d(TAG, "Failed to parse information elements: " + iae);
@@ -709,7 +702,6 @@ public class WifiNative {
                     flags = "";
                     wifiSsid = null;
                     infoElementsStr = null;
-                    anqpLines = null;
                 }
             }
         }
