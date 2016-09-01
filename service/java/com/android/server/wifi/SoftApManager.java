@@ -22,9 +22,8 @@ import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
 import android.net.wifi.IApInterface;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
-import android.os.IBinder.DeathRecipient;
+import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
@@ -42,7 +41,7 @@ import java.util.Locale;
  * Manage WiFi in AP mode.
  * The internal state machine runs under "WifiStateMachine" thread context.
  */
-public class SoftApManager {
+public class SoftApManager implements ActiveModeManager {
     private static final String TAG = "SoftApManager";
 
     private final WifiNative mWifiNative;
@@ -55,6 +54,8 @@ public class SoftApManager {
     private final Listener mListener;
 
     private final IApInterface mApInterface;
+
+    private WifiConfiguration mSoftApConfig;
 
     /**
      * Listener for soft AP state changes.
@@ -81,6 +82,19 @@ public class SoftApManager {
         mAllowed2GChannels = allowed2GChannels;
         mListener = listener;
         mApInterface = apInterface;
+    }
+
+    public void setConfiguration(WifiConfiguration config) {
+        mSoftApConfig = config;
+    }
+
+    /**
+     * Start soft AP with the current saved config.
+     *
+     * TODO: move logic to get saved config from WifiStateMachine to SoftApManager.
+     */
+    public void start() {
+        start(mSoftApConfig);
     }
 
     /**
