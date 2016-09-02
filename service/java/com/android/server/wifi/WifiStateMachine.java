@@ -4012,8 +4012,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             }
 
             if (mWifiApConfigStore == null) {
-                mWifiApConfigStore =
-                        mFacade.makeApConfigStore(mContext, mBackupManagerProxy);
+                mWifiApConfigStore = mWifiInjector.getWifiApConfigStore();
             }
         }
         @Override
@@ -6731,11 +6730,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             }
 
             checkAndSetConnectivityInstance();
-            mSoftApManager = mWifiInjector.makeSoftApManager(
-                    mWifiNative, mNwService,
-                    mCm, mCountryCode.getCountryCode(),
-                    mWifiApConfigStore.getAllowed2GChannel(),
-                    new SoftApListener(), apInterface);
+            mSoftApManager = mWifiInjector.makeSoftApManager(new SoftApListener(), apInterface);
             mSoftApManager.start(config);
         }
 
