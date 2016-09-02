@@ -315,6 +315,8 @@ public class XmlUtil {
         public static final String XML_TAG_ALLOWED_KEY_MGMT = "AllowedKeyMgmt";
         public static final String XML_TAG_ALLOWED_PROTOCOLS = "AllowedProtocols";
         public static final String XML_TAG_ALLOWED_AUTH_ALGOS = "AllowedAuthAlgos";
+        public static final String XML_TAG_ALLOWED_GROUP_CIPHERS = "AllowedGroupCiphers";
+        public static final String XML_TAG_ALLOWED_PAIRWISE_CIPHERS = "AllowedPairwiseCiphers";
         public static final String XML_TAG_SHARED = "Shared";
         public static final String XML_TAG_FQDN = "FQDN";
         public static final String XML_TAG_PROVIDER_FRIENDLY_NAME = "ProviderFriendlyName";
@@ -386,6 +388,12 @@ public class XmlUtil {
             XmlUtil.writeNextValue(
                     out, XML_TAG_ALLOWED_AUTH_ALGOS,
                     configuration.allowedAuthAlgorithms.toByteArray());
+            XmlUtil.writeNextValue(
+                    out, XML_TAG_ALLOWED_GROUP_CIPHERS,
+                    configuration.allowedGroupCiphers.toByteArray());
+            XmlUtil.writeNextValue(
+                    out, XML_TAG_ALLOWED_PAIRWISE_CIPHERS,
+                    configuration.allowedPairwiseCiphers.toByteArray());
             XmlUtil.writeNextValue(out, XML_TAG_SHARED, configuration.shared);
         }
 
@@ -519,6 +527,15 @@ public class XmlUtil {
                     case XML_TAG_ALLOWED_AUTH_ALGOS:
                         byte[] allowedAuthAlgorithms = (byte[]) value;
                         configuration.allowedAuthAlgorithms = BitSet.valueOf(allowedAuthAlgorithms);
+                        break;
+                    case XML_TAG_ALLOWED_GROUP_CIPHERS:
+                        byte[] allowedGroupCiphers = (byte[]) value;
+                        configuration.allowedGroupCiphers = BitSet.valueOf(allowedGroupCiphers);
+                        break;
+                    case XML_TAG_ALLOWED_PAIRWISE_CIPHERS:
+                        byte[] allowedPairwiseCiphers = (byte[]) value;
+                        configuration.allowedPairwiseCiphers =
+                                BitSet.valueOf(allowedPairwiseCiphers);
                         break;
                     case XML_TAG_SHARED:
                         configuration.shared = (boolean) value;
