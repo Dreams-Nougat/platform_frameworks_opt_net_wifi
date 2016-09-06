@@ -34,7 +34,6 @@ import com.android.internal.util.StateMachine;
 import com.android.server.wifi.util.ApConfigUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -45,7 +44,6 @@ public class SoftApManager implements ActiveModeManager {
     private static final String TAG = "SoftApManager";
 
     private final WifiNative mWifiNative;
-    private final ArrayList<Integer> mAllowed2GChannels;
 
     private final String mCountryCode;
 
@@ -55,7 +53,7 @@ public class SoftApManager implements ActiveModeManager {
 
     private final IApInterface mApInterface;
 
-    private WifiConfiguration mSoftApConfig;
+    private final WifiApConfigStore mWifiApConfigStore;
 
     /**
      * Listener for soft AP state changes.
@@ -72,37 +70,28 @@ public class SoftApManager implements ActiveModeManager {
     public SoftApManager(Looper looper,
                          WifiNative wifiNative,
                          String countryCode,
-                         ArrayList<Integer> allowed2GChannels,
                          Listener listener,
-                         IApInterface apInterface) {
+                         IApInterface apInterface,
+                         WifiApConfigStore wifiApConfigStore,
+                         WifiConfiguration config) {
         mStateMachine = new SoftApStateMachine(looper);
 
         mWifiNative = wifiNative;
         mCountryCode = countryCode;
-        mAllowed2GChannels = allowed2GChannels;
         mListener = listener;
         mApInterface = apInterface;
-    }
-
-    public void setConfiguration(WifiConfiguration config) {
-        mSoftApConfig = config;
+        mWifiApConfigStore = wifiApConfigStore;
+        if (config != null) {
+            mWifiApConfigStore.setApConfiguration(config);
+        }
     }
 
     /**
      * Start soft AP with the current saved config.
-     *
-     * TODO: move logic to get saved config from WifiStateMachine to SoftApManager.
      */
     public void start() {
-        start(mSoftApConfig);
-    }
-
-    /**
-     * Start soft AP with given configuration.
-     * @param config AP configuration
-     */
-    public void start(WifiConfiguration config) {
-        mStateMachine.sendMessage(SoftApStateMachine.CMD_START, config);
+        mStateMachine.sendMessage(SoftApStateMachine.CMD_START,
+                                  mWifiApConfigStore.getApConfiguration());
     }
 
     /**
@@ -138,7 +127,8 @@ public class SoftApManager implements ActiveModeManager {
         WifiConfiguration localConfig = new WifiConfiguration(config);
 
         int result = ApConfigUtil.updateApChannelConfig(
-                mWifiNative, mCountryCode, mAllowed2GChannels, localConfig);
+                mWifiNative, mCountryCode,
+                mWifiApConfigStore.getAllowed2GChannel(), localConfig);
         if (result != SUCCESS) {
             Log.e(TAG, "Failed to update AP band and channel");
             return result;
