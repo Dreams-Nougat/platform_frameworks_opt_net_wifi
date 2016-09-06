@@ -1,0 +1,8 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Mitchell Wills <mwills@google.com>
+Verified+1: Chih-hung Hsieh <chh@google.com>
+Submitted-by: Chih-hung Hsieh <chh@google.com>
+Submitted-at: Tue, 06 Sep 2016 19:47:07 +0000
+Reviewed-on: https://android-review.googlesource.com/265872
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
