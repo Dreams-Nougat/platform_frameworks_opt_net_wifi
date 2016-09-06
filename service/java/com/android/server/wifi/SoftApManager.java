@@ -22,9 +22,8 @@ import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
 import android.net.wifi.IApInterface;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
-import android.os.IBinder.DeathRecipient;
+import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
@@ -35,7 +34,6 @@ import com.android.internal.util.StateMachine;
 import com.android.server.wifi.util.ApConfigUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -46,7 +44,6 @@ public class SoftApManager {
     private static final String TAG = "SoftApManager";
 
     private final WifiNative mWifiNative;
-    private final ArrayList<Integer> mAllowed2GChannels;
 
     private final String mCountryCode;
 
@@ -55,6 +52,8 @@ public class SoftApManager {
     private final Listener mListener;
 
     private final IApInterface mApInterface;
+
+    private final WifiApConfigStore mWifiApConfigStore;
 
     /**
      * Listener for soft AP state changes.
@@ -71,24 +70,28 @@ public class SoftApManager {
     public SoftApManager(Looper looper,
                          WifiNative wifiNative,
                          String countryCode,
-                         ArrayList<Integer> allowed2GChannels,
                          Listener listener,
-                         IApInterface apInterface) {
+                         IApInterface apInterface,
+                         WifiApConfigStore wifiApConfigStore,
+                         WifiConfiguration config) {
         mStateMachine = new SoftApStateMachine(looper);
 
         mWifiNative = wifiNative;
         mCountryCode = countryCode;
-        mAllowed2GChannels = allowed2GChannels;
         mListener = listener;
         mApInterface = apInterface;
+        mWifiApConfigStore = wifiApConfigStore;
+        if (config != null) {
+            mWifiApConfigStore.setApConfiguration(config);
+        }
     }
 
     /**
-     * Start soft AP with given configuration.
-     * @param config AP configuration
+     * Start soft AP with the current saved config.
      */
-    public void start(WifiConfiguration config) {
-        mStateMachine.sendMessage(SoftApStateMachine.CMD_START, config);
+    public void start() {
+        mStateMachine.sendMessage(SoftApStateMachine.CMD_START,
+                                  mWifiApConfigStore.getApConfiguration());
     }
 
     /**
@@ -120,22 +123,21 @@ public class SoftApManager {
             return ERROR_GENERIC;
         }
 
-        /* Make a copy of configuration for updating AP band and channel. */
+        // Make a copy of configuration for updating AP band and channel.
         WifiConfiguration localConfig = new WifiConfiguration(config);
 
         int result = ApConfigUtil.updateApChannelConfig(
-                mWifiNative, mCountryCode, mAllowed2GChannels, localConfig);
+                mWifiNative, mCountryCode,
+                mWifiApConfigStore.getAllowed2GChannel(), localConfig);
         if (result != SUCCESS) {
             Log.e(TAG, "Failed to update AP band and channel");
             return result;
         }
 
-        /* Setup country code if it is provide. */
+        // Setup country code if it is provided.
         if (mCountryCode != null) {
-            /**
-             * Country code is mandatory for 5GHz band, return an error if failed to set
-             * country code when AP is configured for 5GHz band.
-             */
+            // Country code is mandatory for 5GHz band, return an error if failed to set
+            // country code when AP is configured for 5GHz band.
             if (!mWifiNative.setCountryCodeHal(mCountryCode.toUpperCase(Locale.ROOT))
                     && config.apBand == WifiConfiguration.AP_BAND_5GHZ) {
                 Log.e(TAG, "Failed to set country code, required for setting up "
@@ -210,7 +212,7 @@ public class SoftApManager {
     }
 
     private class SoftApStateMachine extends StateMachine {
-        /* Commands for the state machine. */
+        // Commands for the state machine.
         public static final int CMD_START = 0;
         public static final int CMD_STOP = 1;
         public static final int CMD_AP_INTERFACE_BINDER_DEATH = 2;
@@ -264,7 +266,7 @@ public class SoftApManager {
                         transitionTo(mStartedState);
                         break;
                     default:
-                        /* Ignore all other commands. */
+                        // Ignore all other commands.
                         break;
                 }
 
@@ -277,7 +279,7 @@ public class SoftApManager {
             public boolean processMessage(Message message) {
                 switch (message.what) {
                     case CMD_START:
-                        /* Already started, ignore this command. */
+                        // Already started, ignore this command.
                         break;
                     case CMD_AP_INTERFACE_BINDER_DEATH:
                     case CMD_STOP:
