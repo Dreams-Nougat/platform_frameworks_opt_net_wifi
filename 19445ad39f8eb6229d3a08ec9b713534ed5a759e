@@ -9,3 +9,13 @@ UUID: 363cf7f1_b95eefe1
 Bytes: 150
 Shouldn't we be fixing the isEnterprise method instead? If the eap method is NONE should we just ignore the enterpriseConfig field and set it to null?
 
+240
+Tue Sep 06 17:01:55 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 363cf7f1_b95eefe1
+UUID: 363cf7f1_19339bb0
+Bytes: 382
+Yeah. That's what I would have thought. But, I don't fully understand the possible combinations of these key_mgmt vs enterpriseConfig params. I agree that should be clarified/fixed as well. 
+
+But, we're serializing the enterprise config object here, so regardless of the validity of the configuration provided. The check here should verify if this particular object is valid or not.
+
