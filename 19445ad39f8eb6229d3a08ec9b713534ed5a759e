@@ -19,3 +19,11 @@ Yeah. That's what I would have thought. But, I don't fully understand the possib
 
 But, we're serializing the enterprise config object here, so regardless of the validity of the configuration provided. The check here should verify if this particular object is valid or not.
 
+240
+Tue Sep 06 17:15:42 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 363cf7f1_19339bb0
+UUID: 363cf7f1_34c9464d
+Bytes: 48
+Added go/aog/269727 to fix isEnterprise() check.
+
