@@ -1,0 +1,10 @@
+Code-Review+1: 金时 宋 <songjinshi@xiaomi.com>
+Code-Review+2: Mitchell Wills <mwills@google.com>
+Autosubmit+1: Mitchell Wills <mwills@google.com>
+Verified+1: Mitchell Wills <mwills@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Tue, 06 Sep 2016 23:07:30 +0000
+Reviewed-on: https://android-review.googlesource.com/263710
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
