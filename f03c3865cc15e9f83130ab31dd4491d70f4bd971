@@ -1,0 +1,11 @@
+Revision: f03c3865cc15e9f83130ab31dd4491d70f4bd971
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+6352:30-6352:42
+Tue Sep 06 14:52:20 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 363cf7f1_ae534733
+Bytes: 63
+Can you change this message to CMD_START_ROAM while u're there?
+
