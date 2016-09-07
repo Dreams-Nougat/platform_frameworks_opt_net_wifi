@@ -11,3 +11,13 @@ Let's remove this line. Now 'mTargetRoamBSSID' is 'bssid'.
 
 Since you are making this change, I am going to transfer b/31317756 to you.
 
+6344:1-6344:44
+Wed Sep 07 17:34:21 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 96c20370_5d3aef24
+UUID: 96c20370_bd634b11
+Bytes: 212
+This may not be the same. setTargetBSSID only sets mTargetBSSID to bssid if the config.BSSID is null.
+
+So, we're not making the change for MR1? I made the change here because this part has changed a lot from MR1.
+
