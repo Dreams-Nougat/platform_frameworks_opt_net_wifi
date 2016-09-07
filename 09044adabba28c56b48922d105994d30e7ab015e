@@ -1,0 +1,11 @@
+Revision: 09044adabba28c56b48922d105994d30e7ab015e
+Patch-set: 6
+File: service/java/com/android/server/wifi/hotspot2/PasspointEventHandler.java
+
+177:16-177:30
+Wed Sep 07 22:05:12 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d6f9dbd6_d82cbdba
+Bytes: 88
+Are u hooking these to WifiMonitor in a separate CL or waiting for wificond integration?
+
