@@ -29,3 +29,11 @@ UUID: b6c8e799_36ad1688
 Bytes: 186
 True, they may not be the same. But mTargetBSSID is what we are actually going to roam to. Logging the 'bssid' here simply causes confusion, especially with the work 'to' in front of it.
 
+6344:1-6344:44
+Wed Sep 07 17:53:21 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b6c8e799_36ad1688
+UUID: 16db7369_4e237317
+Bytes: 4
+Done
+
