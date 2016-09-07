@@ -17,6 +17,14 @@ UUID: 96c20370_dd64bf4b
 Bytes: 286
 Well, if the enabled netId was previously disabled. We want to trigger QNS to ensure that this netId has been reconsidered for connection. We are not forcing connection to this netId. But, if this is actually the best netId now in our saved networks, QNS should decide to connect to it.
 
+1274
+Wed Sep 07 19:55:26 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 96c20370_dd64bf4b
+UUID: d6f9dbd6_e4d8fa75
+Bytes: 171
+I guess at the end all we care about is which network the device is connected to. In that sense, how's forcing connection to that netId different from having QNS picks it?
+
 1276
 Wed Sep 07 17:26:28 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
