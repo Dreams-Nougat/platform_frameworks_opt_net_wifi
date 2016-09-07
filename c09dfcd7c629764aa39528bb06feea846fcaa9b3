@@ -9,3 +9,11 @@ UUID: d6f9dbd6_4d193192
 Bytes: 34
 Thank you!  Was this never called?
 
+7037
+Wed Sep 07 21:44:34 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d6f9dbd6_4d193192
+UUID: d6f9dbd6_cd49a116
+Bytes: 256
+The callsite was removed as part of the WifiConfigManager refactor.  The WNM frames will be handled by the new PasspointManager (will be added in the near future).  This intent is used by the Hotspot 2.0 release 2 client (OSU app) for remediation handling.
+
