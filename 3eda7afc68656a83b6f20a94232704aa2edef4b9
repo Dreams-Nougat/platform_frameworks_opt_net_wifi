@@ -21,3 +21,11 @@ This may not be the same. setTargetBSSID only sets mTargetBSSID to bssid if the 
 
 So, we're not making the change for MR1? I made the change here because this part has changed a lot from MR1.
 
+6344:1-6344:44
+Wed Sep 07 17:50:33 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 96c20370_bd634b11
+UUID: b6c8e799_36ad1688
+Bytes: 186
+True, they may not be the same. But mTargetBSSID is what we are actually going to roam to. Logging the 'bssid' here simply causes confusion, especially with the work 'to' in front of it.
+
