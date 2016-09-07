@@ -1,0 +1,18 @@
+Revision: e5976f16ab076058b84d734d4abff2597f48d307
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+1274
+Wed Sep 07 17:26:28 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 96c20370_3ddbbb0c
+Bytes: 354
+Why force a connectivity scan here? If the user has no permission to connect to this network, what do we expect from this forced scan? If may trigger the device to connect to perform a network selection and connect to another network, which is not the 'netId' specified by this method input parameter anyways. This is not what the purpose of this method.
+
+1276
+Wed Sep 07 17:26:28 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 96c20370_7d26d328
+Bytes: 225
+Can we add some comments. This 'setUserConnectChoice' is for next network selection to favor this user selected network. The following 'startConnectToNetwork' will bypass network selection and connect to the network directly.
+
