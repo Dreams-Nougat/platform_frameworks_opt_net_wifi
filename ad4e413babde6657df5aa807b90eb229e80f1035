@@ -1,0 +1,18 @@
+Revision: ad4e413babde6657df5aa807b90eb229e80f1035
+Patch-set: 5
+File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointEventHandlerTest.java
+
+50:21-50:36
+Wed Sep 07 21:35:00 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d6f9dbd6_ad0f8537
+Bytes: 18
+Maybe mWifiNative?
+
+155
+Wed Sep 07 21:35:00 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d6f9dbd6_cd81a167
+Bytes: 36
+Probably don't need this whitespace?
+
