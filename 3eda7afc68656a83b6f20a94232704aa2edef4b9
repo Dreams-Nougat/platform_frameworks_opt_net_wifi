@@ -1,0 +1,13 @@
+Revision: 3eda7afc68656a83b6f20a94232704aa2edef4b9
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+6344:1-6344:44
+Wed Sep 07 17:31:39 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 96c20370_5d3aef24
+Bytes: 135
+Let's remove this line. Now 'mTargetRoamBSSID' is 'bssid'.
+
+Since you are making this change, I am going to transfer b/31317756 to you.
+
