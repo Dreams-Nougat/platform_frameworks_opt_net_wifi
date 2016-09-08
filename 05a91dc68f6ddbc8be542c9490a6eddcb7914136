@@ -1,0 +1,132 @@
+Revision: 05a91dc68f6ddbc8be542c9490a6eddcb7914136
+Patch-set: 1
+File: wifi_hal_legacy/Android.mk
+
+22
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_fbc2c8f9
+Bytes: 35
+use 4 spaces please, here and below
+
+File: wifi_hal_legacy/failure_reason_util.h
+
+27
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_3ba0b0a3
+Bytes: 83
+I can see why you want to use this.  Unfortunately, style guide says it is verboten
+
+File: wifi_hal_legacy/main.cpp
+
+26
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_7687ad0e
+Bytes: 74
+Avoid using directives:
+
+https://google.github.io/styleguide/cppguide.html
+
+29
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_d69eb957
+Bytes: 49
+This should probably be in an anonymous namespace
+
+31:11-31:12
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_9694313c
+Bytes: 80
+nit: two spaces between end of statement and the beginning of the command please
+
+File: wifi_hal_legacy/wifi_hal_legacy.cpp
+
+51
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_31636fe2
+Bytes: 28
+Why do you bother with this?
+
+76
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_f1f4a7ed
+Bytes: 13
+Not an error?
+
+78
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_b1ebff02
+Bytes: 146
+Could you structure this code like:
+
+if (status != WIFI_SUCCESS) {
+....
+return Status::ok();
+}
+
+// handle the success case here, no nesting needed
+
+104
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_d1d88376
+Bytes: 7
+else if
+
+File: wifi_hal_legacy/wifi_hal_legacy.h
+
+32
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_b6bf75a8
+Bytes: 243
+Is this necessary?  We're already inside android::hardware.  It seems like it might be confused with android::binder::Status?
+
+In general, I'd prefer you move this inside the scope of the class declaration or just type the full type each time.
+
+33
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_96ad118a
+Bytes: 159
+nit: not ok to merge namespaces:
+
+https://google.github.io/styleguide/cppguide.html#Namespaces
+
+I think in the past it was allowed in .cpp files, but not here.
+
+35:6-35:19
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_11e10b91
+Bytes: 109
+Can we call this something that implies it is the root object exposed by this process?  Maybe WifiHalService?
+
+60
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_31b44f89
+Bytes: 94
+This is actually a void* that the vendor implementation can use right?  Maybe comment on that?
+
+61
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_918a7bc3
+Bytes: 137
+Better talk about what this is used for here.  It's  little mysterious and a command will save your coworkers from reading how we use it.
+
+72
+Thu Sep 08 23:24:01 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_51439343
+Bytes: 120
+Interestingly, C++ is the opposite of Java in that members go last, and methods go first in a given section.  Sorry man.
+
