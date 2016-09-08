@@ -9,3 +9,11 @@ UUID: 56832b87_9d21b4ae
 Bytes: 224
 This code assumes that this will never fail, which is could if the service doesn't yet exist when this is called. Would also need to be handled at callers. I think this will be ok for now though unless you want to change it.
 
+319
+Thu Sep 08 21:45:13 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_9d21b4ae
+UUID: 56832b87_db05041c
+Bytes: 189
+as discussed offline, made this method synchronized.  When I move WifiScanner from WSM to WifiService, this method will be called in startScan (to avoid a race between services starting up)
+
