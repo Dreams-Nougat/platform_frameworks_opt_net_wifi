@@ -793,6 +793,8 @@ public class WifiConfigManager {
 
         configuration.setIpAssignment(IpConfiguration.IpAssignment.DHCP);
         configuration.setProxySettings(IpConfiguration.ProxySettings.NONE);
+
+        configuration.status = WifiConfiguration.Status.DISABLED;
     }
 
     /**
