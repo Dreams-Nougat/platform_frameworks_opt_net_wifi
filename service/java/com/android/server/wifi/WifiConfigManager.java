@@ -1400,6 +1400,7 @@ public class WifiConfigManager {
         config.getNetworkSelectionStatus().clearDisableReasonCounter();
         config.getNetworkSelectionStatus().setHasEverConnected(true);
         setNetworkStatus(config, WifiConfiguration.Status.CURRENT);
+        saveToStore(false);
         return true;
     }
 
@@ -1427,6 +1428,7 @@ public class WifiConfigManager {
         if (config.status == WifiConfiguration.Status.CURRENT) {
             setNetworkStatus(config, WifiConfiguration.Status.ENABLED);
         }
+        saveToStore(false);
         return true;
     }
 
@@ -1542,6 +1544,7 @@ public class WifiConfigManager {
         config.getNetworkSelectionStatus().setConnectChoice(null);
         config.getNetworkSelectionStatus().setConnectChoiceTimestamp(
                 NetworkSelectionStatus.INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP);
+        saveToStore(false);
         return true;
     }
 
@@ -1569,6 +1572,7 @@ public class WifiConfigManager {
         }
         config.getNetworkSelectionStatus().setConnectChoice(connectChoiceConfigKey);
         config.getNetworkSelectionStatus().setConnectChoiceTimestamp(timestamp);
+        saveToStore(false);
         return true;
     }
 
@@ -1601,6 +1605,7 @@ public class WifiConfigManager {
         }
         config.validatedInternetAccess = validated;
         config.numNoInternetAccessReports = 0;
+        saveToStore(false);
         return true;
     }
 
