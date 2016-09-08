@@ -1,5 +1,14 @@
 Revision: cb478a4c18602a423c514508503d441db7ce68b5
 Patch-set: 1
+File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+130:4-130:10
+Thu Sep 08 23:59:57 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_6c028018
+Bytes: 141
+We should put all external dependencies of the class as constructor arguments. This will make it easier to mock them out during unit testing.
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 895:7-896:53
