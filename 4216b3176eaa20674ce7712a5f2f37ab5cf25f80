@@ -1,0 +1,11 @@
+Revision: 4216b3176eaa20674ce7712a5f2f37ab5cf25f80
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2467
+Thu Sep 08 22:00:56 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 56832b87_fbee48e8
+Bytes: 46
+lets add a test to verify the contents of this
+
