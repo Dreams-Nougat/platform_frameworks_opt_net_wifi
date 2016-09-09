@@ -9,6 +9,14 @@ UUID: 56832b87_fbc2c8f9
 Bytes: 35
 use 4 spaces please, here and below
 
+22
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_fbc2c8f9
+UUID: 56832b87_2c2b1841
+Bytes: 4
+Done
+
 File: wifi_hal_legacy/failure_reason_util.h
 
 27
@@ -17,6 +25,14 @@ Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_3ba0b0a3
 Bytes: 83
 I can see why you want to use this.  Unfortunately, style guide says it is verboten
+
+27
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_3ba0b0a3
+UUID: 56832b87_8c1a6425
+Bytes: 4
+Done
 
 File: wifi_hal_legacy/main.cpp
 
@@ -29,6 +45,14 @@ Avoid using directives:
 
 https://google.github.io/styleguide/cppguide.html
 
+26
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_7687ad0e
+UUID: 56832b87_0cc2d449
+Bytes: 4
+Done
+
 29
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -36,12 +60,28 @@ UUID: 56832b87_d69eb957
 Bytes: 49
 This should probably be in an anonymous namespace
 
+29
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_d69eb957
+UUID: 56832b87_ecbcd0dc
+Bytes: 4
+Done
+
 31:11-31:12
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_9694313c
 Bytes: 80
 nit: two spaces between end of statement and the beginning of the command please
+
+31:11-31:12
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_9694313c
+UUID: 56832b87_2cc79859
+Bytes: 4
+Done
 
 File: wifi_hal_legacy/wifi_hal_legacy.cpp
 
@@ -52,12 +92,28 @@ UUID: 56832b87_31636fe2
 Bytes: 28
 Why do you bother with this?
 
+51
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_31636fe2
+UUID: 56832b87_acb3a805
+Bytes: 31
+Haha yah I don't use it anymore
+
 76
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_f1f4a7ed
 Bytes: 13
 Not an error?
+
+76
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_f1f4a7ed
+UUID: 56832b87_529e3256
+Bytes: 4
+Done
 
 78
 Thu Sep 08 23:24:01 2016 +0000
@@ -73,12 +129,28 @@ return Status::ok();
 
 // handle the success case here, no nesting needed
 
+78
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_b1ebff02
+UUID: 56832b87_b2adbe89
+Bytes: 4
+Done
+
 104
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_d1d88376
 Bytes: 7
 else if
+
+104
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_d1d88376
+UUID: 56832b87_f2c3c62d
+Bytes: 5
+woops
 
 File: wifi_hal_legacy/wifi_hal_legacy.h
 
@@ -91,6 +163,14 @@ Is this necessary?  We're already inside android::hardware.  It seems like it mi
 
 In general, I'd prefer you move this inside the scope of the class declaration or just type the full type each time.
 
+32
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_b6bf75a8
+UUID: 56832b87_cca0eca9
+Bytes: 74
+I wouldn't expect anything in android::binder:: to be used in this binary.
+
 33
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -102,12 +182,28 @@ https://google.github.io/styleguide/cppguide.html#Namespaces
 
 I think in the past it was allowed in .cpp files, but not here.
 
+33
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_96ad118a
+UUID: 56832b87_3280cef8
+Bytes: 4
+Done
+
 35:6-35:19
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_11e10b91
 Bytes: 109
 Can we call this something that implies it is the root object exposed by this process?  Maybe WifiHalService?
+
+35:6-35:19
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_11e10b91
+UUID: 56832b87_6c92805a
+Bytes: 246
+Done. Should these implementation names mirror the interface in some way? For example does this mean we should call the implementation of IWifiChip WifiChipHalService? Your right it should be renamed, but it would be good to keep them consistent.
 
 60
 Thu Sep 08 23:24:01 2016 +0000
@@ -116,6 +212,14 @@ UUID: 56832b87_31b44f89
 Bytes: 94
 This is actually a void* that the vendor implementation can use right?  Maybe comment on that?
 
+60
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_31b44f89
+UUID: 56832b87_12a4aaa8
+Bytes: 4
+Done
+
 61
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -123,10 +227,26 @@ UUID: 56832b87_918a7bc3
 Bytes: 137
 Better talk about what this is used for here.  It's  little mysterious and a command will save your coworkers from reading how we use it.
 
+61
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_918a7bc3
+UUID: 56832b87_b2093e8a
+Bytes: 4
+Done
+
 72
 Thu Sep 08 23:24:01 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_51439343
 Bytes: 120
 Interestingly, C++ is the opposite of Java in that members go last, and methods go first in a given section.  Sorry man.
+
+72
+Fri Sep 09 00:43:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_51439343
+UUID: 56832b87_3299ae6e
+Bytes: 4
+Done
 
