@@ -2006,7 +2006,8 @@ public final class WifiServiceImpl extends IWifiManager.Stub {
     }
 
     public static String checkValidity(WifiConfiguration config) {
-        if (config.allowedKeyManagement == null)
+        if (config.allowedKeyManagement == null ||
+                        config.allowedKeyManagement.isEmpty())
             return "allowed kmgmt";
 
         if (config.allowedKeyManagement.cardinality() > 1) {
