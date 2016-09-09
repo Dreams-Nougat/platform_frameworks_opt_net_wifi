@@ -1,0 +1,11 @@
+Revision: 4a280c85ca57edca6647b63157fee088958ab7f0
+Patch-set: 1
+File: libwifi_hal/driver_tool.cpp
+
+39:4-39:16
+Fri Sep 09 22:51:10 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_05c5d884
+Bytes: 29
+also better with PLOG() here.
+
