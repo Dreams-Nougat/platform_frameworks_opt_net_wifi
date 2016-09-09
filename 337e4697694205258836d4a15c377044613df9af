@@ -1,0 +1,11 @@
+Revision: 337e4697694205258836d4a15c377044613df9af
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+6545:24-6545:52
+Fri Sep 09 23:04:02 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_30ee90b6
+Bytes: 222
+Hmm. This check is still not enough to catch all ongoing connection requests. There are still come corner cases where we just trigger a connection and supplicant has not yet started going into one of the connecting states.
+
