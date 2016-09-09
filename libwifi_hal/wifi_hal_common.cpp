@@ -16,13 +16,11 @@
 
 #include "hardware_legacy/wifi.h"
 
-#define LOG_TAG "WifiHalCommon"
-
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <cutils/log.h>
+#include <android-base/logging.h>
 #include <cutils/misc.h>
 #include <cutils/properties.h>
 
@@ -80,8 +78,8 @@ static int rmmod(const char *modname) {
   }
 
   if (ret != 0)
-    ALOGD("Unable to unload driver module \"%s\": %s\n", modname,
-          strerror(errno));
+    LOG(DEBUG) << "Unable to unload driver module '" << modname << "': "
+               << strerror(errno);
   return ret;
 }
 
@@ -94,12 +92,14 @@ int wifi_change_driver_state(const char *state) {
   if (!state) return -1;
   fd = TEMP_FAILURE_RETRY(open(WIFI_DRIVER_STATE_CTRL_PARAM, O_WRONLY));
   if (fd < 0) {
-    ALOGE("Failed to open driver state control param (%s)", strerror(errno));
+    LOG(ERROR) << "Failed to open driver state control param ("
+               << strerror(errno) << ")";
     return -1;
   }
   len = strlen(state) + 1;
   if (TEMP_FAILURE_RETRY(write(fd, state, len)) != len) {
-    ALOGE("Failed to write driver state control param (%s)", strerror(errno));
+    LOG(ERROR) << "Failed to write driver state control param ("
+               << strerror(errno) << ")";
     ret = -1;
   }
   close(fd);
@@ -126,7 +126,7 @@ int is_wifi_driver_loaded() {
    * crash.
    */
   if ((proc = fopen(MODULE_FILE, "r")) == NULL) {
-    ALOGW("Could not open %s: %s", MODULE_FILE, strerror(errno));
+    LOG(WARNING) << "Could not open " << MODULE_FILE << ": " << strerror(errno);
     property_set(DRIVER_PROP_NAME, "unloaded");
     return 0;
   }
@@ -210,12 +210,14 @@ int wifi_change_fw_path(const char *fwpath) {
   if (!fwpath) return ret;
   fd = TEMP_FAILURE_RETRY(open(WIFI_DRIVER_FW_PATH_PARAM, O_WRONLY));
   if (fd < 0) {
-    ALOGE("Failed to open wlan fw path param (%s)", strerror(errno));
+    LOG(ERROR) << "Failed to open wlan fw path param ("
+               << strerror(errno) << ")";
     return -1;
   }
   len = strlen(fwpath) + 1;
   if (TEMP_FAILURE_RETRY(write(fd, fwpath, len)) != len) {
-    ALOGE("Failed to write wlan fw path param (%s)", strerror(errno));
+    LOG(ERROR) << "Failed to write wlan fw path param ("
+               << strerror(errno) << ")";
     ret = -1;
   }
   close(fd);
