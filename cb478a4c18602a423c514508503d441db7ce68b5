@@ -9,6 +9,14 @@ UUID: 56832b87_6c028018
 Bytes: 141
 We should put all external dependencies of the class as constructor arguments. This will make it easier to mock them out during unit testing.
 
+130:4-130:10
+Fri Sep 09 00:06:51 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_6c028018
+UUID: 56832b87_4c9f7cb0
+Bytes: 148
+This is not a dependency. Evaluator is registered via the registerNetworkEvaluator() method, which makes it convenient for mocking and unit testing.
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 895:7-896:53
@@ -17,4 +25,12 @@ Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 56832b87_2c6958ef
 Bytes: 37
 This should be moved to WifiInjector.
+
+895:7-896:53
+Fri Sep 09 00:06:51 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 56832b87_2c6958ef
+UUID: 56832b87_8c9984cc
+Bytes: 8
+Will do.
 
