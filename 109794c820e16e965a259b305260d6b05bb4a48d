@@ -1,0 +1,11 @@
+Revision: 109794c820e16e965a259b305260d6b05bb4a48d
+Patch-set: 1
+File: libwifi_hal/wifi_hal_common.cpp
+
+81:4-81:7
+Fri Sep 09 21:14:40 2016 +0000
+Author: Elliott Hughes <1003224@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_bff993af
+Bytes: 39
+PLOG gives you the strerror for free...
+
