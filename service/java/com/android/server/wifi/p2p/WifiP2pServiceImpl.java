@@ -339,12 +339,16 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
               case WifiP2pManager.ADD_SERVICE_REQUEST:
               case WifiP2pManager.REMOVE_SERVICE_REQUEST:
               case WifiP2pManager.CLEAR_SERVICE_REQUESTS:
-              case WifiP2pManager.REQUEST_PEERS:
               case WifiP2pManager.REQUEST_CONNECTION_INFO:
               case WifiP2pManager.REQUEST_GROUP_INFO:
               case WifiP2pManager.DELETE_PERSISTENT_GROUP:
               case WifiP2pManager.REQUEST_PERSISTENT_GROUP_INFO:
                 mP2pStateMachine.sendMessage(Message.obtain(msg));
+                break;
+             case WifiP2pManager.REQUEST_PEERS:
+                /**
+                 * Deprecated
+                 */
                 break;
               default:
                 Slog.d(TAG, "ClientHandler.handleMessage ignoring msg=" + msg);
@@ -457,6 +461,26 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         mIpManager.startProvisioning(config);
     }
 
+    /**
+     * Get P2P peer list
+     */
+    public WifiP2pDeviceList getPeers(String callingPackage) {
+      boolean callerPermission = false;
+      /* TODO check caller Permission by invoking
+       * Permission Uitlity
+       * WifiPermissionsInjector mWifiPermissionsInjector = new
+       *             mWifiPermissionsInjector(mContext);
+       * WifiPermissionsUtil mWifiPermissionsUtil = new
+       *             WifiPermissionsUtil(mWifiPermissionsInjector);
+       * callerPermission =
+       *             mWifiPermissionsUtil.canCallerAccessScanResults(
+       *                         callingPackage);
+       */
+      if (callerPermission) {
+        return mP2pStateMachine.getPeerList();
+      }
+      return new WifiP2pDeviceList();
+    }
     /**
      * Get a reference to handler. This is used by a client to establish
      * an AsyncChannel communication with WifiP2pService
@@ -3205,6 +3229,10 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         }
 
         return clientInfo;
+    }
+
+    public WifiP2pDeviceList getPeerList() {
+      return new WifiP2pDeviceList(mPeers);
     }
 
     }
