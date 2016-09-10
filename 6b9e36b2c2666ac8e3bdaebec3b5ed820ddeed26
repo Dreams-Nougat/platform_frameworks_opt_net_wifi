@@ -1,0 +1,11 @@
+Revision: 6b9e36b2c2666ac8e3bdaebec3b5ed820ddeed26
+Patch-set: 1
+File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
+
+479
+Sat Sep 10 02:02:03 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_03386d27
+Bytes: 193
+need to add another check for version. Maybe callerPermission can be defaulted to true and in Line 475, it is only updated for the right version. This will make it compatible with older builds.
+
