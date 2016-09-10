@@ -32,6 +32,14 @@ UUID: cbe692fe_b9536831
 Bytes: 64
 Can you clarify? I didn't quiet understand what I'm over-riding.
 
+467:4-467:10
+Sat Sep 10 18:31:15 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_b9536831
+UUID: cbe692fe_595c241e
+Bytes: 174
+Isn't this the method of the AIDL (if not then ignore). You're implementing it by "extends IWifiP2pManager.Stub". Hence this method is an @Override of the method in the stub.
+
 479
 Sat Sep 10 02:02:03 2016 +0000
 Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -54,6 +62,22 @@ UUID: cbe692fe_5945046a
 Bytes: 39
 So you suggest that I have an else too?
 
+481:6-481:7
+Sat Sep 10 18:31:15 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_5945046a
+UUID: cbe692fe_7961e0d8
+Bytes: 153
+I mean:
+
+if (callerPermission) {
+   return mP2pStateMachine.getPeerList();
+} else {
+    return new WifiP2pDeviceList();
+}
+
+But this is a nit/style issue.
+
 3234:0-3236:5
 Sat Sep 10 04:47:35 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -68,4 +92,12 @@ Parent: cbe692fe_26a737ab
 UUID: cbe692fe_793ac0f6
 Bytes: 132
 it's a getter, copies the device list and returns to caller. mPeers is private to the state machine right now. I will add a java doc
+
+3234:0-3236:5
+Sat Sep 10 18:31:15 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_793ac0f6
+UUID: cbe692fe_9966acf0
+Bytes: 107
+I asked because this is new code (i.e. old code worked without it), but didn't see any new code using this.
 
