@@ -9,12 +9,28 @@ UUID: cbe692fe_e6854f08
 Bytes: 74
 maybe put a little more information - i.e. a reference to the new function
 
+350:19-350:29
+Sat Sep 10 17:30:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_e6854f08
+UUID: cbe692fe_19745cc2
+Bytes: 2
+ok
+
 467:4-467:10
 Sat Sep 10 04:47:35 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cbe692fe_c6af7384
 Bytes: 9
 @Override
+
+467:4-467:10
+Sat Sep 10 17:30:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_c6af7384
+UUID: cbe692fe_b9536831
+Bytes: 64
+Can you clarify? I didn't quiet understand what I'm over-riding.
 
 479
 Sat Sep 10 02:02:03 2016 +0000
@@ -30,10 +46,26 @@ UUID: cbe692fe_86d1ebf5
 Bytes: 47
 nit/style preference seems to be if {} else {}.
 
+481:6-481:7
+Sat Sep 10 17:30:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_86d1ebf5
+UUID: cbe692fe_5945046a
+Bytes: 39
+So you suggest that I have an else too?
+
 3234:0-3236:5
 Sat Sep 10 04:47:35 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cbe692fe_26a737ab
 Bytes: 18
 what does this do?
+
+3234:0-3236:5
+Sat Sep 10 17:30:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_26a737ab
+UUID: cbe692fe_793ac0f6
+Bytes: 132
+it's a getter, copies the device list and returns to caller. mPeers is private to the state machine right now. I will add a java doc
 
