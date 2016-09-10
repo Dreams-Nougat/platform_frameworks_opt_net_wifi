@@ -2,10 +2,38 @@ Revision: 6b9e36b2c2666ac8e3bdaebec3b5ed820ddeed26
 Patch-set: 1
 File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
 
+350:19-350:29
+Sat Sep 10 04:47:35 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_e6854f08
+Bytes: 74
+maybe put a little more information - i.e. a reference to the new function
+
+467:4-467:10
+Sat Sep 10 04:47:35 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_c6af7384
+Bytes: 9
+@Override
+
 479
 Sat Sep 10 02:02:03 2016 +0000
 Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cbe692fe_03386d27
 Bytes: 193
 need to add another check for version. Maybe callerPermission can be defaulted to true and in Line 475, it is only updated for the right version. This will make it compatible with older builds.
+
+481:6-481:7
+Sat Sep 10 04:47:35 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_86d1ebf5
+Bytes: 47
+nit/style preference seems to be if {} else {}.
+
+3234:0-3236:5
+Sat Sep 10 04:47:35 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_26a737ab
+Bytes: 18
+what does this do?
 
