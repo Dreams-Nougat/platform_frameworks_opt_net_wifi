@@ -1,0 +1,8 @@
+Verified+1: Christopher Wiley <wiley@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Ningyuan Wang <nywang@google.com>
+Submitted-by: Christopher Wiley <wiley@google.com>
+Submitted-at: Mon, 12 Sep 2016 17:52:45 +0000
+Reviewed-on: https://android-review.googlesource.com/272523
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
