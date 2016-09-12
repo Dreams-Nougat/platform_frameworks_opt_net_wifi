@@ -37,6 +37,8 @@ import com.android.internal.R;
 import com.android.server.am.BatteryStatsService;
 import com.android.server.net.DelayedDiskWrite;
 import com.android.server.net.IpConfigStore;
+import com.android.server.wifi.hotspot2.PasspointEventHandler;
+import com.android.server.wifi.hotspot2.PasspointManager;
 
 import java.util.ArrayList;
 
@@ -84,6 +86,7 @@ public class WifiInjector {
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
     private WifiScanner mWifiScanner;
+    private final PasspointManager mPasspointManager;
 
     private final boolean mUseRealLogger;
 
@@ -154,6 +157,7 @@ public class WifiInjector {
         mWifiLastResortWatchdog = new WifiLastResortWatchdog(mWifiController, mWifiMetrics);
         mWifiMulticastLockManager = new WifiMulticastLockManager(mWifiStateMachine,
                 BatteryStatsService.getService());
+        mPasspointManager = new PasspointManager(mContext, this);
     }
 
     /**
@@ -258,6 +262,10 @@ public class WifiInjector {
         return mWifiConfigManager;
     }
 
+    public PasspointManager getPasspointManager() {
+        return mPasspointManager;
+    }
+
     public TelephonyManager makeTelephonyManager() {
         // may not be available when WiFi starts
         return (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
@@ -321,5 +329,9 @@ public class WifiInjector {
                     mWifiStateMachineHandlerThread.getLooper());
         }
         return mWifiScanner;
+    }
+
+    public PasspointEventHandler makePasspointEventHandler(PasspointManager passpointManager) {
+        return new PasspointEventHandler(mWifiNative, passpointManager);
     }
 }
