@@ -40,6 +40,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.os.WorkSource;
 import android.util.ArrayMap;
 import android.util.LocalLog;
@@ -93,6 +94,8 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
     }
 
     private WifiScannerImpl mScannerImpl;
+
+    private ScanResult[] mCachedScanResults = new ScanResult[0];
 
     @Override
     public Messenger getMessenger() {
@@ -653,6 +656,7 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                     case CMD_SCAN_FAILED:
                         mWifiMetrics.incrementScanReturnEntry(
                                 WifiMetricsProto.WifiLog.SCAN_UNKNOWN, mActiveScans.size());
+                        sendScanResultBroadcast(false);
                         sendOpFailedToAllAndClear(mActiveScans, WifiScanner.REASON_UNSPECIFIED,
                                 "Scan failed");
                         transitionTo(mIdleState);
@@ -815,6 +819,13 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
             }
         }
 
+        void sendScanResultBroadcast(boolean scanSucceeded) {
+            Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+            intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+            intent.putExtra(WifiManager.EXTRA_RESULTS_UPDATED, scanSucceeded);
+            mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+        }
+
         void reportScanResults(ScanData results) {
             if (results != null && results.getResults() != null) {
                 if (results.getResults().length > 0) {
@@ -843,6 +854,10 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
                         describeForLog(allResults));
                 entry.reportEvent(WifiScanner.CMD_SCAN_RESULT, 0, parcelableAllResults);
             }
+
+            // Cache the results here so that apps can retrieve them.
+            mCachedScanResults = results.getResults();
+            sendScanResultBroadcast(true);
         }
     }
 

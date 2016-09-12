@@ -3107,12 +3107,14 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         return address;
     }
 
+    /*
     void sendScanResultsAvailableBroadcast(boolean scanSucceeded) {
         Intent intent = new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
         intent.putExtra(WifiManager.EXTRA_RESULTS_UPDATED, scanSucceeded);
         mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
     }
+    */
 
     private void sendRssiChangeBroadcast(final int newRssi) {
         try {
@@ -4351,8 +4353,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     setScanResults();
                     if (mIsFullScanOngoing || mSendScanResultsBroadcast) {
                         /* Just updated results from full scan, let apps know about this */
-                        boolean scanSucceeded = message.what == WifiMonitor.SCAN_RESULTS_EVENT;
-                        sendScanResultsAvailableBroadcast(scanSucceeded);
+                        //boolean scanSucceeded = message.what == WifiMonitor.SCAN_RESULTS_EVENT;
+                        //sendScanResultsAvailableBroadcast(scanSucceeded);
                     }
                     mSendScanResultsBroadcast = false;
                     mIsScanOngoing = false;

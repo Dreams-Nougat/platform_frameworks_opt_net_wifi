@@ -26,6 +26,7 @@ import android.app.test.MockAnswerUtil.AnswerWithArguments;
 import android.app.test.TestAlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -36,6 +37,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.os.WorkSource;
 import android.os.test.TestLooper;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -495,6 +497,7 @@ public class WifiScanningServiceTest {
         mLooper.dispatchAll();
         verifyScanResultsRecieved(order, handler, requestId, results.getScanData());
         verifySingleScanCompletedRecieved(order, handler, requestId);
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verifyNoMoreInteractions(handler);
         verify(mBatteryStats).noteWifiScanStoppedFromSource(eq(workSource));
         assertDumpContainsRequestLog("addSingleScanRequest", requestId);
@@ -627,6 +630,7 @@ public class WifiScanningServiceTest {
         assertEquals(mWifiMetrics.getOneshotScanCount(), 1);
         assertEquals(mWifiMetrics.getScanReturnEntry(WifiMetricsProto.WifiLog.SCAN_UNKNOWN), 1);
         verify(mBatteryStats).noteWifiScanStoppedFromSource(eq(workSource));
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
     }
 
     /**
@@ -743,7 +747,7 @@ public class WifiScanningServiceTest {
 
         Handler handler = mock(Handler.class);
         BidirectionalAsyncChannel controlChannel = connectChannel(handler);
-        InOrder order = inOrder(handler, mWifiScannerImpl);
+        InOrder order = inOrder(handler, mWifiScannerImpl, mContext);
 
         // Run scan 1
         sendSingleScanRequest(controlChannel, requestId1, requestSettings1, null);
@@ -759,6 +763,13 @@ public class WifiScanningServiceTest {
         eventHandler1.onScanStatus(WifiNative.WIFI_SCAN_RESULTS_AVAILABLE);
 
         mLooper.dispatchAll();
+        // Note: The order of the following verification calls looks out of order if you compare to
+        // the source code of WifiScanningServiceImpl WifiSingleScanStateMachine.reportScanResults.
+        // This is due to the fact that verifyScanResultsReceived and
+        // verifySingleScanCompletedReceived require an additional call to handle the message that
+        // is created in reportScanResults.  This handling is done in the two verify*Received calls
+        // that is run AFTER the reportScanResults method in WifiScanningServiceImpl completes.
+        order.verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verifyScanResultsRecieved(order, handler, requestId1, results1.getScanData());
         verifySingleScanCompletedRecieved(order, handler, requestId1);
 
@@ -776,6 +787,7 @@ public class WifiScanningServiceTest {
         eventHandler2.onScanStatus(WifiNative.WIFI_SCAN_RESULTS_AVAILABLE);
 
         mLooper.dispatchAll();
+        order.verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verifyScanResultsRecieved(order, handler, requestId2, results2.getScanData());
         verifySingleScanCompletedRecieved(order, handler, requestId2);
     }
@@ -828,6 +840,7 @@ public class WifiScanningServiceTest {
         mLooper.dispatchAll();
         verifyScanResultsRecieved(handlerOrder, handler, requestId1, results1.getScanData());
         verifySingleScanCompletedRecieved(handlerOrder, handler, requestId1);
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
 
         // now that the first scan completed we expect the second one to start
         WifiNative.ScanEventHandler eventHandler2 = verifyStartSingleScan(nativeOrder,
@@ -841,6 +854,7 @@ public class WifiScanningServiceTest {
         mLooper.dispatchAll();
         verifyScanResultsRecieved(handlerOrder, handler, requestId2, results2.getScanData());
         verifySingleScanCompletedRecieved(handlerOrder, handler, requestId2);
+        verify(mContext, times(2)).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         assertEquals(mWifiMetrics.getOneshotScanCount(), 2);
         assertEquals(mWifiMetrics.getScanReturnEntry(WifiMetricsProto.WifiLog.SCAN_SUCCESS), 2);
     }
@@ -917,6 +931,7 @@ public class WifiScanningServiceTest {
         mLooper.dispatchAll();
         verifyScanResultsRecieved(handlerOrder, handler, requestId1, results1.getScanData());
         verifySingleScanCompletedRecieved(handlerOrder, handler, requestId1);
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verify(mBatteryStats).noteWifiScanStoppedFromSource(eq(workSource1));
         verify(mBatteryStats).noteWifiScanStartedFromSource(eq(workSource2and3));
 
@@ -1095,6 +1110,7 @@ public class WifiScanningServiceTest {
 
         verifyScanResultsRecieved(handlerOrder, handler, requestId2, results2.getScanData());
         verifySingleScanCompletedRecieved(handlerOrder, handler, requestId2);
+        verify(mContext, times(2)).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         assertEquals(mWifiMetrics.getOneshotScanCount(), 3);
         assertEquals(mWifiMetrics.getScanReturnEntry(WifiMetricsProto.WifiLog.SCAN_SUCCESS), 3);
 
@@ -1151,6 +1167,7 @@ public class WifiScanningServiceTest {
         verifyScanResultsRecieved(order, handler, requestId, results.getScanData());
         verifySingleScanCompletedRecieved(order, handler, requestId);
         verifyScanResultsRecieved(order, handler, listenerRequestId, results.getScanData());
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verifyNoMoreInteractions(handler);
 
         assertDumpContainsRequestLog("registerScanListener", listenerRequestId);
@@ -1200,6 +1217,7 @@ public class WifiScanningServiceTest {
         mLooper.dispatchAll();
         verifyScanResultsRecieved(order, handler, requestId, results.getScanData());
         verifySingleScanCompletedRecieved(order, handler, requestId);
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verifyNoMoreInteractions(handler);
 
         assertDumpContainsRequestLog("registerScanListener", listenerRequestId);
@@ -1277,6 +1295,7 @@ public class WifiScanningServiceTest {
         verifyScanResultsRecieved(handlerOrder, handler, requestId1, results1.getScanData());
         verifySingleScanCompletedRecieved(handlerOrder, handler, requestId1);
         verifyScanResultsRecieved(handlerOrder, handler, listenerRequestId, results1.getScanData());
+        verify(mContext).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
 
         // now that the first scan completed we expect the second and third ones to start
         WifiNative.ScanEventHandler eventHandler2and3 = verifyStartSingleScan(nativeOrder,
