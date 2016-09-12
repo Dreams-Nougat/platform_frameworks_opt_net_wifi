@@ -40,12 +40,36 @@ UUID: cbe692fe_595c241e
 Bytes: 174
 Isn't this the method of the AIDL (if not then ignore). You're implementing it by "extends IWifiP2pManager.Stub". Hence this method is an @Override of the method in the stub.
 
+467:4-467:10
+Mon Sep 12 17:04:23 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_b9536831
+UUID: cbe692fe_d4cc7230
+Bytes: 4
+Done
+
+467:4-467:10
+Mon Sep 12 17:04:23 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_595c241e
+UUID: cbe692fe_f4d08ebf
+Bytes: 4
+Done
+
 479
 Sat Sep 10 02:02:03 2016 +0000
 Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cbe692fe_03386d27
 Bytes: 193
 need to add another check for version. Maybe callerPermission can be defaulted to true and in Line 475, it is only updated for the right version. This will make it compatible with older builds.
+
+479
+Mon Sep 12 17:04:23 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_03386d27
+UUID: cbe692fe_b4c7e609
+Bytes: 4
+Done
 
 481:6-481:7
 Sat Sep 10 04:47:35 2016 +0000
@@ -78,6 +102,14 @@ if (callerPermission) {
 
 But this is a nit/style issue.
 
+481:6-481:7
+Mon Sep 12 17:04:23 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_7961e0d8
+UUID: cbe692fe_74bd5e86
+Bytes: 50
+Okay. Will follow style guidelines and updated it.
+
 3234:0-3236:5
 Sat Sep 10 04:47:35 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -100,4 +132,12 @@ Parent: cbe692fe_793ac0f6
 UUID: cbe692fe_9966acf0
 Bytes: 107
 I asked because this is new code (i.e. old code worked without it), but didn't see any new code using this.
+
+3234:0-3236:5
+Mon Sep 12 17:04:23 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cbe692fe_9966acf0
+UUID: cbe692fe_5435c22d
+Bytes: 42
+There's a call to this method on line 480.
 
