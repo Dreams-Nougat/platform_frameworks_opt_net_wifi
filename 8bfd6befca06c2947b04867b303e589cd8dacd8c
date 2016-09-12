@@ -9,6 +9,13 @@ UUID: cb277249_8851472b
 Bytes: 97
 leaving these commented out for the first rounds of code review.  Will be removed before merging.
 
+4354
+Mon Sep 12 23:17:41 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_0e945feb
+Bytes: 36
+Can we just remove this whole block?
+
 File: service/java/com/android/server/wifi/scanner/WifiScanningServiceImpl.java
 
 809:13-809:33
@@ -17,4 +24,19 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_a862030d
 Bytes: 38
 Should the broadcast be sent here too?
+
+809:13-809:33
+Mon Sep 12 23:17:41 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_a862030d
+UUID: cb277249_6eaab327
+Bytes: 40
+No this is a result for an individual AP
+
+822
+Mon Sep 12 23:17:41 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_8ea70f5b
+Bytes: 16
+could be private
 
