@@ -31,6 +31,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.android.internal.R;
+import com.android.internal.annotations.VisibleForTesting;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -49,7 +50,8 @@ public class WifiNetworkSelector {
     private static final long INVALID_TIME_STAMP = Long.MIN_VALUE;
     // Minimum time gap between last successful network selection and a new selection
     // attempt.
-    private static final int MINIMUM_NETWORK_SELECTION_INTERVAL_MS = 10 * 1000;
+    @VisibleForTesting
+    public static final int MINIMUM_NETWORK_SELECTION_INTERVAL_MS = 10 * 1000;
 
     // Constants for BSSID blacklist.
     public static final int BSSID_BLACKLIST_THRESHOLD = 3;
