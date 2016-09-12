@@ -1,0 +1,15 @@
+Revision: 8cd2a977fb76937684b9bac684e038d1956a5862
+Patch-set: 1
+File: /COMMIT_MSG
+
+12:3-12:6
+Mon Sep 12 16:34:53 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cbe692fe_94c2eaf9
+Bytes: 144
+try following format:
+
+Bug: XXXXXX
+
+For some reason gerrit isn't displaying the current format as a link. Possibly AOSP gerrit bug but not sure.
+
