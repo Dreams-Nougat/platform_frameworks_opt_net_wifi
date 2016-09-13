@@ -9,6 +9,16 @@ UUID: cb277249_bdf7a3ba
 Bytes: 132
 Can we create the PasspointEventHandler() here itself? We don't need a makePasspointEventHandler if it has no external dependencies.
 
+160
+Tue Sep 13 01:29:22 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_bdf7a3ba
+UUID: cb277249_5e8a02c8
+Bytes: 330
+It is a chicken and egg problem, since PasspointEventHandler needs an instance of PasspointEventHandler.Callbacks which PasspointManager implement.
+
+Now I think again, I don't think it is necessary to mock PasspointEventHandler, since it will not be used in unit tests.  Will remove it for now and revisit if needed in unit tests.
+
 File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
 
 47:45-47:70
