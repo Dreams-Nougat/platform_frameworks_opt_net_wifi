@@ -9,12 +9,32 @@ UUID: cb277249_29c8359e
 Bytes: 208
 We're now iterating thru the same results twice now (in each of the evaluator). This might be a performance issue because the |getSavedNetworkForScanDetailAndCache| is pretty expensive operation (b/30758712).
 
+201:39-201:75
+Tue Sep 13 06:35:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_29c8359e
+UUID: cb277249_0f9c565d
+Bytes: 339
+Some thoughts here:
+
+1) Can we improve the performance of WifiConfigManager#getSavedNetworkForScanDetail? Instead of iterating thru all the saved networks, can use something like hash table for lookup?
+
+2) We don't always iterate through the same results twice. We get here only if no candidate surfaces out from the SavedNetworkEvaluator.
+
 222:16-222:68
 Tue Sep 13 00:33:11 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_49bc9123
 Bytes: 241
 This change won't reflect in the WifiConfigMAnager database. Use this: https://cs.corp.google.com/android/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java?rcl=1eb13bbe2067a536dbf5ab7fd43f9e7a75454963&l=1487
+
+222:16-222:68
+Tue Sep 13 06:35:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_49bc9123
+UUID: cb277249_0ff8d665
+Bytes: 237
+Can we chat more about this tomorrow? My understanding is this is because of the recent WifiConfigManager change, right? I am a bit concerned on this kind of behavior changes given setSeeInLastQualifiedNetworkSelection() is a public API.
 
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
@@ -24,6 +44,20 @@ Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_693aad85
 Bytes: 116
 Should this be in connectivity manager at all? This is internal to network selector and is probably best kept there.
+
+122:1-124:67
+Tue Sep 13 06:35:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_693aad85
+UUID: 8b83ba54_72863815
+Bytes: 1375
+Here is my take on this. In addition to move out the saved networks and ephemeral networks evaluations code from the original QNS, we de-couple them further by not registering any network evaluator in the WifiNetworkSelector itself. All WifiNetworkSelector does is to filter the scan results, pass the potentially connectable networks to network evaluators if any registered, and pass the network surfaced out for WifiConnectivityManager to connect or roam to.
+
+WifiNetworkSelector has no interests in knowing which evaluator(s) are registered and how they are implemented, regardless of whether they are internally developed ones or the ones added by third party later. Other than defining the interface of WifiNetworkEvaluator, WifiNetworkSelector, SavedNetworkEvaluator and ExternalScoreNetworkEvaluator are three independent entities.
+
+WCM is the one which makes decision on how a connectivity scan should be performed, whether a candidate recommended by WifiNetworkSelector should be connected or roamed to, and etc. These make it naturally an ideal place to decide which network evaluators should be registered and what priorities these evaluators should be.
+
+This benefit of this modularized architecture is going to be demoed by the unit tests of WifiNetworkSelector, SavedNetworkSelector and ExternalScoreNetworkSelector. These unit tests will be coming in next CLs.
 
 131:0-132:63
 Tue Sep 13 00:33:11 2016 +0000
@@ -39,6 +73,14 @@ UUID: cb277249_09ee99ec
 Bytes: 196
 Same comment. I know the network selector is trying to be agnostic of these evaulators. But, these 2 evaluators are internal ones and can be registered internally in NetworkSelector() constructor.
 
+508:8-511:55
+Tue Sep 13 06:35:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_09ee99ec
+UUID: 8b83ba54_3290b042
+Bytes: 21
+See my replies above.
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
 
 127:66-127:85
@@ -47,6 +89,14 @@ Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_c972e173
 Bytes: 66
 What is this doing? Is this different from the candidate returned?
+
+127:66-127:85
+Tue Sep 13 06:35:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_c972e173
+UUID: 8b83ba54_9295dc31
+Bytes: 169
+This is a list of networks that can be potentially used for connection. The candidate returned is the best one among them. This list is used by the last resort watchdog.
 
 130:4-130:10
 Thu Sep 08 23:59:57 2016 +0000
