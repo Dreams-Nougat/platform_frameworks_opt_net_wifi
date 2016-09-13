@@ -139,3 +139,13 @@ Getting them will be done in the next CL (created b/31444878).  There is more pl
 
 For expiration - I do not think this should be timestamped and then filtered by the apps.  I was more addressing the issues with toggling wifi vs doze mode, etc.  Doze mode could cause scans to be cancelled for hours - maybe we should invalidate the scan results if they are x-minutes old?   (Just a thought I had tonight)
 
+859
+Tue Sep 13 06:43:31 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_14c0e941
+UUID: 8b83ba54_32a750ab
+Bytes: 127
+Thanks for the explanation. 
+
+Regarding expiration, do we know which apps are going to be the user of this cached scan results?
+
