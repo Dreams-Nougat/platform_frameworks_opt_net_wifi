@@ -25,6 +25,14 @@ UUID: cb277249_89a7095b
 Bytes: 79
 This is probably unnecessary? We can check for null if nothing is assigned yet.
 
+98:45-98:64
+Tue Sep 13 00:38:41 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_89a7095b
+UUID: cb277249_c9a0a1a7
+Bytes: 150
+I like this style just so you don't have to worry about doing the check. I doubt this has significant impact and will be gced as soon as we do a scan.
+
 809:13-809:33
 Mon Sep 12 22:06:32 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -46,4 +54,11 @@ Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_8ea70f5b
 Bytes: 16
 could be private
+
+859
+Tue Sep 13 00:38:41 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_498d7134
+Bytes: 97
+Should this get cleared out when wifi is toggled? It might not be today, but probably makes sense
 
