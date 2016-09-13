@@ -16,6 +16,14 @@ UUID: cb277249_0e945feb
 Bytes: 36
 Can we just remove this whole block?
 
+4354
+Tue Sep 13 02:15:32 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_0e945feb
+UUID: cb277249_6e4b9356
+Bytes: 150
+yep - will do after I double check.  Might need to be fully removed in the next CL when the cached scan results are retrieved from WifiScanningService
+
 File: service/java/com/android/server/wifi/scanner/WifiScanningServiceImpl.java
 
 98:45-98:64
@@ -48,6 +56,14 @@ UUID: cb277249_6eaab327
 Bytes: 40
 No this is a result for an individual AP
 
+809:13-809:33
+Tue Sep 13 02:15:32 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_6eaab327
+UUID: cb277249_ee7d6377
+Bytes: 11
+Ah, thanks!
+
 822
 Mon Sep 12 23:17:41 2016 +0000
 Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -61,4 +77,14 @@ Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_498d7134
 Bytes: 97
 Should this get cleared out when wifi is toggled? It might not be today, but probably makes sense
+
+859
+Tue Sep 13 02:15:32 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_498d7134
+UUID: cb277249_9e165a50
+Bytes: 137
+Would it be more appropriate to clear it when the interface is down?
+
+Also, would we want to have them cleared after some amount of time?
 
