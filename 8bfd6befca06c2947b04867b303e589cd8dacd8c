@@ -17,12 +17,28 @@ UUID: cb277249_5468a189
 Bytes: 154
 Can I suggest we just remove this block just in case we forget to delete it later? With Git and Gerrit I think it is pretty clear where they are moved to.
 
+3110:4-3116:5
+Tue Sep 13 05:40:15 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_5468a189
+UUID: cb277249_d4cef17d
+Bytes: 156
+I am removing it (and the other commented out lines) after this first round of reviews.  I wanted to make sure it was very clear what was getting removed :)
+
 4347:1-4348:47
 Tue Sep 13 05:18:26 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cb277249_145229da
 Bytes: 91
 Can this be moved out of WifiStateMachine as well? It doesn't have to be in this CL though.
+
+4347:1-4348:47
+Tue Sep 13 05:40:15 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_145229da
+UUID: cb277249_74e4bdff
+Bytes: 31
+That is planned for the next CL
 
 4354
 Mon Sep 12 23:17:41 2016 +0000
@@ -112,4 +128,14 @@ Bytes: 419
 I only see this 'mCachedScanResults' gets set. Don't see where it is retrieved. Am I missing something?
 
 How do we expect apps to make use of this cached scan results? Do we expect apps to check the timestamp and decide whether they can use it or not? Or we will expire them internally? If the latter, how do we determine the expiration threshold? If apps have to look the timestamp, then we don't need to clear it out.
+
+859
+Tue Sep 13 05:40:15 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_14eea9ec
+UUID: cb277249_14c0e941
+Bytes: 653
+Getting them will be done in the next CL (created b/31444878).  There is more plumbing to do to get the calls added and it seemed better to break it in to two pieces.  This will also have a follow-on CL to move the scan requests getting cancelled from WifiService to WifiScanningServiceImpl (as noted in a comment in WifiService)
+
+For expiration - I do not think this should be timestamped and then filtered by the apps.  I was more addressing the issues with toggling wifi vs doze mode, etc.  Doze mode could cause scans to be cancelled for hours - maybe we should invalidate the scan results if they are x-minutes old?   (Just a thought I had tonight)
 
