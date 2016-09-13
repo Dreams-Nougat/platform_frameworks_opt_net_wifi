@@ -1,0 +1,33 @@
+Revision: 6bad5e4cd5c61357416c4d996da8ce1096c4b07f
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+160
+Tue Sep 13 00:11:03 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_bdf7a3ba
+Bytes: 132
+Can we create the PasspointEventHandler() here itself? We don't need a makePasspointEventHandler if it has no external dependencies.
+
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+47:45-47:70
+Tue Sep 13 00:11:03 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_e92a3da1
+Bytes: 394
+Don't pass WifiInjector in the constructor. You can create the PasspointEventHandler directly in WifiInjector and pass it to the constructor here. 
+
+WifiInjector is passed into the constructor of a few classes today. We will be removing all of them soon. All the external dependencies for each class should be taken in as a constructor argument. WifiInjector should just create these instances.
+
+File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
+
+68:0-69:37
+Tue Sep 13 00:11:03 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_c910a161
+Bytes: 172
+This should be changed to directly pass the mock PasspointEventHandler in the constructor. 
+
+There are other tests which do this pattern as well. We should get rid of them.
+
