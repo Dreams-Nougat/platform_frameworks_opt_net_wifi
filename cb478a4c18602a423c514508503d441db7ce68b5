@@ -1,6 +1,52 @@
 Revision: cb478a4c18602a423c514508503d441db7ce68b5
 Patch-set: 1
+File: service/java/com/android/server/wifi/ExternalScoreEvaluator.java
+
+201:39-201:75
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_29c8359e
+Bytes: 208
+We're now iterating thru the same results twice now (in each of the evaluator). This might be a performance issue because the |getSavedNetworkForScanDetailAndCache| is pretty expensive operation (b/30758712).
+
+222:16-222:68
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_49bc9123
+Bytes: 241
+This change won't reflect in the WifiConfigMAnager database. Use this: https://cs.corp.google.com/android/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java?rcl=1eb13bbe2067a536dbf5ab7fd43f9e7a75454963&l=1487
+
+File: service/java/com/android/server/wifi/WifiConnectivityManager.java
+
+122:1-124:67
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_693aad85
+Bytes: 116
+Should this be in connectivity manager at all? This is internal to network selector and is probably best kept there.
+
+131:0-132:63
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_89370999
+Bytes: 14
+Same as above.
+
+508:8-511:55
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_09ee99ec
+Bytes: 196
+Same comment. I know the network selector is trying to be agnostic of these evaulators. But, these 2 evaluators are internal ones and can be registered internally in NetworkSelector() constructor.
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+127:66-127:85
+Tue Sep 13 00:33:11 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cb277249_c972e173
+Bytes: 66
+What is this doing? Is this different from the candidate returned?
 
 130:4-130:10
 Thu Sep 08 23:59:57 2016 +0000
