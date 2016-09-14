@@ -45,6 +45,14 @@ Will hashmap help lookup in WifiConfigManager#getSavedNetworkForScanDetails? Cur
             }
         }
 
+201:39-201:75
+Wed Sep 14 17:51:35 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_5893ff50
+UUID: 8b6c9a82_7b691db5
+Bytes: 37
+Filed b/31489297 to investigate this.
+
 222:16-222:68
 Tue Sep 13 00:33:11 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
