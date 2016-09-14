@@ -1,0 +1,22 @@
+Revision: a2dd90cb612d05f3e7e5e611dd03b4e4585c0258
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+5402:60-5402:65
+Wed Sep 14 15:15:56 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_9b1c1483
+Bytes: 106
+We should probably declare constants for these bundle keys. You can take it up in a separate CL if u want.
+
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+43:40-43:72
+Wed Sep 14 15:15:56 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_3b00880d
+Bytes: 449
+This is left to your preference. 
+You could have a private member variable for handling the callbacks instead of extending this class and passing that member to the PasspointEventHandler constructor. I kind of feel confused when the main class is also implementing a bunch of other interfaces. Then you also don't need to add the extra comments below to clarify what these methods are doing.
+/** Implementation of PasspointEventHandler.Callbacks. */
+
