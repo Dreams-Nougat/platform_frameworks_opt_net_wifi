@@ -31,16 +31,16 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.net.wifi.RttManager;
 import android.net.wifi.nan.ConfigRequest;
+import android.net.wifi.nan.IWifiNanDiscoverySessionCallback;
 import android.net.wifi.nan.IWifiNanEventCallback;
 import android.net.wifi.nan.IWifiNanManager;
-import android.net.wifi.nan.IWifiNanSessionCallback;
 import android.net.wifi.nan.PublishConfig;
 import android.net.wifi.nan.SubscribeConfig;
+import android.net.wifi.nan.WifiNanDiscoverySessionCallback;
 import android.net.wifi.nan.WifiNanEventCallback;
 import android.net.wifi.nan.WifiNanManager;
-import android.net.wifi.nan.WifiNanPublishSession;
-import android.net.wifi.nan.WifiNanSessionCallback;
-import android.net.wifi.nan.WifiNanSubscribeSession;
+import android.net.wifi.nan.WifiNanPublishDiscoverySession;
+import android.net.wifi.nan.WifiNanSubscribeDiscoverySession;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcel;
@@ -83,16 +83,16 @@ public class WifiNanManagerTest {
     public WifiNanEventCallback mockCallback;
 
     @Mock
-    public WifiNanSessionCallback mockSessionCallback;
+    public WifiNanDiscoverySessionCallback mockSessionCallback;
 
     @Mock
     public IWifiNanManager mockNanService;
 
     @Mock
-    public WifiNanPublishSession mockPublishSession;
+    public WifiNanPublishDiscoverySession mockPublishSession;
 
     @Mock
-    public WifiNanSubscribeSession mockSubscribeSession;
+    public WifiNanSubscribeDiscoverySession mockSubscribeSession;
 
     @Mock
     public RttManager.RttListener mockRttListener;
@@ -179,7 +179,7 @@ public class WifiNanManagerTest {
         PublishConfig publishConfig = new PublishConfig.Builder().build();
         mDut.publish(publishConfig, mockSessionCallback);
         inOrder.verify(mockNanService).publish(eq(clientId), eq(publishConfig),
-                any(IWifiNanSessionCallback.class));
+                any(IWifiNanDiscoverySessionCallback.class));
 
         // (4) disconnect
         mDut.disconnect();
@@ -236,7 +236,7 @@ public class WifiNanManagerTest {
         SubscribeConfig subscribeConfig = new SubscribeConfig.Builder().build();
         mDut.subscribe(subscribeConfig, mockSessionCallback);
         inOrder.verify(mockNanService).subscribe(eq(clientId), eq(subscribeConfig),
-                any(IWifiNanSessionCallback.class));
+                any(IWifiNanDiscoverySessionCallback.class));
 
         verifyNoMoreInteractions(mockCallback, mockSessionCallback, mockNanService);
     }
@@ -273,7 +273,7 @@ public class WifiNanManagerTest {
     }
 
     /*
-     * WifiNanSessionCallbackProxy Tests
+     * WifiNanDiscoverySessionCallbackProxy Tests
      */
 
     /**
@@ -292,7 +292,7 @@ public class WifiNanManagerTest {
         final String string1 = "hey from here...";
         final String string2 = "some other arbitrary string...";
         final int messageId = 2123;
-        final int reason = WifiNanSessionCallback.REASON_OTHER;
+        final int reason = WifiNanDiscoverySessionCallback.REASON_OTHER;
 
         when(mockNanService.connect(any(IBinder.class), anyString(),
                 any(IWifiNanEventCallback.class), eq(configRequest))).thenReturn(clientId);
@@ -301,10 +301,10 @@ public class WifiNanManagerTest {
                 mockPublishSession);
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanPublishSession> publishSession = ArgumentCaptor
-                .forClass(WifiNanPublishSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanPublishDiscoverySession> publishSession = ArgumentCaptor
+                .forClass(WifiNanPublishDiscoverySession.class);
 
         // (0) connect + success
         mDut.connect(mMockLooperHandler, configRequest, mockCallback);
@@ -371,7 +371,7 @@ public class WifiNanManagerTest {
         final int sessionId = 123;
         final ConfigRequest configRequest = new ConfigRequest.Builder().build();
         final PublishConfig publishConfig = new PublishConfig.Builder().build();
-        final int reason = WifiNanSessionCallback.TERMINATE_REASON_DONE;
+        final int reason = WifiNanDiscoverySessionCallback.TERMINATE_REASON_DONE;
 
         when(mockNanService.connect(any(IBinder.class), anyString(),
                 any(IWifiNanEventCallback.class), eq(configRequest))).thenReturn(clientId);
@@ -380,10 +380,10 @@ public class WifiNanManagerTest {
                 mockPublishSession);
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanPublishSession> publishSession = ArgumentCaptor
-                .forClass(WifiNanPublishSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanPublishDiscoverySession> publishSession = ArgumentCaptor
+                .forClass(WifiNanPublishDiscoverySession.class);
 
         // (1) connect successfully
         mDut.connect(mMockLooperHandler, configRequest, mockCallback);
@@ -426,7 +426,7 @@ public class WifiNanManagerTest {
         final String string1 = "hey from here...";
         final String string2 = "some other arbitrary string...";
         final int messageId = 2123;
-        final int reason = WifiNanSessionCallback.REASON_OTHER;
+        final int reason = WifiNanDiscoverySessionCallback.REASON_OTHER;
 
         when(mockNanService.connect(any(IBinder.class), anyString(),
                 any(IWifiNanEventCallback.class), eq(configRequest))).thenReturn(clientId);
@@ -435,10 +435,10 @@ public class WifiNanManagerTest {
                 mockSubscribeSession);
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanSubscribeSession> subscribeSession = ArgumentCaptor
-                .forClass(WifiNanSubscribeSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanSubscribeDiscoverySession> subscribeSession = ArgumentCaptor
+                .forClass(WifiNanSubscribeDiscoverySession.class);
 
         // (0) connect + success
         mDut.connect(mMockLooperHandler, configRequest, mockCallback);
@@ -505,7 +505,7 @@ public class WifiNanManagerTest {
         final int sessionId = 123;
         final ConfigRequest configRequest = new ConfigRequest.Builder().build();
         final SubscribeConfig subscribeConfig = new SubscribeConfig.Builder().build();
-        final int reason = WifiNanSessionCallback.TERMINATE_REASON_DONE;
+        final int reason = WifiNanDiscoverySessionCallback.TERMINATE_REASON_DONE;
 
         when(mockNanService.connect(any(IBinder.class), anyString(),
                 any(IWifiNanEventCallback.class), eq(configRequest))).thenReturn(clientId);
@@ -514,10 +514,10 @@ public class WifiNanManagerTest {
                 mockSubscribeSession);
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanSubscribeSession> subscribeSession = ArgumentCaptor
-                .forClass(WifiNanSubscribeSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanSubscribeDiscoverySession> subscribeSession = ArgumentCaptor
+                .forClass(WifiNanSubscribeDiscoverySession.class);
 
         // (1) connect successfully
         mDut.connect(mMockLooperHandler, configRequest, mockCallback);
@@ -885,10 +885,10 @@ public class WifiNanManagerTest {
                 mockPublishSession, mockRttListener);
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanPublishSession> publishSession = ArgumentCaptor
-                .forClass(WifiNanPublishSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanPublishDiscoverySession> publishSession = ArgumentCaptor
+                .forClass(WifiNanPublishDiscoverySession.class);
         ArgumentCaptor<RttManager.ParcelableRttParams> rttParamCaptor = ArgumentCaptor
                 .forClass(RttManager.ParcelableRttParams.class);
         ArgumentCaptor<RttManager.RttResult[]> rttResultsCaptor = ArgumentCaptor
@@ -957,10 +957,10 @@ public class WifiNanManagerTest {
 
         ArgumentCaptor<IWifiNanEventCallback> clientProxyCallback = ArgumentCaptor
                 .forClass(IWifiNanEventCallback.class);
-        ArgumentCaptor<IWifiNanSessionCallback> sessionProxyCallback = ArgumentCaptor
-                .forClass(IWifiNanSessionCallback.class);
-        ArgumentCaptor<WifiNanPublishSession> publishSession = ArgumentCaptor
-                .forClass(WifiNanPublishSession.class);
+        ArgumentCaptor<IWifiNanDiscoverySessionCallback> sessionProxyCallback = ArgumentCaptor
+                .forClass(IWifiNanDiscoverySessionCallback.class);
+        ArgumentCaptor<WifiNanPublishDiscoverySession> publishSession = ArgumentCaptor
+                .forClass(WifiNanPublishDiscoverySession.class);
 
         when(mockNanService.connect(any(IBinder.class), anyString(),
                 any(IWifiNanEventCallback.class), any(ConfigRequest.class))).thenReturn(clientId);
