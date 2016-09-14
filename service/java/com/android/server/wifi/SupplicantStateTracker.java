@@ -230,6 +230,10 @@ public class SupplicantStateTracker extends StateMachine {
                     transitionOnSupplicantStateChange(stateChangeResult);
                     break;
                 case WifiStateMachine.CMD_RESET_SUPPLICANT_STATE:
+                    if (getCurrentState() == mScanState
+                            || getCurrentState() == mHandshakeState) {
+                        sendSupplicantStateChangedBroadcast(SupplicantState.DISCONNECTED, false);
+                    }
                     transitionTo(mUninitializedState);
                     break;
                 case WifiManager.CONNECT_NETWORK:
