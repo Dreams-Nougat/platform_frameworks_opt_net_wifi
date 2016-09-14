@@ -21,6 +21,14 @@ Some thoughts here:
 
 2) We don't always iterate through the same results twice. We get here only if no candidate surfaces out from the SavedNetworkEvaluator.
 
+201:39-201:75
+Wed Sep 14 15:33:20 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_0f9c565d
+UUID: 8b6c9a82_7b4b6056
+Bytes: 182
+The linking of networks is expensive and we have to iterate thru all the networks there, hashmaps will not work. But, that is anyway planned to be optimized tracked by the bug above.
+
 222:16-222:68
 Tue Sep 13 00:33:11 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -35,6 +43,14 @@ Parent: cb277249_49bc9123
 UUID: cb277249_0ff8d665
 Bytes: 237
 Can we chat more about this tomorrow? My understanding is this is because of the recent WifiConfigManager change, right? I am a bit concerned on this kind of behavior changes given setSeeInLastQualifiedNetworkSelection() is a public API.
+
+222:16-222:68
+Wed Sep 14 15:33:20 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_0ff8d665
+UUID: 8b6c9a82_1b5ca41c
+Bytes: 35
+I'm assuming this is now clarified.
 
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
