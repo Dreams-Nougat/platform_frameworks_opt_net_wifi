@@ -1,0 +1,11 @@
+Revision: 0b3c56d427f18791e144dc1f5af33fc73660d9ef
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+801
+Wed Sep 14 17:46:24 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_9b1f3177
+Bytes: 141
+Do we always want to bump up mNextNetworkId++? If there is an existing internal config already, we don't need to create new networkId, right?
+
