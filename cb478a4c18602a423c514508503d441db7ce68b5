@@ -84,6 +84,14 @@ UUID: 8b6c9a82_98bbb7bf
 Bytes: 70
 I am going to rebase these CLs and go through how this "seen" is used.
 
+222:16-222:68
+Wed Sep 14 22:01:15 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_98bbb7bf
+UUID: 8b6c9a82_b2e1f2f0
+Bytes: 92
+As we discussed, this is needed. Going to be via WifiConfigManager though. Filed b/31497121.
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 122:1-124:67
