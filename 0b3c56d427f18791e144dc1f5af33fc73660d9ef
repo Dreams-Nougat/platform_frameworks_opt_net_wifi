@@ -17,3 +17,18 @@ UUID: 8b6c9a82_3bdf255c
 Bytes: 146
 True. But, I'm not sure if it's worth going back and decrementing this. We don't need the network ID's to be continuous as long as they're unique.
 
+801
+Wed Sep 14 18:03:36 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_3bdf255c
+UUID: 8b6c9a82_bb855540
+Bytes: 75
+Agreed, as long as we have no concerns with having holes in the networkIds.
+
+874:66-874:71
+Wed Sep 14 18:03:36 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_3bc08542
+Bytes: 105
+As we discussed, can we add a test case that there are two networks, same SSID, one Open and one WPA_PSK?
+
