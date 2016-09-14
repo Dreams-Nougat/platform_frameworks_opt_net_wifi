@@ -19,7 +19,6 @@ package com.android.server.wifi;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import android.app.Application;
 import android.app.test.MockAnswerUtil.AnswerWithArguments;
 import android.content.Context;
 import android.content.Intent;
@@ -2091,6 +2090,42 @@ public class WifiConfigManagerTest {
         assertEquals(2, hiddenNetworks.size());
         assertEquals(network1.SSID, hiddenNetworks.get(0).ssid);
         assertEquals(network2.SSID, hiddenNetworks.get(1).ssid);
+    }
+
+    /**
+     * Verifies the addition of a network configuration using
+     * {@link WifiConfigManager#addOrUpdateNetwork(WifiConfiguration, int)} with same SSID and
+     * default key mgmt does not add a duplicate network config.
+     */
+    @Test
+    public void testAddMultipleNetworksWithSameSSIDAndDefaultKeyMgmt() {
+        final String ssid = "test_blah";
+        // Add a network with the above SSID and default key mgmt and ensure it was added
+        // successfully.
+        WifiConfiguration network1 = new WifiConfiguration();
+        network1.SSID = ssid;
+        NetworkUpdateResult result = addNetworkToWifiConfigManager(network1);
+        assertTrue(result.getNetworkId() != WifiConfiguration.INVALID_NETWORK_ID);
+        assertTrue(result.isNewNetwork());
+
+        List<WifiConfiguration> retrievedNetworks =
+                mWifiConfigManager.getConfiguredNetworksWithPasswords();
+        assertEquals(1, retrievedNetworks.size());
+        WifiConfigurationTestUtil.assertConfigurationEqualForConfigManagerAddOrUpdate(
+                network1, retrievedNetworks.get(0));
+
+        // Now add a second network with the same SSID and default key mgmt and ensure that it
+        // didn't add a new duplicate network.
+        WifiConfiguration network2 = new WifiConfiguration();
+        network2.SSID = ssid;
+        result = addNetworkToWifiConfigManager(network2);
+        assertTrue(result.getNetworkId() != WifiConfiguration.INVALID_NETWORK_ID);
+        assertFalse(result.isNewNetwork());
+
+        retrievedNetworks = mWifiConfigManager.getConfiguredNetworksWithPasswords();
+        assertEquals(1, retrievedNetworks.size());
+        WifiConfigurationTestUtil.assertConfigurationEqualForConfigManagerAddOrUpdate(
+                network2, retrievedNetworks.get(0));
     }
 
     private void createWifiConfigManager() {
