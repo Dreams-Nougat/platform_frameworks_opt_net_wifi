@@ -32,3 +32,11 @@ UUID: 8b6c9a82_3bc08542
 Bytes: 105
 As we discussed, can we add a test case that there are two networks, same SSID, one Open and one WPA_PSK?
 
+874:66-874:71
+Wed Sep 14 18:10:29 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_3bc08542
+UUID: 8b6c9a82_dee7d7d4
+Bytes: 4
+Done
+
