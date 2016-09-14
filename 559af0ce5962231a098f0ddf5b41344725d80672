@@ -9,3 +9,11 @@ UUID: 8b6c9a82_96b2a950
 Bytes: 53
 Same comment as other CL about wrapping just the ssid
 
+1653
+Wed Sep 14 18:19:19 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_96b2a950
+UUID: 8b6c9a82_fee2db94
+Bytes: 139
+Commented there. I don't see any other fields for now in this class. But, this is symmetric to the PnoNetwork class we have in PnoSettings.
+
