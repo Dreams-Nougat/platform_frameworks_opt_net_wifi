@@ -9,3 +9,11 @@ UUID: 8b6c9a82_9b1f3177
 Bytes: 141
 Do we always want to bump up mNextNetworkId++? If there is an existing internal config already, we don't need to create new networkId, right?
 
+801
+Wed Sep 14 17:54:08 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_9b1f3177
+UUID: 8b6c9a82_3bdf255c
+Bytes: 146
+True. But, I'm not sure if it's worth going back and decrementing this. We don't need the network ID's to be continuous as long as they're unique.
+
