@@ -1,0 +1,11 @@
+Revision: 559af0ce5962231a098f0ddf5b41344725d80672
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiNative.java
+
+1653
+Wed Sep 14 16:55:47 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_96b2a950
+Bytes: 53
+Same comment as other CL about wrapping just the ssid
+
