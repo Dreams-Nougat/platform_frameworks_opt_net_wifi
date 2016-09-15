@@ -1498,7 +1498,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
             mSettingsStore.dump(fd, pw, args);
             mNotificationController.dump(fd, pw, args);
             mTrafficPoller.dump(fd, pw, args);
-
+/*
             pw.println("Latest scan results:");
             List<ScanResult> scanResults = mWifiStateMachine.syncGetScanResultsList();
             long nowMs = System.currentTimeMillis();
@@ -1525,6 +1525,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
                 }
             }
             pw.println();
+            */
             pw.println("Locks held:");
             mWifiLockManager.dump(pw);
             pw.println();
