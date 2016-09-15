@@ -63,10 +63,12 @@ import com.android.server.wifi.scanner.ChannelHelper.ChannelCollection;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class WifiScanningServiceImpl extends IWifiScanner.Stub {
@@ -871,6 +873,10 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
             // Cache the results here so that apps can retrieve them.
             mCachedScanResults = results.getResults();
             sendScanResultBroadcast(true);
+        }
+
+        List<ScanResult> getCachedScanResultsAsList() {
+            return Arrays.asList(mCachedScanResults);
         }
     }
 
@@ -2656,6 +2662,36 @@ public class WifiScanningServiceImpl extends IWifiScanner.Stub {
         }
         if (mPnoScanStateMachine != null) {
             mPnoScanStateMachine.dump(fd, pw, args);
+        }
+        pw.println();
+
+        if (mSingleScanStateMachine != null) {
+            pw.println("Latest scan results:");
+            List<ScanResult> scanResults = mSingleScanStateMachine.getCachedScanResultsAsList();
+            long nowMs = System.currentTimeMillis();
+            if (scanResults != null && scanResults.size() != 0) {
+                pw.println("    BSSID              Frequency  RSSI    Age      SSID "
+                        + "                                Flags");
+                for (ScanResult r : scanResults) {
+                    long ageSec = 0;
+                    long ageMilli = 0;
+                    if (nowMs > r.seen && r.seen > 0) {
+                        ageSec = (nowMs - r.seen) / 1000;
+                        ageMilli = (nowMs - r.seen) % 1000;
+                    }
+                    String candidate = " ";
+                    if (r.isAutoJoinCandidate > 0) candidate = "+";
+                    pw.printf("  %17s  %9d  %5d  %3d.%03d%s   %-32s  %s\n",
+                              r.BSSID,
+                              r.frequency,
+                              r.level,
+                              ageSec, ageMilli,
+                              candidate,
+                              r.SSID == null ? "" : r.SSID,
+                              r.capabilities);
+                }
+            }
+            pw.println();
         }
     }
 
