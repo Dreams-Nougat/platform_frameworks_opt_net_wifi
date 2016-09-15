@@ -1013,7 +1013,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
             if (!isCurrentProfile(userId) && !hasInteractUsersFull) {
                 return new ArrayList<ScanResult>();
             }
-            return mWifiStateMachine.syncGetScanResultsList();
+            return mWifiScanner.getSingleScanResults();
         } finally {
             Binder.restoreCallingIdentity(ident);
         }
