@@ -310,6 +310,7 @@ message RouterFingerPrint {
   optional bool passpoint = 8;
 }
 
+// Event representing Connection Attempts, from frameworks decision to connect to success/failure
 message ConnectionEvent {
 
   // Roam Type.
@@ -397,4 +398,25 @@ message AlertReasonCount {
 
   // Number of alerts with |reason|.
   optional int32 count = 2;
+}
+
+// Event representing entire connection, from start to end of connection
+message ConnectionLifetime {
+  start_time_millis // Absolute time value
+  duration_association
+  duration_authentication
+  duration_dhcp
+  duration_internet
+
+  start_reason
+  //FAILURE REASONS
+  level_2_reason_code //supplicant
+
+  auth_type
+  router_tech
+
+  scan_rssi
+  last_poll_rssi
+  packet_stats //rx-tx-lost  etc...
+  
 }
