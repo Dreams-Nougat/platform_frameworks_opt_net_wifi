@@ -1,0 +1,11 @@
+Revision: d8f6e2c484c603595ae401b769e4adbd626c706e
+Patch-set: 6
+File: service/java/com/android/server/wifi/PropertyService.java
+
+44
+Thu Sep 15 04:30:43 2016 +0000
+Author: Wei Wang <1060529@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_a9f8a043
+Bytes: 85
+This annotation isn't necessary(the method returns a boolean which couldn't be null).
+
