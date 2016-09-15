@@ -1,0 +1,19 @@
+Revision: 348be9d98ba07be923d56e57f31cd948558580a8
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+5405:0-5429:26
+Thu Sep 15 15:39:50 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8b6c9a82_6640925c
+Bytes: 383
+The new WifiConfigManager does all of these permission checks, saving to store, etc internally when removeNetwork() is invoked. So, there is no need for all of them to done here now.  
+
+All you need is:
+
+List<WifiConfiguration> networks = WifiConfigManager.getSavedNetworks();
+
+for (WifiConfiguration network : networks) {      
+mWifiConfigManager.removeNetwork(network.networkId);
+}
+
