@@ -1,0 +1,19 @@
+Revision: e453b35939b54527770b70128c165cb948b7ccee
+Patch-set: 2
+File: service/java/com/android/server/wifi/scanner/WifiScanningServiceImpl.java
+
+2673:70-2673:73
+Fri Sep 16 22:41:04 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_0759d75e
+Bytes: 78
+Maybe add "(sec)" here. I wasn't really sure what the units were when I saw it
+
+2676:0-2681:21
+Fri Sep 16 22:41:04 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_673a9bee
+Bytes: 212
+If your going to touch this...
+It's suggest just doing floating point math and use the format specifier to specify the size as a single argument. I think this should be possible to replicate the current behavior.
+
