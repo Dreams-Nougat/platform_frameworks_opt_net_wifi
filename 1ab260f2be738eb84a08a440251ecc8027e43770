@@ -1,0 +1,11 @@
+Revision: 1ab260f2be738eb84a08a440251ecc8027e43770
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiServiceImpl.java
+
+1016:19-1016:31
+Fri Sep 16 00:19:49 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_af4548fd
+Bytes: 147
+Going to add a check before this if mWifiScanner is null - ran into this with a test today with a pone booting in airplane mode + opening settings.
+
