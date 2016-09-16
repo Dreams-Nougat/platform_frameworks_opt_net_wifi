@@ -9,3 +9,11 @@ UUID: eb3b56ab_af4548fd
 Bytes: 147
 Going to add a check before this if mWifiScanner is null - ran into this with a test today with a pone booting in airplane mode + opening settings.
 
+1016:19-1016:31
+Fri Sep 16 20:44:18 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_af4548fd
+UUID: eb3b56ab_4a3a0985
+Bytes: 4
+Done
+
