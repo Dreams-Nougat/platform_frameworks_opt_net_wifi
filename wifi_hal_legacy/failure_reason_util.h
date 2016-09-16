@@ -24,6 +24,8 @@ namespace android {
 namespace hardware {
 namespace wifi {
 
+std::string LegacyErrorToString(wifi_error error);
+
 V1_0::FailureReason CreateFailureReason(
     V1_0::CommandFailureReason reason, const std::string& description);
 V1_0::FailureReason CreateFailureReasonLegacyError(
