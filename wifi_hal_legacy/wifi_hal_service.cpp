@@ -17,8 +17,10 @@
 #include "wifi_hal_service.h"
 
 #include <android-base/logging.h>
+#include <cutils/properties.h>
 
 #include "failure_reason_util.h"
+#include "wifi_chip_service.h"
 
 namespace {
 class FunctionMessageHandler : public android::MessageHandler {
@@ -38,6 +40,12 @@ class FunctionMessageHandler : public android::MessageHandler {
 
   DISALLOW_COPY_AND_ASSIGN(FunctionMessageHandler);
 };
+
+std::string GetWlanInterfaceName() {
+  char buffer[PROPERTY_VALUE_MAX];
+  property_get("wifi.interface", buffer, "wlan0");
+  return buffer;
+}
 }
 
 namespace android {
@@ -86,12 +94,50 @@ Return<void> WifiHalService::start() {
   }
 
   event_loop_thread_ = std::thread(&WifiHalService::DoHalEventLoop, this);
+
+  wifi_interface_handle iface_handle =
+      FindInterfaceHandle(GetWlanInterfaceName());
+  if (iface_handle != kInterfaceNotFoundHandle) {
+    chip_ = new WifiChipService(this, iface_handle);
+  } else {
+    // TODO fail to init?
+  }
+
   state_ = State::STARTED;
   for (auto& callback : callbacks_) {
     callback->onStart();
   }
   return Void();
 }
+
+wifi_interface_handle WifiHalService::FindInterfaceHandle(
+    const std::string& ifname) {
+  char buffer[IFNAMSIZ];
+  int num_iface_handles = 0;
+  wifi_interface_handle* iface_handles = NULL;
+  wifi_error ret = hal_func_table_.wifi_get_ifaces(
+      hal_handle_, &num_iface_handles, &iface_handles);
+  if (ret == WIFI_SUCCESS) {
+    for (int i = 0; i < num_iface_handles; ++i) {
+      bzero(buffer, sizeof(buffer));
+      ret = hal_func_table_.wifi_get_iface_name(
+          iface_handles[i], buffer, sizeof(buffer));
+      if (ret == WIFI_SUCCESS) {
+        if (ifname == buffer) {
+          return iface_handles[i];
+        }
+      } else {
+        LOG(WARNING) << "Failed to get interface handle name: "
+                     << LegacyErrorToString(ret);
+      }
+    }
+  } else {
+    LOG(ERROR) << "Failed to enumerate interface handles: "
+               << LegacyErrorToString(ret);
+  }
+  return kInterfaceNotFoundHandle;
+}
+
 
 void NoopHalCleanupHandler(wifi_handle) {}
 
@@ -109,6 +155,10 @@ Return<void> WifiHalService::stop() {
   awaiting_hal_cleanup_command_ = true;
   awaiting_hal_event_loop_termination_ = true;
   state_ = State::STOPPING;
+
+  if (chip_.get()) chip_->Invalidate();
+  chip_.clear();
+
   hal_func_table_.wifi_cleanup(hal_handle_, NoopHalCleanupHandler);
   awaiting_hal_cleanup_command_ = false;
   LOG(VERBOSE) << "HAL cleanup command complete";
@@ -141,9 +191,8 @@ void WifiHalService::FinishHalCleanup() {
 }
 
 
-Return<void> WifiHalService::getChip(
-    std::function<void(const sp<IWifiChip>& chip)> cb) {
-  cb(sp<IWifiChip>()); // TODO return a real IWifiChip implementation
+Return<void> WifiHalService::getChip(getChip_cb cb) {
+  cb(chip_);
   return Void();
 }
 
