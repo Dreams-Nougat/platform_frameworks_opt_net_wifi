@@ -27,6 +27,8 @@ namespace wifi {
 using android::hardware::wifi::V1_0::FailureReason;
 using android::hardware::wifi::V1_0::CommandFailureReason;
 
+std::string LegacyErrorToString(wifi_error error);
+
 FailureReason CreateFailureReason(
     CommandFailureReason reason, const std::string& description);
 FailureReason CreateFailureReasonLegacyError(
