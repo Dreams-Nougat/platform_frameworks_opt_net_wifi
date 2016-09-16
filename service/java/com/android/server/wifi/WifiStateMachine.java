@@ -4012,6 +4012,15 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 case CMD_START_SUPPLICANT:
                     // Refresh our reference to wificond.  This allows us to tolerate restarts.
                     mWificond = mWifiInjector.makeWificond();
+                    // Clean up existing interfaces in wificond.
+                    // This ensures that wificond continue to work if java framework restarts.
+                    try {
+                        mWificond.tearDownInterfaces();
+                    } catch (RemoteException e) {
+                        // There is very little we can do here
+                        Log.e(TAG, "Failed to tear down interfaces via wificond");
+                    }
+
                     mClientInterface = setupDriverForClientMode(mWificond);
                     if (mClientInterface == null ||
                             !mDeathRecipient.linkToDeath(mClientInterface.asBinder())) {
