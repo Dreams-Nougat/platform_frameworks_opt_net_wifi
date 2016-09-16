@@ -36,6 +36,7 @@ using android::hardware::wifi::V1_0::IWifiChip;
 using android::hardware::wifi::V1_0::IWifiEventCallback;
 
 class WifiHalService : public IWifi {
+  friend class WifiChipService;
  public:
   WifiHalService(android::sp<android::Looper>& looper);
 
@@ -48,6 +49,10 @@ class WifiHalService : public IWifi {
   Return<void> getChip(std::function<void(const sp<IWifiChip>& chip)> cb) override;
 
  private:
+  const wifi_interface_handle kInterfaceNotFoundHandle = nullptr;
+  /** Get a HAL interface handle by name */
+  wifi_interface_handle FindInterfaceHandle(const std::string& ifname);
+
   /**
    * Called to indicate that the HAL implementation cleanup may be complete and
    * the rest of HAL cleanup should be performed.
@@ -84,6 +89,7 @@ class WifiHalService : public IWifi {
    * thread terminates when the HAL is cleaned up.
    */
   std::thread event_loop_thread_;
+  sp<IWifiChip> chip_;
 
   // Variables to hold state while stopping the HAL
   bool awaiting_hal_cleanup_command_;
