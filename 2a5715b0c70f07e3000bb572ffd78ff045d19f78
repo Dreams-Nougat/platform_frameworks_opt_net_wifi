@@ -9,3 +9,11 @@ UUID: cb277249_bd9d6311
 Bytes: 212
 These checks had to be there because of the now refactored out DriverStartedState. I think it is worth mentioning this in the commit message so we understand what's going on here when look at these changes later.
 
+7
+Fri Sep 16 16:10:08 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cb277249_bd9d6311
+UUID: eb3b56ab_bbbca924
+Bytes: 251
+I don't think that's really true.  These checks were always superfluous, because they were always in a child state of a state that instantiated WifiConnectivityManager.  Today that state is SupplicantStartedState, but before it was DriverStartedState.
+
