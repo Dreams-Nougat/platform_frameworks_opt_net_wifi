@@ -9,6 +9,14 @@ UUID: eb3b56ab_0759d75e
 Bytes: 78
 Maybe add "(sec)" here. I wasn't really sure what the units were when I saw it
 
+2673:70-2673:73
+Sat Sep 17 06:41:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_0759d75e
+UUID: eb3b56ab_baa49a56
+Bytes: 4
+Done
+
 2676:0-2681:21
 Fri Sep 16 22:41:04 2016 +0000
 Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -17,10 +25,41 @@ Bytes: 212
 If your going to touch this...
 It's suggest just doing floating point math and use the format specifier to specify the size as a single argument. I think this should be possible to replicate the current behavior.
 
+2676:0-2681:21
+Sat Sep 17 06:41:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_673a9bee
+UUID: eb3b56ab_2e35c8fb
+Bytes: 218
+Got it!  Here is what the output looks like (let me know what you think!  I think this conveys more info):
+r.seen <= 0:
+  ___?___
+nowMs < r.seen:
+    0.000
+r.seen < nowMs - 1000000:
+  >1000.0
+nowMs >= r.seen:
+   11.262
+
 2683:26-2683:45
 Fri Sep 16 22:44:03 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: eb3b56ab_c7550fed
 Bytes: 97
 Is this even used anymore? This should not be called autojoin if it's still being used somewhere.
+
+2683:26-2683:45
+Sat Sep 17 06:41:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_c7550fed
+UUID: eb3b56ab_2e0f883c
+Bytes: 166
+I did a quick codesearch.  i see it being copied around, but not used.  I'll remove it from the dump and file a bug for it to be cleaned out of the code (b/31565767).
+
+2690:30-2690:58
+Sat Sep 17 06:41:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_6e4b5056
+Bytes: 54
+I also worked on the ssid value in case it is too long
 
