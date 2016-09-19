@@ -1,0 +1,11 @@
+Revision: d94a62ffdf0e7f282948109d05d96e682eb32eef
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiServiceImpl.java
+
+1017:16-1017:28
+Mon Sep 19 22:12:58 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b3926b8_d1f133f5
+Bytes: 41
+I'm assuming this will never return null.
+
