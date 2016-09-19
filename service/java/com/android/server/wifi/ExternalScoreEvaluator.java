@@ -209,8 +209,10 @@ public class ExternalScoreEvaluator implements WifiNetworkSelector.NetworkEvalua
                     if (!mWifiConfigManager.wasEphemeralNetworkDeleted(scanResult.SSID)) {
                         score = getNetworkScore(scanResult, scoreCache);
                         externalScoreTracker.trackUntrustedCandidate(score, scanResult);
-                        connectableNetworks.add(Pair.create(scanDetail,
+                        if (connectableNetworks != null) {
+                            connectableNetworks.add(Pair.create(scanDetail,
                                 getPotentialEphemeralNetworkConfiguration(associatedConfigs)));
+                        }
                     }
                 }
                 continue;
@@ -239,7 +241,9 @@ public class ExternalScoreEvaluator implements WifiNetworkSelector.NetworkEvalua
                             + " uses external score");
                     score = getNetworkScore(scanResult, scoreCache);
                     externalScoreTracker.trackSavedCandidate(score, network, scanResult);
-                    connectableNetworks.add(Pair.create(scanDetail, network));
+                    if (connectableNetworks != null) {
+                        connectableNetworks.add(Pair.create(scanDetail, network));
+                    }
                 }
             }
         }
@@ -321,7 +325,9 @@ public class ExternalScoreEvaluator implements WifiNetworkSelector.NetworkEvalua
         }
 
         private void localLog(String log) {
-            mLocalLog.log(log);
+            if (mLocalLog != null) {
+                mLocalLog.log(log);
+            }
         }
     }
 }
