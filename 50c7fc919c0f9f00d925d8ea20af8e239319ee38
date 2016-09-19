@@ -1,0 +1,14 @@
+Revision: 50c7fc919c0f9f00d925d8ea20af8e239319ee38
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+1819:12-1819:23
+Mon Sep 19 17:27:31 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_60799859
+Bytes: 243
+mIsRunning is not a bool for DriverStartedState now.
+We removed 'DriverStartedState' from WifiStateMachine.
+Currently driver loading is finished by wificond.
+So here I would suggest that we use 'mClientInterface != null' instead of mIsRunning.
+
