@@ -270,8 +270,10 @@ public class SavedNetworkEvaluator implements WifiNetworkSelector.NetworkEvaluat
                 }
             }
 
-            connectableNetworks.add(Pair.create(scanDetail,
+            if (connectableNetworks != null) {
+                connectableNetworks.add(Pair.create(scanDetail,
                     mWifiConfigManager.getConfiguredNetwork(candidateIdOfScanResult)));
+            }
 
             if (highestScoreOfScanResult > highestScore
                     || (highestScoreOfScanResult == highestScore
