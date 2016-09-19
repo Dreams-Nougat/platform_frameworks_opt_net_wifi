@@ -2899,12 +2899,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     }
 
     /*
-     * Fetch RSSI, linkspeed, and frequency on current connection
+     * Fetch RSSI, linkspeed, on current connection
      */
-    private void fetchRssiLinkSpeedAndFrequencyNative() {
+    private void fetchRssiLinkSpeedNative() {
         Integer newRssi = null;
         Integer newLinkSpeed = null;
-        Integer newFrequency = null;
 
         String signalPoll = mWifiNative.signalPoll();
 
@@ -2918,8 +2917,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         newRssi = Integer.parseInt(prop[1]);
                     } else if (prop[0].equals("LINKSPEED")) {
                         newLinkSpeed = Integer.parseInt(prop[1]);
-                    } else if (prop[0].equals("FREQUENCY")) {
-                        newFrequency = Integer.parseInt(prop[1]);
                     }
                 } catch (NumberFormatException e) {
                     //Ignore, defaults on rssi and linkspeed are assigned
@@ -2928,8 +2925,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         }
 
         if (mVerboseLoggingEnabled) {
-            logd("fetchRssiLinkSpeedAndFrequencyNative rssi=" + newRssi +
-                 " linkspeed=" + newLinkSpeed + " freq=" + newFrequency);
+            logd("fetchRssiLinkSpeedNative rssi=" + newRssi +
+                 " linkspeed=" + newLinkSpeed);
         }
 
         if (newRssi != null && newRssi > WifiInfo.INVALID_RSSI && newRssi < WifiInfo.MAX_RSSI) {
@@ -2967,14 +2964,13 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         if (newLinkSpeed != null) {
             mWifiInfo.setLinkSpeed(newLinkSpeed);
         }
-        if (newFrequency != null && newFrequency > 0) {
-            if (ScanResult.is5GHz(newFrequency)) {
+        if (mWifiInfo.getFrequency() > 0) {
+            if (ScanResult.is5GHz(mWifiInfo.getFrequency())) {
                 mWifiConnectionStatistics.num5GhzConnected++;
             }
-            if (ScanResult.is24GHz(newFrequency)) {
+            if (ScanResult.is24GHz(mWifiInfo.getFrequency())) {
                 mWifiConnectionStatistics.num24GhzConnected++;
             }
-            mWifiInfo.setFrequency(newFrequency);
         }
         mWifiConfigManager.updateScanDetailCacheFromWifiInfo(mWifiInfo);
     }
@@ -3116,7 +3112,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 mNetworkInfo.getDetailedState() == DetailedState.CONNECTED) {
             // We no longer report MAC address to third-parties and our code does
             // not rely on this broadcast, so just send the default MAC address.
-            fetchRssiLinkSpeedAndFrequencyNative();
+            fetchRssiLinkSpeedNative();
             WifiInfo sentWifiInfo = new WifiInfo(mWifiInfo);
             sentWifiInfo.setMacAddress(WifiInfo.DEFAULT_MAC_ADDRESS);
             intent.putExtra(WifiManager.EXTRA_WIFI_INFO, sentWifiInfo);
@@ -5324,8 +5320,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         ScanDetailCache scanDetailCache =
                                 mWifiConfigManager.getScanDetailCacheForNetwork(mTargetNetworkId);
                         if (scanDetailCache != null) {
-                            mWifiMetrics.setConnectionScanDetail(scanDetailCache.getScanDetail(
-                                    someBssid));
+                            ScanDetail associatedScanDetail = scanDetailCache.getScanDetail(someBssid);
+                            mWifiInfo.setFrequency(associatedScanDetail.getScanResult().frequency);
+                            mWifiMetrics.setConnectionScanDetail(associatedScanDetail);
                         }
                     }
                     return NOT_HANDLED;
@@ -5743,7 +5740,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                                 }
                             }
                             // Get Info and continue polling
-                            fetchRssiLinkSpeedAndFrequencyNative();
+                            fetchRssiLinkSpeedNative();
                             // Send the update score to network agent.
                             mWifiScoreReport.calculateAndReportScore(
                                     mWifiInfo, mNetworkAgent, mAggressiveHandover,
@@ -5766,14 +5763,14 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     mRssiPollToken++;
                     if (mEnableRssiPolling) {
                         // First poll
-                        fetchRssiLinkSpeedAndFrequencyNative();
+                        fetchRssiLinkSpeedNative();
                         sendMessageDelayed(obtainMessage(CMD_RSSI_POLL,
                                 mRssiPollToken, 0), POLL_RSSI_INTERVAL_MSECS);
                     }
                     break;
                 case WifiManager.RSSI_PKTCNT_FETCH:
                     RssiPacketCountInfo info = new RssiPacketCountInfo();
-                    fetchRssiLinkSpeedAndFrequencyNative();
+                    fetchRssiLinkSpeedNative();
                     info.rssi = mWifiInfo.getRssi();
                     fetchPktcntNative(info);
                     replyToMessage(message, WifiManager.RSSI_PKTCNT_FETCH_SUCCEEDED, info);
