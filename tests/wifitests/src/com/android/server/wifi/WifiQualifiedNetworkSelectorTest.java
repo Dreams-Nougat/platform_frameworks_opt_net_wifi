@@ -72,7 +72,6 @@ public class WifiQualifiedNetworkSelectorTest {
         mWifiQualifiedNetworkSelector = new WifiQualifiedNetworkSelector(mWifiConfigManager,
                 mContext, mWifiInfo, mClock);
         mWifiQualifiedNetworkSelector.enableVerboseLogging(1);
-        mWifiQualifiedNetworkSelector.setUserPreferredBand(WifiManager.WIFI_FREQUENCY_BAND_AUTO);
         mWifiQualifiedNetworkSelector.setWifiNetworkScoreCache(mScoreCache);
         when(mClock.getElapsedSinceBootMillis()).thenReturn(SystemClock.elapsedRealtime());
     }
@@ -562,7 +561,6 @@ public class WifiQualifiedNetworkSelectorTest {
         scanResultLinkConfiguration(savedConfigs, scanDetails);
         ScanResult chosenScanResult = scanDetails.get(0).getScanResult();
 
-        mWifiQualifiedNetworkSelector.setUserPreferredBand(WifiManager.WIFI_FREQUENCY_BAND_AUTO);
         WifiConfiguration candidate = mWifiQualifiedNetworkSelector.selectQualifiedNetwork(false,
                 false, false, false, true, false, scanDetails);
 
@@ -2232,78 +2230,6 @@ public class WifiQualifiedNetworkSelectorTest {
     }
 
     /**
-     * Case #46   5GHz due to user band preference is set to 5GHz only
-     *
-     * In this test. we simulate following scenario
-     * WifiStateMachine is under disconnected state
-     * User band preference is set to 5GHz only
-     * Two networks test1, test2 are secured network
-     * Both network are enabled
-     * test1 is @ 2GHz with RSSI -50
-     * test2 is @ 5Ghz with RSSI -75
-     *
-     * Expected behavior: test2 is chosen due to user band preference
-     */
-    @Test
-    public void chooseNetworkDisconnectUserPrefer5GTest() {
-        String[] ssids = DEFAULT_SSIDS;
-        String[] bssids = DEFAULT_BSSIDS;
-        int[] frequencies = {2437, 5180};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
-        int[] levels = {-50, -75};
-        int[] security = {SECURITY_PSK, SECURITY_PSK};
-
-        List<ScanDetail> scanDetails = getScanDetails(ssids, bssids, frequencies, caps, levels);
-        WifiConfiguration[] savedConfigs = generateWifiConfigurations(ssids, security);
-        prepareConfigStore(savedConfigs);
-
-        scanResultLinkConfiguration(savedConfigs, scanDetails);
-        ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
-
-        mWifiQualifiedNetworkSelector.setUserPreferredBand(WifiManager.WIFI_FREQUENCY_BAND_5GHZ);
-        WifiConfiguration candidate = mWifiQualifiedNetworkSelector.selectQualifiedNetwork(false,
-                false, false, false, true, false, scanDetails);
-
-        verifySelectedResult(chosenScanResult, candidate);
-    }
-
-    /**
-     * Case #47   2GHz due to user band preference is set to 2GHz only
-     *
-     * In this test. we simulate following scenario
-     * WifiStateMachine is under disconnected state
-     * User band preference is set to 2.4GHz only
-     * Two networks test1, test2 are secured network
-     * Both network are enabled
-     * test1 is @ 2GHz with RSSI -75
-     * test2 is @ 5Ghz with RSSI -50
-     *
-     * Expected behavior: test1 is chosen due to user band preference
-     */
-    @Test
-    public void chooseNetworkDisconnectUserPrefer2GTest() {
-        String[] ssids = DEFAULT_SSIDS;
-        String[] bssids = DEFAULT_BSSIDS;
-        int[] frequencies = {2437, 5180};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
-        int[] levels = {-75, -50};
-        int[] security = {SECURITY_PSK, SECURITY_PSK};
-
-        List<ScanDetail> scanDetails = getScanDetails(ssids, bssids, frequencies, caps, levels);
-        WifiConfiguration[] savedConfigs = generateWifiConfigurations(ssids, security);
-        prepareConfigStore(savedConfigs);
-
-        scanResultLinkConfiguration(savedConfigs, scanDetails);
-        ScanResult chosenScanResult = scanDetails.get(0).getScanResult();
-
-        mWifiQualifiedNetworkSelector.setUserPreferredBand(WifiManager.WIFI_FREQUENCY_BAND_2GHZ);
-        WifiConfiguration candidate = mWifiQualifiedNetworkSelector.selectQualifiedNetwork(false,
-                false, false, false, true, false, scanDetails);
-
-        verifySelectedResult(chosenScanResult, candidate);
-    }
-
-    /**
      * Case #48  5GHz due to user band preference is set to AUTO
      *
      * In this test. we simulate following scenario
@@ -2333,7 +2259,6 @@ public class WifiQualifiedNetworkSelectorTest {
         scanResultLinkConfiguration(savedConfigs, scanDetails);
         ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
 
-        mWifiQualifiedNetworkSelector.setUserPreferredBand(WifiManager.WIFI_FREQUENCY_BAND_AUTO);
         WifiConfiguration candidate = mWifiQualifiedNetworkSelector.selectQualifiedNetwork(false,
                 false, false, false, true, false, scanDetails);
 

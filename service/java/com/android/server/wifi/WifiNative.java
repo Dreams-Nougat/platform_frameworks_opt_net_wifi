@@ -962,10 +962,6 @@ public class WifiNative {
         return doStringCommandWithoutLogging("SIGNAL_POLL");
     }
 
-    public void bssFlush() {
-        doBooleanCommand("BSS_FLUSH 0");
-    }
-
     public boolean startWpsPbc(String bssid) {
         if (TextUtils.isEmpty(bssid)) {
             return doBooleanCommand("WPS_PBC");
