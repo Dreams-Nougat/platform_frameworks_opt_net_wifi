@@ -48,6 +48,7 @@ import android.net.wifi.p2p.nsd.WifiP2pServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pServiceRequest;
 import android.net.wifi.p2p.nsd.WifiP2pServiceResponse;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -76,9 +77,11 @@ import com.android.internal.util.AsyncChannel;
 import com.android.internal.util.Protocol;
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
+import com.android.server.wifi.WifiInjector;
 import com.android.server.wifi.WifiMonitor;
 import com.android.server.wifi.WifiNative;
 import com.android.server.wifi.WifiStateMachine;
+import com.android.server.wifi.util.WifiPermissionsUtil;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -186,6 +189,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
     public static final int ENABLED                         = 1;
     public static final int DISABLED                        = 0;
 
+    private static final int UNKNOWN_PID                    = -1;
     private final boolean mP2pSupported;
 
     private WifiP2pDevice mThisDevice = new WifiP2pDevice();
@@ -551,6 +555,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         private WifiNative mWifiNative = WifiNative.getP2pNativeInterface();
         private WifiMonitor mWifiMonitor = WifiMonitor.getInstance();
         private final WifiP2pDeviceList mPeers = new WifiP2pDeviceList();
+        private WifiInjector mWifiInjector;
         /* During a connection, supplicant can tell us that a device was lost. From a supplicant's
          * perspective, the discovery stops during connection and it purges device since it does
          * not get latest updates about the device without being in discovery state.
@@ -605,7 +610,6 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
             }
             setLogRecSize(50);
             setLogOnlyTransitions(true);
-
             String interfaceName = mWifiNative.getInterfaceName();
             mWifiMonitor.registerHandler(interfaceName,
                     WifiMonitor.AP_STA_CONNECTED_EVENT, getHandler());
@@ -781,7 +785,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     break;
                 case WifiP2pManager.REQUEST_PEERS:
                     replyToMessage(message, WifiP2pManager.RESPONSE_PEERS,
-                            new WifiP2pDeviceList(mPeers));
+                            getPeers((String) message.obj, message.sendingUid));
                     break;
                 case WifiP2pManager.REQUEST_CONNECTION_INFO:
                     replyToMessage(message, WifiP2pManager.RESPONSE_CONNECTION_INFO,
@@ -3210,6 +3214,26 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         return clientInfo;
     }
 
+        /**
+         * Enforces permissions on the caller who is requesting for P2p Peers
+         * @param pkg String indicating calling package
+         * @param uid of the caller
+         * @return WifiP2pDeviceList the peer list
+         */
+        private WifiP2pDeviceList getPeers(String pkgName, int uid) {
+            if (mWifiInjector == null) {
+                mWifiInjector = WifiInjector.getInstance();
+            }
+            WifiPermissionsUtil wifiPermissionsUtil = mWifiInjector.getWifiPermissionsUtil();
+            // TODO: Update VERSION_CODES.N + 2 to VERSION_CODES.O when it is defined
+            // Minimum Version to enforce location permission is O or later
+            if (wifiPermissionsUtil.canAccessScanResults(pkgName, uid, UNKNOWN_PID,
+                    Build.VERSION_CODES.N + 2)) {
+                return new WifiP2pDeviceList(mPeers);
+            } else {
+                return new WifiP2pDeviceList();
+            }
+        }
     }
 
     /**
