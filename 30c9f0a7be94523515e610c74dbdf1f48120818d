@@ -1,0 +1,18 @@
+Revision: 30c9f0a7be94523515e610c74dbdf1f48120818d
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+116:0-117:75
+Mon Sep 19 04:18:41 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_9a72750a
+Bytes: 367
+Just curious, instead of having this API, would it make more sense to pass the necessary parameters to the implementation of NetworkEvaluator constructor (on creation), since each NetworkEvaluator implementation might requires different dependencies.  For example, an upcoming PasspointNetworkEvaluator might not need WifiConfigManager but will need PasspointManager.
+
+187:13-187:75
+Mon Sep 19 04:18:41 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb3b56ab_fa61b936
+Bytes: 135
+Hmm, line 180 says 2.4GHz network is not qualified, but then we are checking the RSSI for 2.4GHz network.  this doens't seem to add up.
+
