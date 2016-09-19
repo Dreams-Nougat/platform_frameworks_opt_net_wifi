@@ -663,14 +663,7 @@ public class WifiConnectivityManager {
 
     private int getScanBand(boolean isFullBandScan) {
         if (isFullBandScan) {
-            int freqBand = mStateMachine.getFrequencyBand();
-            if (freqBand == WifiManager.WIFI_FREQUENCY_BAND_5GHZ) {
-                return WifiScanner.WIFI_BAND_5_GHZ_WITH_DFS;
-            } else if (freqBand == WifiManager.WIFI_FREQUENCY_BAND_2GHZ) {
-                return WifiScanner.WIFI_BAND_24_GHZ;
-            } else {
-                return WifiScanner.WIFI_BAND_BOTH_WITH_DFS;
-            }
+            return WifiScanner.WIFI_BAND_BOTH_WITH_DFS;
         } else {
             // Use channel list instead.
             return WifiScanner.WIFI_BAND_UNSPECIFIED;
@@ -1101,16 +1094,6 @@ public class WifiConnectivityManager {
         }
 
         return ret;
-    }
-
-    /**
-     * Set band preference when doing scan and making connection
-     */
-    public void setUserPreferredBand(int band) {
-        Log.i(TAG, "User band preference: " + band);
-
-        mQualifiedNetworkSelector.setUserPreferredBand(band);
-        startConnectivityScan(SCAN_IMMEDIATELY);
     }
 
     /**
