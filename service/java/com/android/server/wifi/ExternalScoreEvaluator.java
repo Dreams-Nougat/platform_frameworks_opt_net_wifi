@@ -28,6 +28,7 @@ import android.util.LocalLog;
 import android.util.Log;
 import android.util.Pair;
 
+import com.android.internal.annotations.VisibleForTesting;
 import com.android.server.wifi.util.ScanResultUtil;
 
 import java.util.ArrayList;
@@ -297,6 +298,15 @@ public class ExternalScoreEvaluator implements WifiNetworkSelector.NetworkEvalua
             return null;
         }
     }
+
+    /**
+     * Set the score cache.
+     */
+    @VisibleForTesting
+    public void setScoreCache(WifiNetworkScoreCache scoreCache) {
+        mScoreCache = scoreCache;
+    }
+
 
     /**
      * Used to track the network with the highest score.
