@@ -17,6 +17,14 @@ UUID: eb3b56ab_ba13b111
 Bytes: 327
 How about separate each NetworkEvaluator's initialization into two parts: 1) pass in network specific parameters via constructor; 2) pass in common stuff from this initialize() method. For example,  local log buffer can be passed in from initialize() so that all the evaluators log to the buffer created by WifiNetworkSelector.
 
+116:0-117:75
+Mon Sep 19 21:03:24 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_ba13b111
+UUID: eb3b56ab_b0990dcc
+Bytes: 30
+File b/31596073 to track this.
+
 187:13-187:75
 Mon Sep 19 04:18:41 2016 +0000
 Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -31,4 +39,12 @@ Parent: eb3b56ab_fa61b936
 UUID: eb3b56ab_9a2ef550
 Bytes: 142
 Nice catch. We don't need this 2.4GHz network RSSI check because it will always get evaluated to false. Will delete it and update the comment.
+
+187:13-187:75
+Mon Sep 19 21:03:24 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb3b56ab_9a2ef550
+UUID: eb3b56ab_f09395a5
+Bytes: 4
+Done
 
