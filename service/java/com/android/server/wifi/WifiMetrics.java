@@ -49,6 +49,10 @@ public class WifiMetrics {
      */
     private static final int MAX_RSSI_POLL = 0;
     private static final int MIN_RSSI_POLL = -127;
+    public static final int MAX_RSSI_DELTA = 127;
+    public static final int MIN_RSSI_DELTA = -127;
+    /** Maximum time period between ScanResult and RSSI poll to generate rssi delta datapoint */
+    public static final long TIMEOUT_RSSI_DELTA_MILLIS =  3000;
     private static final int MIN_WIFI_SCORE = 0;
     private static final int MAX_WIFI_SCORE = NetworkAgent.WIFI_BASE_SCORE;
     private final Object mLock = new Object();
@@ -82,6 +86,17 @@ public class WifiMetrics {
     private final SparseIntArray mWifiSystemStateEntries = new SparseIntArray();
     /** Mapping of RSSI values to counts. */
     private final SparseIntArray mRssiPollCounts = new SparseIntArray();
+    /** Mapping of RSSI scan-poll delta values to counts. */
+    private final SparseIntArray mRssiDeltaCounts = new SparseIntArray();
+    /** Flag indicating that the last connection event has a candidate Scan Result
+     *  If this flag is true, the next rssi poll can potentially be used to calculate an RSSI delta
+     */
+    private boolean mGotCandidateScanResult = false;
+    /** RSSI of the scan result for the last connection event*/
+    private int mScanResultRssi = 0;
+    /** Real elapsed time value (millis) for the last received ScanResult candidate, used for RSSI
+     * delta calculation */
+    private long mGotCandidateTime = 0;
     /** Mapping of alert reason to the respective alert count. */
     private final SparseIntArray mWifiAlertReasonCounts = new SparseIntArray();
     /**
@@ -142,6 +157,12 @@ public class WifiMetrics {
                     ScanResult candidate = config.getNetworkSelectionStatus().getCandidate();
                     if (candidate != null) {
                         updateMetricsFromScanResult(candidate);
+                        // Cache the RSSI of the candidate, as the connection event level is updated
+                        // from other sources (polls, bssid_associations) and delta requires the
+                        // scanResult rssi
+                        mScanResultRssi = candidate.level;
+                        mGotCandidateScanResult = true;
+                        mGotCandidateTime = mClock.getElapsedSinceBootMillis();
                     }
                 }
             }
@@ -341,6 +362,7 @@ public class WifiMetrics {
      */
     public void startConnectionEvent(WifiConfiguration config, String targetBSSID, int roamType) {
         synchronized (mLock) {
+            mGotCandidateScanResult = false;
             // Check if this is overlapping another current connection event
             if (mCurrentConnectionEvent != null) {
                 //Is this new Connection Event the same as the current one
@@ -433,6 +455,9 @@ public class WifiMetrics {
                         connectivityFailureCode;
                 // ConnectionEvent already added to ConnectionEvents List. Safe to null current here
                 mCurrentConnectionEvent = null;
+                if (!result) {
+                    mGotCandidateScanResult = false;
+                }
             }
         }
     }
@@ -825,6 +850,28 @@ public class WifiMetrics {
         synchronized (mLock) {
             int count = mRssiPollCounts.get(rssi);
             mRssiPollCounts.put(rssi, count + 1);
+            // Check if this RSSI poll is close enough to a scan result RSSI to log a delta value
+            if (mGotCandidateScanResult) {
+                long timeDelta = mClock.getElapsedSinceBootMillis() - mGotCandidateTime;
+                if (timeDelta <= TIMEOUT_RSSI_DELTA_MILLIS) {
+                    incrementRssiDeltaRssiCount(rssi - mScanResultRssi);
+                }
+                mGotCandidateScanResult = false;
+            }
+        }
+    }
+
+    /**
+     * Increment occurence count of difference between scan result RSSI and the first RSSI poll.
+     * Ignores rssi values outside the bounds of [MIN_RSSI_DELTA, MAX_RSSI_DELTA]
+     */
+    private void incrementRssiDeltaRssiCount(int rssi) {
+        if (!(rssi >= MIN_RSSI_DELTA && rssi <= MAX_RSSI_DELTA)) {
+            return;
+        }
+        synchronized (mLock) {
+            int count = mRssiDeltaCounts.get(rssi);
+            mRssiDeltaCounts.put(rssi, count + 1);
         }
     }
 
@@ -1050,6 +1097,13 @@ public class WifiMetrics {
                     sb.append(mRssiPollCounts.get(i) + " ");
                 }
                 pw.println("  " + sb.toString());
+                pw.println("mWifiLogProto.rssiPollDeltaCount: Printing counts for ["
+                        + MIN_RSSI_DELTA + ", " + MAX_RSSI_DELTA + "]");
+                sb.setLength(0);
+                for (int i = MIN_RSSI_DELTA; i <= MAX_RSSI_DELTA; i++) {
+                    sb.append(mRssiDeltaCounts.get(i) + " ");
+                }
+                pw.println("  " + sb.toString());
                 pw.print("mWifiLogProto.alertReasonCounts=");
                 sb.setLength(0);
                 for (int i = WifiLoggerHal.WIFI_ALERT_REASON_MIN;
@@ -1099,6 +1153,7 @@ public class WifiMetrics {
     private void consolidateProto(boolean incremental) {
         List<WifiMetricsProto.ConnectionEvent> events = new ArrayList<>();
         List<WifiMetricsProto.RssiPollCount> rssis = new ArrayList<>();
+        List<WifiMetricsProto.RssiPollCount> deltas = new ArrayList<>();
         List<WifiMetricsProto.AlertReasonCount> alertReasons = new ArrayList<>();
         List<WifiMetricsProto.WifiScoreCount> scores = new ArrayList<>();
         synchronized (mLock) {
@@ -1160,6 +1215,18 @@ public class WifiMetrics {
             mWifiLogProto.rssiPollRssiCount = rssis.toArray(mWifiLogProto.rssiPollRssiCount);
 
             /**
+             * Convert the SparseIntArray of RSSI delta rssi's and counts to the proto's repeated
+             * IntKeyVal array.
+             */
+            for (int i = 0; i < mRssiDeltaCounts.size(); i++) {
+                WifiMetricsProto.RssiPollCount keyVal = new WifiMetricsProto.RssiPollCount();
+                keyVal.rssi = mRssiDeltaCounts.keyAt(i);
+                keyVal.count = mRssiDeltaCounts.valueAt(i);
+                deltas.add(keyVal);
+            }
+            mWifiLogProto.rssiPollDeltaCount = deltas.toArray(mWifiLogProto.rssiPollDeltaCount);
+
+            /**
              * Convert the SparseIntArray of alert reasons and counts to the proto's repeated
              * IntKeyVal array.
              */
@@ -1198,9 +1265,11 @@ public class WifiMetrics {
             mWifiSystemStateEntries.clear();
             mRecordStartTimeSec = mClock.getElapsedSinceBootMillis() / 1000;
             mRssiPollCounts.clear();
+            mRssiDeltaCounts.clear();
             mWifiAlertReasonCounts.clear();
             mWifiScoreCounts.clear();
             mWifiLogProto.clear();
+            mGotCandidateScanResult = false;
         }
     }
 
