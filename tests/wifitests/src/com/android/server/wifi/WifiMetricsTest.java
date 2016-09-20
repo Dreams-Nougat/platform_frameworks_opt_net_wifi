@@ -626,6 +626,206 @@ public class WifiMetricsTest {
         assertEquals(mDeserializedWifiMetrics.connectionEvent.length, 2);
     }
 
+    private static final int NUM_REPEATED_DELTAS = 7;
+    private static final int REPEATED_DELTA = 0;
+    private static final int SINGLE_GOOD_DELTA = 1;
+    private static final int SINGLE_TIMEOUT_DELTA = 2;
+    private static final int NUM_EXPECTED_DELTA_LOGS = 2;
+    private static final int NUM_REPEATED_BOUND_DELTAS = 2;
+    private static final int MAX_DELTA_LEVEL = 127;
+    private static final int MIN_DELTA_LEVEL = -127;
+    private static final int ARBITRARY_DELTA_LEVEL = 20;
+
+    /**
+     * Sunny day RSSI delta logging scenario.
+     * Logs one rssi delta value multiple times
+     * Logs a different delta value a single time
+     */
+    @Test
+    public void testRssiDeltasSuccessfulLogging() throws Exception {
+        // Generate some repeated deltas
+        for (int i = 0; i < NUM_REPEATED_DELTAS; i++) {
+            generateRssiDelta(MIN_RSSI_LEVEL, REPEATED_DELTA,
+                    WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        }
+        // Generate a single delta
+        generateRssiDelta(MIN_RSSI_LEVEL, SINGLE_GOOD_DELTA,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        dumpProtoAndDeserialize();
+        assertEquals(NUM_EXPECTED_DELTA_LOGS, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+        // Check the repeated deltas
+        assertEquals(NUM_REPEATED_DELTAS, mDeserializedWifiMetrics.rssiPollDeltaCount[0].count);
+        assertEquals(REPEATED_DELTA, mDeserializedWifiMetrics.rssiPollDeltaCount[0].rssi);
+        // Check the single delta
+        assertEquals(1, mDeserializedWifiMetrics.rssiPollDeltaCount[1].count);
+        assertEquals(SINGLE_GOOD_DELTA, mDeserializedWifiMetrics.rssiPollDeltaCount[1].rssi);
+    }
+
+    /**
+     * Tests that Rssi Delta events whose scanResult and Rssi Poll come too far apart, timeout,
+     * and are not logged.
+     */
+    @Test
+    public void testRssiDeltasTimeout() throws Exception {
+        // Create timed out rssi deltas
+        generateRssiDelta(MIN_RSSI_LEVEL, REPEATED_DELTA,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS + 1);
+        generateRssiDelta(MIN_RSSI_LEVEL, SINGLE_TIMEOUT_DELTA,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS + 1);
+        dumpProtoAndDeserialize();
+        assertEquals(0, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+    }
+
+    /**
+     * Tests the exact inclusive boundaries of RSSI delta logging.
+     */
+    @Test
+    public void testRssiDeltaSuccessfulLoggingExactBounds() throws Exception {
+        generateRssiDelta(MIN_RSSI_LEVEL, MAX_DELTA_LEVEL,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        generateRssiDelta(MAX_RSSI_LEVEL, MIN_DELTA_LEVEL,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        dumpProtoAndDeserialize();
+        assertEquals(NUM_EXPECTED_DELTA_LOGS, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+        assertEquals(MIN_DELTA_LEVEL, mDeserializedWifiMetrics.rssiPollDeltaCount[0].rssi);
+        assertEquals(1, mDeserializedWifiMetrics.rssiPollDeltaCount[0].count);
+        assertEquals(MAX_DELTA_LEVEL, mDeserializedWifiMetrics.rssiPollDeltaCount[1].rssi);
+        assertEquals(1, mDeserializedWifiMetrics.rssiPollDeltaCount[1].count);
+    }
+
+    /**
+     * Tests the exact exclusive boundaries of RSSI delta logging.
+     * This test ensures that too much data is not generated.
+     */
+    @Test
+    public void testRssiDeltaOutOfBounds() throws Exception {
+        generateRssiDelta(MIN_RSSI_LEVEL, MAX_DELTA_LEVEL + 1,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        generateRssiDelta(MAX_RSSI_LEVEL, MIN_DELTA_LEVEL - 1,
+                WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        dumpProtoAndDeserialize();
+        assertEquals(0, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+    }
+
+    /**
+     * This test ensures no rssi Delta is logged after an unsuccessful ConnectionEvent
+     */
+    @Test
+    public void testUnsuccesfulConnectionEventRssiDeltaIsNotLogged() throws Exception {
+        when(mClock.getElapsedSinceBootMillis()).thenReturn((long) 0);
+        ScanResult scanResult = mock(ScanResult.class);
+        scanResult.level = MIN_RSSI_LEVEL;
+        WifiConfiguration config = mock(WifiConfiguration.class);
+        WifiConfiguration.NetworkSelectionStatus networkSelectionStat =
+                mock(WifiConfiguration.NetworkSelectionStatus.class);
+        when(networkSelectionStat.getCandidate()).thenReturn(scanResult);
+        when(config.getNetworkSelectionStatus()).thenReturn(networkSelectionStat);
+        mWifiMetrics.startConnectionEvent(config, "TestNetwork",
+                WifiMetricsProto.ConnectionEvent.ROAM_ENTERPRISE);
+        mWifiMetrics.endConnectionEvent(
+                WifiMetrics.ConnectionEvent.FAILURE_AUTHENTICATION_FAILURE,
+                WifiMetricsProto.ConnectionEvent.HLF_NONE);
+        when(mClock.getElapsedSinceBootMillis()).thenReturn(WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        mWifiMetrics.incrementRssiPollRssiCount(MIN_RSSI_LEVEL + ARBITRARY_DELTA_LEVEL);
+
+        dumpProtoAndDeserialize();
+        assertEquals(0, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+    }
+
+    /**
+     * This test ensures rssi Deltas can be logged during a ConnectionEvent
+     */
+    @Test
+    public void testIncompleteConnectionEventRssiDeltaIsLogged() throws Exception {
+        when(mClock.getElapsedSinceBootMillis()).thenReturn((long) 0);
+        ScanResult scanResult = mock(ScanResult.class);
+        scanResult.level = MIN_RSSI_LEVEL;
+        WifiConfiguration config = mock(WifiConfiguration.class);
+        WifiConfiguration.NetworkSelectionStatus networkSelectionStat =
+                mock(WifiConfiguration.NetworkSelectionStatus.class);
+        when(networkSelectionStat.getCandidate()).thenReturn(scanResult);
+        when(config.getNetworkSelectionStatus()).thenReturn(networkSelectionStat);
+        mWifiMetrics.startConnectionEvent(config, "TestNetwork",
+                WifiMetricsProto.ConnectionEvent.ROAM_ENTERPRISE);
+        when(mClock.getElapsedSinceBootMillis()).thenReturn(WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        mWifiMetrics.incrementRssiPollRssiCount(MIN_RSSI_LEVEL + ARBITRARY_DELTA_LEVEL);
+
+        dumpProtoAndDeserialize();
+        assertEquals(1, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+        assertEquals(ARBITRARY_DELTA_LEVEL, mDeserializedWifiMetrics.rssiPollDeltaCount[0].rssi);
+        assertEquals(1, mDeserializedWifiMetrics.rssiPollDeltaCount[0].count);
+    }
+
+    /**
+     * This test ensures that no delta is logged for a null ScanResult Candidate
+     */
+    @Test
+    public void testRssiDeltaNotLoggedForNullCandidateScanResult() throws Exception {
+        when(mClock.getElapsedSinceBootMillis()).thenReturn((long) 0);
+        WifiConfiguration config = mock(WifiConfiguration.class);
+        WifiConfiguration.NetworkSelectionStatus networkSelectionStat =
+                mock(WifiConfiguration.NetworkSelectionStatus.class);
+        when(networkSelectionStat.getCandidate()).thenReturn(null);
+        when(config.getNetworkSelectionStatus()).thenReturn(networkSelectionStat);
+        mWifiMetrics.startConnectionEvent(config, "TestNetwork",
+                WifiMetricsProto.ConnectionEvent.ROAM_ENTERPRISE);
+        mWifiMetrics.endConnectionEvent(
+                WifiMetrics.ConnectionEvent.FAILURE_AUTHENTICATION_FAILURE,
+                WifiMetricsProto.ConnectionEvent.HLF_NONE);
+        when(mClock.getElapsedSinceBootMillis()).thenReturn(WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        mWifiMetrics.incrementRssiPollRssiCount(MIN_RSSI_LEVEL + ARBITRARY_DELTA_LEVEL);
+
+        dumpProtoAndDeserialize();
+        assertEquals(0, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+    }
+
+    /**
+     * This test ensures that Rssi Deltas are not logged over a 'clear()' call (Metrics Serialized)
+     */
+    @Test
+    public void testMetricsSerializedDuringRssiDeltaEventLogsNothing() throws Exception {
+        when(mClock.getElapsedSinceBootMillis()).thenReturn((long) 0);
+        WifiConfiguration config = mock(WifiConfiguration.class);
+        WifiConfiguration.NetworkSelectionStatus networkSelectionStat =
+                mock(WifiConfiguration.NetworkSelectionStatus.class);
+        when(networkSelectionStat.getCandidate()).thenReturn(null);
+        when(config.getNetworkSelectionStatus()).thenReturn(networkSelectionStat);
+        mWifiMetrics.startConnectionEvent(config, "TestNetwork",
+                WifiMetricsProto.ConnectionEvent.ROAM_ENTERPRISE);
+        mWifiMetrics.endConnectionEvent(
+                WifiMetrics.ConnectionEvent.FAILURE_AUTHENTICATION_FAILURE,
+                WifiMetricsProto.ConnectionEvent.HLF_NONE);
+        when(mClock.getElapsedSinceBootMillis()).thenReturn(WifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS);
+        dumpProtoAndDeserialize();
+        mWifiMetrics.incrementRssiPollRssiCount(MIN_RSSI_LEVEL + ARBITRARY_DELTA_LEVEL);
+        dumpProtoAndDeserialize();
+        assertEquals(0, mDeserializedWifiMetrics.rssiPollDeltaCount.length);
+    }
+
+    /**
+     * Generate an RSSI delta event by creating a connection event and an RSSI poll within
+     * 'interArrivalTime' milliseconds of each other.
+     * Event will not be logged if interArrivalTime > mWifiMetrics.TIMEOUT_RSSI_DELTA_MILLIS
+     */
+    private void generateRssiDelta(int scanRssi, int rssiDelta,
+            long interArrivalTime) {
+        when(mClock.getElapsedSinceBootMillis()).thenReturn((long) 0);
+        ScanResult scanResult = mock(ScanResult.class);
+        scanResult.level = scanRssi;
+        WifiConfiguration config = mock(WifiConfiguration.class);
+        WifiConfiguration.NetworkSelectionStatus networkSelectionStat =
+                mock(WifiConfiguration.NetworkSelectionStatus.class);
+        when(networkSelectionStat.getCandidate()).thenReturn(scanResult);
+        when(config.getNetworkSelectionStatus()).thenReturn(networkSelectionStat);
+        mWifiMetrics.startConnectionEvent(config, "TestNetwork",
+                WifiMetricsProto.ConnectionEvent.ROAM_ENTERPRISE);
+        mWifiMetrics.endConnectionEvent(
+                WifiMetrics.ConnectionEvent.FAILURE_NONE,
+                WifiMetricsProto.ConnectionEvent.HLF_NONE);
+        when(mClock.getElapsedSinceBootMillis()).thenReturn(interArrivalTime);
+        mWifiMetrics.incrementRssiPollRssiCount(scanRssi + rssiDelta);
+    }
+
     private void assertStringContains(
             String actualString, String expectedSubstring) {
         assertTrue("Expected text not found in: " + actualString,
@@ -641,5 +841,3 @@ public class WifiMetricsTest {
         return stream.toString();
     }
 }
-
-
