@@ -888,15 +888,6 @@ public class WifiNative {
         return doBooleanCommand("SAVE_CONFIG");
     }
 
-    public boolean addToBlacklist(String bssid) {
-        if (TextUtils.isEmpty(bssid)) return false;
-        return doBooleanCommand("BLACKLIST " + bssid);
-    }
-
-    public boolean clearBlacklist() {
-        return doBooleanCommand("BLACKLIST clear");
-    }
-
     public boolean setSuspendOptimizations(boolean enabled) {
         if (enabled) {
             return doBooleanCommand("DRIVER SETSUSPENDMODE 1");
@@ -2952,26 +2943,6 @@ public class WifiNative {
         } else {
             /* this can happen because of race conditions */
             Log.d(TAG, "Ignoring Pno Network found event");
-        }
-    }
-
-    private native static boolean setBssidBlacklistNative(int iface, int id,
-                                              String list[]);
-
-    public boolean setBssidBlacklist(String list[]) {
-        int size = 0;
-        if (list != null) {
-            size = list.length;
-        }
-        Log.e(TAG, "setBssidBlacklist cmd " + sPnoCmdId + " size " + size);
-
-        synchronized (sLock) {
-            if (isHalStarted()) {
-                sPnoCmdId = getNewCmdIdLocked();
-                return setBssidBlacklistNative(sWlan0Index, sPnoCmdId, list);
-            } else {
-                return false;
-            }
         }
     }
 
