@@ -1,0 +1,11 @@
+Revision: ddefabbc4f2e99a427fc4f290e6ab76c4057705c
+Patch-set: 3
+File: tests/wifitests/src/com/android/server/wifi/SavedNetworkEvaluatorTest.java
+
+190:47-190:66
+Tue Sep 20 17:37:49 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_b06c11c7
+Bytes: 130
+Is this needed? It is not used for any verification, maybe pass a |null| instead to be consistent with ExternalScoreEvaluatorTest.
+
