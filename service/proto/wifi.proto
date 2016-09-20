@@ -227,8 +227,20 @@ message WifiLog {
   // Total number of scans handled by framework (oneshot or otherwise)
   optional int32 num_scans = 46;
 
-  // Counts the occurrences of each Wifi score
+  // Counts the occurrences of each alert reason.
+  repeated AlertReasonCount alert_reason_count = 47;
+
+  // Counts the occurences of each Wifi score
   repeated WifiScoreCount wifi_score_count = 48;
+
+  // Histogram of Soft AP Durations
+  repeated SoftApDurationBucket soft_ap_duration = 49;
+
+  // Histogram of Soft AP ReturnCode
+  repeated SoftApReturnCodeCount soft_ap_return_code = 50;
+
+  // Histogram of the delta between scan result RSSI and RSSI polls
+  repeated RssiPollCount rssi_poll_delta_count = 51;
 }
 
 // Information that gets logged for every WiFi connection.
