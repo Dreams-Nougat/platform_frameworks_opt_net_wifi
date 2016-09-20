@@ -1,0 +1,25 @@
+Revision: 393b4a50becb44af6b4afd05b53c4814ce561f0b
+Patch-set: 6
+File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+67:0-70:56
+Tue Sep 20 23:41:48 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_e8aaa571
+Bytes: 53
+Given these are "public" i'd opt to drop the m prefix
+
+73:24-73:52
+Tue Sep 20 23:41:48 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_48b731d3
+Bytes: 10
+Not needed
+
+105
+Tue Sep 20 23:41:48 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_08c12921
+Bytes: 115
+Maybe consider splitting into it's own file. Also might suggest generally putting all this stuff in a sub directory
+
