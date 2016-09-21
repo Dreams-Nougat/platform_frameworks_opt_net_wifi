@@ -538,6 +538,8 @@ public class WifiNative {
         }
     }
 
+    // TODO(nywang): RttService.java still needs this.
+    // Remove this when Rtt request finnaly goes through wificond.
     public String getMacAddress() {
         //Macaddr = XX.XX.XX.XX.XX.XX
         String ret = doStringCommand("DRIVER MACADDR");
@@ -547,8 +549,6 @@ public class WifiNative {
         }
         return null;
     }
-
-
 
     /**
      * Format of results:
@@ -2978,16 +2978,10 @@ public class WifiNative {
     private native static int startSendingOffloadedPacketNative(int iface, int idx,
                                     byte[] srcMac, byte[] dstMac, byte[] pktData, int period);
 
-    public int
-    startSendingOffloadedPacket(int slot, KeepalivePacketData keepAlivePacket, int period) {
+    public int startSendingOffloadedPacket(int slot, byte[] srcMac,
+            KeepalivePacketData keepAlivePacket, int period) {
         Log.d(TAG, "startSendingOffloadedPacket slot=" + slot + " period=" + period);
 
-        String[] macAddrStr = getMacAddress().split(":");
-        byte[] srcMac = new byte[6];
-        for(int i = 0; i < 6; i++) {
-            Integer hexVal = Integer.parseInt(macAddrStr[i], 16);
-            srcMac[i] = hexVal.byteValue();
-        }
         synchronized (sLock) {
             if (isHalStarted()) {
                 return startSendingOffloadedPacketNative(sWlan0Index, slot, srcMac,
