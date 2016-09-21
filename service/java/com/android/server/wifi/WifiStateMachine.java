@@ -1431,7 +1431,13 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     }
 
     int startWifiIPPacketOffload(int slot, KeepalivePacketData packetData, int intervalSeconds) {
-        int ret = mWifiNative.startSendingOffloadedPacket(slot, packetData, intervalSeconds * 1000);
+        byte[] src_mac = null;
+        try {
+            src_mac = mClientInterface.getMacAddress();
+        } catch (RemoteException e) { }
+
+        int ret = mWifiNative.startSendingOffloadedPacket(
+                slot, src_mac, packetData, intervalSeconds * 1000);
         if (ret != 0) {
             loge("startWifiIPPacketOffload(" + slot + ", " + intervalSeconds +
                     "): hardware error " + ret);
@@ -4030,6 +4036,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         cleanup();
                         break;
                     }
+                    String mac_address = null;
+                    try {
+                        mac_address = mClientInterface.getMacAddressStr();
+                    } catch (RemoteException e) { }
+                    mWifiInfo.setMacAddress(mac_address);
 
                     try {
                         // A runtime crash can leave the interface up and
@@ -4142,7 +4153,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     mLastNetworkId = WifiConfiguration.INVALID_NETWORK_ID;
                     mLastSignalLevel = -1;
 
-                    mWifiInfo.setMacAddress(mWifiNative.getMacAddress());
                     /* set frequency band of operation */
                     setFrequencyBand();
                     mWifiConfigManager.loadFromStore();
@@ -4191,7 +4201,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             if (mVerboseLoggingEnabled) {
                 logd("SupplicantStartedState enter");
             }
-
             /* Wifi is available as long as we have a connection to supplicant */
             mNetworkInfo.setIsAvailable(true);
             if (mNetworkAgent != null) mNetworkAgent.sendNetworkInfo(mNetworkInfo);
