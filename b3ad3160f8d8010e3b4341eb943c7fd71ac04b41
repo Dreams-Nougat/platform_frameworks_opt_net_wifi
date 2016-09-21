@@ -1,0 +1,27 @@
+Revision: b3ad3160f8d8010e3b4341eb943c7fd71ac04b41
+Patch-set: 6
+File: tests/wifitests/src/com/android/server/wifi/WifiNetworkSelectorTest.java
+
+88:16-88:33
+Wed Sep 21 15:01:33 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_0bf03eef
+Bytes: 182
+Do we need the WifiConfigManager instance passed to the dummy evaluator? As far as network selector tests are concerned, it should only be concerned with the output of the evaluator.
+
+112:12-115:87
+Wed Sep 21 15:01:33 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_cbdb166d
+Bytes: 159
+We probably don't need these details in these tests. This evaluator should only return a network config required. Doesn't need to call in to WifiConfigManager.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiNetworkSelectorTestUtil.java
+
+45:8-45:12
+Wed Sep 21 15:01:33 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_2bc66293
+Bytes: 125
+Ordering of this list is not guaranteed. If u want a one to one mapping, use an ordered list for both or use arrays for both.
+
