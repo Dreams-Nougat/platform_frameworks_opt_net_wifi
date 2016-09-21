@@ -2,6 +2,13 @@ Revision: b3ad3160f8d8010e3b4341eb943c7fd71ac04b41
 Patch-set: 6
 File: tests/wifitests/src/com/android/server/wifi/WifiNetworkSelectorTest.java
 
+22
+Wed Sep 21 18:34:45 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f074270d_0bc6e141
+Bytes: 52
+Don't interleave static/non-static imports like this
+
 88:16-88:33
 Wed Sep 21 15:01:33 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -24,4 +31,14 @@ Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 70d83709_2bc66293
 Bytes: 125
 Ordering of this list is not guaranteed. If u want a one to one mapping, use an ordered list for both or use arrays for both.
+
+45:8-45:12
+Wed Sep 21 18:34:45 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 70d83709_2bc66293
+UUID: f074270d_6bf83563
+Bytes: 234
+@rpius what do you mean by this? Both a List and array are always ordered.
+
+However, I would almost suggest using returning a list of pairs here instead of a pair of lists (assuming that this is supposed to represent a 1 to 1 mapping.
 
