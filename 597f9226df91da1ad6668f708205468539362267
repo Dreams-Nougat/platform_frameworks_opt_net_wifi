@@ -1,0 +1,20 @@
+Revision: 597f9226df91da1ad6668f708205468539362267
+Patch-set: 3
+File: service/java/com/android/server/wifi/ExternalScoreEvaluator.java
+
+328
+Wed Sep 21 18:37:13 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f074270d_0b4b41b1
+Bytes: 69
+maybe just pass a noop log impl instead of needing to null check this
+
+File: tests/wifitests/src/com/android/server/wifi/ExternalScoreEvaluatorTest.java
+
+22
+Wed Sep 21 18:37:13 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f074270d_cb5f696b
+Bytes: 15
+import ordering
+
