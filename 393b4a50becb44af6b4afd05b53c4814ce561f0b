@@ -1,5 +1,79 @@
 Revision: 393b4a50becb44af6b4afd05b53c4814ce561f0b
 Patch-set: 6
+File: service/java/com/android/server/wifi/ExternalScoreEvaluator.java
+
+43:66-43:68
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_a8e498a2
+Bytes: 81
+why does this name need to be suffixed with ": ". it's a name not a prefix right?
+
+44
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_c88ebce0
+Bytes: 75
+You shouldn't really have the tag end in ": " since it's somewhat redundant
+
+99:55-99:59
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_c8bc7c8c
+Bytes: 50
+normally just "null" not "NULL" since this is java
+
+189:63-189:73
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_28d748b6
+Bytes: 10
+not needed
+
+193
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_08da84dc
+Bytes: 205
+Why does this need to be declared at this outer scope. Just declare it in the scope it's used to make it clearer what the scope of this value is. Even if that means it's used multiple times in this method.
+
+263
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d063a325_74346801
+Bytes: 211
+I'm super confused what this is supposed to be? Some kind of enum like thing? It kind of feels like it's abusing annotations. Is this common practice to scope enum values in android? I've never seen this before.
+
+264
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d063a325_54396cf5
+Bytes: 45
+Either way these should probably be indented.
+
+267
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d063a325_b41d6080
+Bytes: 39
+and maybe have an empty line after this
+
+File: service/java/com/android/server/wifi/SavedNetworkEvaluator.java
+
+38:0-52:42
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_e850605b
+Bytes: 96
+These should all be able to be final if you move the arguments of initialize to the constructor.
+
+60
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_e8cb8045
+Bytes: 39
+this doesn't appear to be used anywhere
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
 
 67:0-70:56
@@ -16,10 +90,61 @@ UUID: 70d83709_48b731d3
 Bytes: 10
 Not needed
 
+91:58-91:61
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_c8ef9caf
+Bytes: 25
+Is this still called QNS?
+
 105
 Tue Sep 20 23:41:48 2016 +0000
 Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 70d83709_08c12921
 Bytes: 115
 Maybe consider splitting into it's own file. Also might suggest generally putting all this stuff in a sub directory
+
+116
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_c8f9dc6a
+Bytes: 235
+Is there a reason to defer this initialization till later instead of doing it in the constructor. This means that you have to define all dependancies defined by any implementation here, even if they are not used by all implementations.
+
+117:24-117:41
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_08c4c431
+Bytes: 245
+wifiInfo is not used in either of the evaluators implemented in this CL. I'd also suggest that if it is indeed needed in the future that it is passed in at evaluation time and not at initialization since it is a value that is intended to change.
+
+121
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_48e3acc9
+Bytes: 47
+Could this just be the toString method instead?
+
+135:18-135:28
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_08604431
+Bytes: 281
+Is this something that changes over time. Can it be passed as an initial dependency to the constructor? It's only used by one implementation right now. Generally I would say you should limit parameters to this method to things that would most likely be used by all implementations.
+
+137:68-137:90
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_480dec96
+Bytes: 269
+Why do these need to be passed to the evaluators if there used by the last resort watchdog.
+
+Upon further investigation it looks like this is an output parameter, but it's not clear from this description. Also maybe describe how this list differs from the return value.
+
+149:45-149:90
+Wed Sep 21 06:42:46 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 70d83709_a8eed8af
+Bytes: 157
+Can this just be a list sorted by priority instead? The size of this array is a little confusing upon first read without some investigation. Also make final.
 
