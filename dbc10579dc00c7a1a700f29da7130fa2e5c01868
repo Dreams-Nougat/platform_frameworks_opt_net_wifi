@@ -1,0 +1,124 @@
+Revision: dbc10579dc00c7a1a700f29da7130fa2e5c01868
+Patch-set: 3
+File: /COMMIT_MSG
+
+12:0-12:4
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 10e1bbe4_1e41ad60
+Bytes: 37
+blank line between paragraphs, please
+
+12:40-12:50
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 10e1bbe4_9e6bfde7
+Bytes: 11
+framework's
+
+File: service/java/com/android/server/wifi/WifiMetrics.java
+
+97:7-97:40
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f0d7c739_ad441d9f
+Bytes: 715
+1. "Real elapsed time" is a bit confusing here, as the "elapsed" part suggests that this value is relative to the time the scan result was received.
+
+How about "Boot-relative timestamp for the last...", instead?
+
+2. Instead of documenting the granularity in a comment, it's clearer to document the granularity in the name. E.g. |mScanResultRssiTimestampMillis|. As a bonus, such a name would follow the pattern you set with the name of the timeout constant.
+
+3. Consider eliminating the |mGotCandidateScanResult| field, and using a negative timestamp to indicate that case, instead (e.g. -1, or -TIMEOUT_RSSI_DELTA_MILLIS). My concern here is that, with multiple fields, we risk getting the information out of sync.
+
+155:0-166:21
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_2cf39367
+Bytes: 478
+I don't understand why this code is in the RouterFingerprint class. The methods that are called, and the fields that are referenced, all seem like they'd be available in the caller's context. (startConnectionEvent())
+
+One particular benefit of having this code in startConnectionEvent() is that the updating of mGotCandidateScanResult would be clearer. (Right now, it's obvious that startConnectionEvent() will clear that boolean. But it's not obvious how the boolean gets set.)
+
+854
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_6c6cfbff
+Bytes: 138
+If you follow the suggestion above, about setting |mGotCandidateTime| to -TIMEOUT_RSSI_DELTA_MILLIS, then you'll no longer need this |if|.
+
+855:0-859:48
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_8c3f27e3
+Bytes: 229
+You might consider moving all of this code into incrementRssiDeltaRssiCount(), and renaming that method to maybeIncrementRssiDeltaRssiCount().
+
+The benefit would be in the consolidation of the logic about which samples are valid.
+
+868:17-868:44
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_2c4f1388
+Bytes: 128
+Not sure about this name. The first instance of rssi makes sense. The second, not so much. Consider |incrementRssiDeltaCount()|.
+
+1156:45-1156:51
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f018a7be_856f42bb
+Bytes: 74
+|deltas| is ambiguous. Consider |rssiDeltas|, or something to that affect.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiMetricsTest.java
+
+649:27-649:33
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_6c187b7e
+Bytes: 30
+delta? (there's only one here)
+
+653:18-653:40
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_ec558bf3
+Bytes: 44
+"timed out rssi deltas" (there are two here)
+
+672:0-678:70
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_6c4abb52
+Bytes: 361
+Reviewing these assertions requires understanding how the 8 generateRssiDelta() call-sites above interact. At least for me, that's not trivial.
+
+Is there something in particular that your testing about that interaction? If not, I think it would be clearer to have the different cases split into separate tests. E.g. testRssiDeltaMetricsExcludeTimedOutSamples().
+
+698:0-700:59
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_0cbb372d
+Bytes: 493
+Do we have any tests that exercise the connection failure cases? That is, do any tests verify that the following sequences do _not_ generate a sample?
+
+    1. startConnectionEvent()
+    2. endConnectionEvent()
+    3. startConnectionEvent()
+    4. incrementRssiPollRssiCount()
+
+and
+
+    1. startConnectionEvent()
+    2. endConnectionEvent()
+    3. incrementRssiPollRssiCount()
+
+(I _believe_ that the implementing code handles this correctly. But it would be even better if tests verified that.)
+
+704
+Wed Sep 21 23:33:54 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d0e00315_6ce63b43
+Bytes: 74
+Do we have any tests that exercise clear(), as it pertains to rssi deltas?
+
