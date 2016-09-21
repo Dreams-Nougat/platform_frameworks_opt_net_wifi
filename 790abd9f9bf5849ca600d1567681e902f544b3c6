@@ -9,6 +9,14 @@ UUID: f074270d_28f723f0
 Bytes: 81
 But should we check only is sWifiInjector is null? I.e. if we need to create one?
 
+159:8-159:38
+Wed Sep 21 18:24:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f074270d_28f723f0
+UUID: f074270d_e818ab2c
+Bytes: 397
+While technically no, i'd suggest leaving it this way to ensure that the caller actually has a context, which would ensure it doesn't start getting called from lower level places because it's more convenient than passing it. Also ensuring this always means that if the initialization order of things ever changes there will always be a context present no matter which call of getInstance is first.
+
 160:22-160:43
 Wed Sep 21 18:16:57 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -33,4 +41,12 @@ Bytes: 109
 is there another assert which checks for object equality? hash isn't a guarantee necessarily.
 
 Use assertSame
+
+63:70-63:78
+Wed Sep 21 18:24:15 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f074270d_a8cb139a
+UUID: f074270d_c834cf97
+Bytes: 99
+Just use assertSame (although because there's no equals method assertEquals technically works too).
 
