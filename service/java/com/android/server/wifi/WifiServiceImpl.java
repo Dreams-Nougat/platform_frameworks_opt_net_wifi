@@ -307,7 +307,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
 
     public WifiServiceImpl(Context context) {
         mContext = context;
-        mWifiInjector = new WifiInjector(context);
+        mWifiInjector = WifiInjector.getInstance(context);
 
         mFacade = mWifiInjector.getFrameworkFacade();
         mWifiMetrics = mWifiInjector.getWifiMetrics();

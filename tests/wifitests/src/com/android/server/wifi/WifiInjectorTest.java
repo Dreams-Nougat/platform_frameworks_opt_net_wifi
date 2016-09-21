@@ -16,6 +16,7 @@
 
 package com.android.server.wifi;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import android.content.Context;
@@ -41,32 +42,25 @@ public class WifiInjectorTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
-     * Test that attempting to get the instance of the WifiInjector throws an IllegalStateException
-     * if it is not initialized.
-     */
-    @Test(expected = IllegalStateException.class)
-    public void testGetInstanceWithUninitializedWifiInjector() {
-        WifiInjector.getInstance();
-    }
-
-    /**
-     * Test that attempting to call the WifiInjector a second time throws an exception.
-     */
-    @Test(expected = IllegalStateException.class)
-    public void testShouldNotBeAbleToCreateMoreThanOneWifiInjector() {
-        try {
-            WifiInjector willThrowNullPointerException = new WifiInjector(mContext);
-        } catch (NullPointerException e) {
-        }
-        WifiInjector shouldThrowIllegalStateException = new WifiInjector(mContext);
-    }
 
     /**
      * Test that a WifiInjector cannot be created with a null Context.
      */
     @Test(expected = IllegalStateException.class)
     public void testShouldNotCreateWifiInjectorWithNullContext() {
-        new WifiInjector(null);
+        mInjector = WifiInjector.getInstance(null);
+    }
+
+    /**
+     * Test that attempting to call the WifiInjector a second time returns the same instance
+     */
+    @Test(expected = NullPointerException.class)
+    public void testShouldNotBeAbleToCreateMoreThanOneWifiInjector() {
+        try {
+            mInjector = WifiInjector.getInstance(mContext);
+        } catch (NullPointerException e) {
+        }
+        assertEquals("Different instances of WifiInjector", mInjector.hashCode(),
+                WifiInjector.getInstance(mContext).hashCode());
     }
 }

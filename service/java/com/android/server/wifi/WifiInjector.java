@@ -87,17 +87,7 @@ public class WifiInjector {
 
     private final boolean mUseRealLogger;
 
-    public WifiInjector(Context context) {
-        if (context == null) {
-            throw new IllegalStateException(
-                    "WifiInjector should not be initialized with a null Context.");
-        }
-
-        if (sWifiInjector != null) {
-            throw new IllegalStateException(
-                    "WifiInjector was already created, use getInstance instead.");
-        }
-
+    private WifiInjector(Context context) {
         sWifiInjector = this;
 
         mContext = context;
@@ -159,13 +149,19 @@ public class WifiInjector {
     /**
      *  Obtain an instance of the WifiInjector class.
      *
-     *  This is the generic method to get an instance of the class. The first instance should be
-     *  retrieved using the getInstanceWithContext method.
+     *  This is the generic method to get an instance of the class.
+     *  If the instance is not created, create it and return the new
+     *  instance. Otherwise, return the existing instance of the class.
+     *  @param contextIfNeeded required to construct instance
+     *  @return WifiInjector the single instance of the class
      */
-    public static WifiInjector getInstance() {
-        if (sWifiInjector == null) {
+    public static WifiInjector getInstance(Context contextIfNeeded) {
+        if (contextIfNeeded == null) {
             throw new IllegalStateException(
-                    "Attempted to retrieve a WifiInjector instance before constructor was called.");
+                "WifiInjector should not be initialized with a null Context.");
+        }
+        if (sWifiInjector == null) {
+            return new WifiInjector(contextIfNeeded);
         }
         return sWifiInjector;
     }
