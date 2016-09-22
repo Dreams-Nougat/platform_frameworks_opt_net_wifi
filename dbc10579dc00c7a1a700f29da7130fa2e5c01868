@@ -16,6 +16,22 @@ UUID: 10e1bbe4_9e6bfde7
 Bytes: 11
 framework's
 
+12:0-12:4
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 10e1bbe4_1e41ad60
+UUID: b04b8ffc_de2ce1a5
+Bytes: 4
+Done
+
+12:40-12:50
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 10e1bbe4_9e6bfde7
+UUID: b04b8ffc_fe319dfa
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/WifiMetrics.java
 
 97:7-97:40
@@ -31,6 +47,14 @@ How about "Boot-relative timestamp for the last...", instead?
 
 3. Consider eliminating the |mGotCandidateScanResult| field, and using a negative timestamp to indicate that case, instead (e.g. -1, or -TIMEOUT_RSSI_DELTA_MILLIS). My concern here is that, with multiple fields, we risk getting the information out of sync.
 
+97:7-97:40
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f0d7c739_ad441d9f
+UUID: 10cc5bf8_a69c865e
+Bytes: 4
+Done
+
 155:0-166:21
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -40,12 +64,28 @@ I don't understand why this code is in the RouterFingerprint class. The methods 
 
 One particular benefit of having this code in startConnectionEvent() is that the updating of mGotCandidateScanResult would be clearer. (Right now, it's obvious that startConnectionEvent() will clear that boolean. But it's not obvious how the boolean gets set.)
 
+155:0-166:21
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_2cf39367
+UUID: b04b8ffc_3bedd718
+Bytes: 4
+Done
+
 854
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d0e00315_6c6cfbff
 Bytes: 138
 If you follow the suggestion above, about setting |mGotCandidateTime| to -TIMEOUT_RSSI_DELTA_MILLIS, then you'll no longer need this |if|.
+
+854
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_6c6cfbff
+UUID: b04b8ffc_7b5d9fe3
+Bytes: 4
+Done
 
 855:0-859:48
 Wed Sep 21 23:33:54 2016 +0000
@@ -56,6 +96,14 @@ You might consider moving all of this code into incrementRssiDeltaRssiCount(), a
 
 The benefit would be in the consolidation of the logic about which samples are valid.
 
+855:0-859:48
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_8c3f27e3
+UUID: b04b8ffc_1b6a5b83
+Bytes: 4
+Done
+
 868:17-868:44
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -63,12 +111,28 @@ UUID: d0e00315_2c4f1388
 Bytes: 128
 Not sure about this name. The first instance of rssi makes sense. The second, not so much. Consider |incrementRssiDeltaCount()|.
 
+868:17-868:44
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_2c4f1388
+UUID: b04b8ffc_3b6717bc
+Bytes: 4
+Done
+
 1156:45-1156:51
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: f018a7be_856f42bb
 Bytes: 74
 |deltas| is ambiguous. Consider |rssiDeltas|, or something to that affect.
+
+1156:45-1156:51
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f018a7be_856f42bb
+UUID: b04b8ffc_7b86ff4d
+Bytes: 4
+Done
 
 File: tests/wifitests/src/com/android/server/wifi/WifiMetricsTest.java
 
@@ -79,12 +143,28 @@ UUID: d0e00315_6c187b7e
 Bytes: 30
 delta? (there's only one here)
 
+649:27-649:33
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_6c187b7e
+UUID: b04b8ffc_db1dd322
+Bytes: 4
+Done
+
 653:18-653:40
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d0e00315_ec558bf3
 Bytes: 44
 "timed out rssi deltas" (there are two here)
+
+653:18-653:40
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_ec558bf3
+UUID: b04b8ffc_fb220f68
+Bytes: 4
+Done
 
 672:0-678:70
 Wed Sep 21 23:33:54 2016 +0000
@@ -94,6 +174,14 @@ Bytes: 361
 Reviewing these assertions requires understanding how the 8 generateRssiDelta() call-sites above interact. At least for me, that's not trivial.
 
 Is there something in particular that your testing about that interaction? If not, I think it would be clearer to have the different cases split into separate tests. E.g. testRssiDeltaMetricsExcludeTimedOutSamples().
+
+672:0-678:70
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_6c4abb52
+UUID: b04b8ffc_7ee02dbc
+Bytes: 4
+Done
 
 698:0-700:59
 Wed Sep 21 23:33:54 2016 +0000
@@ -115,10 +203,30 @@ and
 
 (I _believe_ that the implementing code handles this correctly. But it would be even better if tests verified that.)
 
+698:0-700:59
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_0cbb372d
+UUID: b04b8ffc_1e01e912
+Bytes: 158
+Done. Added 3 new tests, testing variations of a delta event:
+- INVALID: start, end(failure), poll
+- VALID: start, poll
+- INVALID: start(null_scan), end, poll
+
 704
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d0e00315_6ce63b43
 Bytes: 74
 Do we have any tests that exercise clear(), as it pertains to rssi deltas?
+
+704
+Thu Sep 22 18:51:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d0e00315_6ce63b43
+UUID: b04b8ffc_9ea979ec
+Bytes: 248
+Done. Added a 'testMetricsSerializedDuringRssiDeltaEventLogsNothing' test.
+clear() is a private operation, but the public event that causes it is a Metrics upload. By design I choose to not to log rssiDelta events that occur across a serialization.
 
