@@ -1,0 +1,11 @@
+Revision: 22f57da33e6b132a0e7e4bd6d986f74b53d19527
+Base-for-patch-set: 2
+File: service/java/com/android/server/wifi/SupplicantStateTracker.java
+
+357:33-357:52
+Thu Sep 22 22:54:41 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_cc5ab721
+Bytes: 60
+Don't we need to transition back to the mUninitializedState?
+
