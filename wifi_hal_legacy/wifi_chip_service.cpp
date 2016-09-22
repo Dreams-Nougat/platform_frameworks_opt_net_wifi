@@ -100,13 +100,72 @@ Return<void> WifiChipService::requestChipDebugInfo() {
   return Void();
 }
 
+WifiChipService* WifiChipService::chip_service_ = nullptr;
+bool WifiChipService::callback_called_ = false;
+
+void WifiChipService::SetupForCallback(WifiChipService* service) {
+  chip_service_ = service;
+  callback_called_ = false;
+}
+
+bool WifiChipService::CheckCallbackAndCleanup() {
+  chip_service_ = nullptr;
+  return callback_called_;
+}
+
+void WifiChipService::DriverMemoryDumpCallback(char* buffer, int buffer_size) {
+  if (chip_service_ != nullptr) {
+    hidl_vec<uint8_t> result;
+    result.setToExternal((uint8_t*) buffer, buffer_size);
+
+    for (auto& callback : chip_service_->callbacks_) {
+      callback->onDriverDebugDumpAvailable(result);
+    }
+  }
+}
+
+void WifiChipService::FirmwareMemoryDumpCallback(char* buffer, int buffer_size) {
+  if (chip_service_ != nullptr) {
+    hidl_vec<uint8_t> result;
+    result.setToExternal((uint8_t*) buffer, buffer_size);
+
+    for (auto& callback : chip_service_->callbacks_) {
+      callback->onFirmwareDebugDumpAvailable(result);
+    }
+  }
+}
+
 Return<void> WifiChipService::requestDriverDebugDump() {
-  // TODO implement
+  SetupForCallback(this);
+  wifi_error ret = hal_state_->func_table_.wifi_get_driver_memory_dump(
+      interface_handle_, {DriverMemoryDumpCallback});
+  if (!CheckCallbackAndCleanup()) {
+    LOG(WARNING) << "Failed to get driver debug dump: "
+                 << LegacyErrorToString(ret);
+
+    // send empty callback
+    hidl_vec<uint8_t> data;
+    for (auto& callback : callbacks_) {
+      callback->onDriverDebugDumpAvailable(data);
+    }
+  }
   return Void();
 }
 
 Return<void> WifiChipService::requestFirmwareDebugDump() {
-  // TODO implement
+  SetupForCallback(this);
+  wifi_error ret = hal_state_->func_table_.wifi_get_firmware_memory_dump(
+      interface_handle_, {FirmwareMemoryDumpCallback});
+  if (!CheckCallbackAndCleanup()) {
+    LOG(WARNING) << "Failed to get firmware debug dump: "
+                 << LegacyErrorToString(ret);
+
+    // send empty callback
+    hidl_vec<uint8_t> data;
+    for (auto& callback : callbacks_) {
+      callback->onFirmwareDebugDumpAvailable(data);
+    }
+  }
   return Void();
 }
 
