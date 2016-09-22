@@ -1,0 +1,11 @@
+Revision: ef9e9467f7197b4fec58db757237748d387a7f26
+Patch-set: 10
+File: wifi_hal_legacy/failure_reason_util.h
+
+27
+Thu Sep 22 20:35:06 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_9d4aa3ab
+Bytes: 14
+nit: these too
+
