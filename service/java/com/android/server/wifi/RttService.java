@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.IApInterface;
+import android.net.wifi.IClientInterface;
+import android.net.wifi.IInterfaceEventCallback;
 import android.net.wifi.IRttManager;
+import android.net.wifi.IWificond;
 import android.net.wifi.RttManager;
 import android.net.wifi.RttManager.ResponderConfig;
 import android.net.wifi.WifiManager;
@@ -14,10 +18,12 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.Slog;
@@ -35,12 +41,14 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
 public final class RttService extends SystemService {
 
     public static final boolean DBG = true;
+    private static final String WIFICOND_SERVICE_NAME = "wificond";
 
     static class RttServiceImpl extends IRttManager.Stub {
 
@@ -291,11 +299,39 @@ public final class RttService extends SystemService {
 
         class RttStateMachine extends StateMachine {
 
+            private IWificond mWificond;
+            private InterfaceEventHandler mInterfaceEventHandler;
+            private IClientInterface mClientInterface;
+
             DefaultState mDefaultState = new DefaultState();
             EnabledState mEnabledState = new EnabledState();
             InitiatorEnabledState mInitiatorEnabledState = new InitiatorEnabledState();
             ResponderEnabledState mResponderEnabledState = new ResponderEnabledState();
             ResponderConfig mResponderConfig;
+
+            private class InterfaceEventHandler extends IInterfaceEventCallback.Stub {
+                @Override
+                public void OnClientTorndownEvent(IClientInterface networkInterface) {
+                    if (networkInterface == mClientInterface) {
+                        mClientInterface = null;
+                    }
+                }
+                @Override
+                public void OnClientInterfaceReady(IClientInterface networkInterface) {
+                    mClientInterface = networkInterface;
+                }
+                @Override
+                public void OnApTorndownEvent(IApInterface networkInterface) { }
+                @Override
+                public void OnApInterfaceReady(IApInterface networkInterface) { }
+            }
+
+            private IWificond makeWificond() {
+                // We depend on being able to refresh our binder in WifiStateMachine,
+                // so don't cache it.
+                IBinder binder = ServiceManager.getService(WIFICOND_SERVICE_NAME);
+                return IWificond.Stub.asInterface(binder);
+            }
 
             RttStateMachine(Looper looper) {
                 super("RttStateMachine", looper);
@@ -350,6 +386,27 @@ public final class RttService extends SystemService {
             }
 
             class EnabledState extends State {
+                @Override
+                public void enter() {
+                    mWificond = makeWificond();
+                    mInterfaceEventHandler = new InterfaceEventHandler();
+                    try {
+                        mWificond.RegisterCallback(mInterfaceEventHandler);
+                        List<IBinder> interfaces = mWificond.GetClientInterfaces();
+                        if (interfaces.size() > 0) {
+                            mClientInterface = IClientInterface.Stub.asInterface(interfaces.get(0));
+                        }
+                    } catch (RemoteException e1) { }
+                }
+
+                @Override
+                public void exit() {
+                    try {
+                        mWificond.UnregisterCallback(mInterfaceEventHandler);
+                        mInterfaceEventHandler = null;
+                    } catch (RemoteException e1) { }
+                }
+
                 @Override
                 public boolean processMessage(Message msg) {
                     if (DBG) Log.d(TAG, "EnabledState got" + msg);
