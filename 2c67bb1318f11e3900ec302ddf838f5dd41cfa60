@@ -1,0 +1,68 @@
+Revision: 2c67bb1318f11e3900ec302ddf838f5dd41cfa60
+Patch-set: 9
+File: wifi_hal_legacy/wifi_chip_service.cpp
+
+28:73-28:74
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_1113dc65
+Bytes: 122
+nit: Put this on the next line, check out
+
+https://google.github.io/styleguide/cppguide.html#Constructor_Initializer_Lists
+
+39
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_5170049a
+Bytes: 60
+What happens when the process that is hosting callback dies?
+
+File: wifi_hal_legacy/wifi_chip_service.h
+
+55
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_91252ccc
+Bytes: 42
+Could be handy to have a DISALLOW_COPY_...
+
+File: wifi_hal_legacy/wifi_hal_service.cpp
+
+117
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_112d9c54
+Bytes: 96
+Could you move this declaration down by the loop that uses it?  Not inside the loop, just nearby
+
+119:41-119:45
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_71c980a1
+Bytes: 7
+nullptr
+
+131
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_31fc589d
+Bytes: 106
+Similarly, it would be nice to check for != SUCCESS and continue in that case rather than nest this deeper
+
+136:4-139:3
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_d179745a
+Bytes: 166
+This nesting makes me loopy.  Can you check for != WIFI_SUCCESS, and return kInterfaceNotFoundHandle in this case?  That will let you reduce the nesting level by one.
+
+File: wifi_hal_legacy/wifi_hal_service.h
+
+35
+Thu Sep 22 22:39:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_f1fbd0d6
+Bytes: 251
+Woah there.  Can we avoid this?  This is usually a pretty bad code smell.  At least need some comments on why we need to break our object boundaries.  Also should be down in the private section, because of our deep shame that we had to resort to this.
+
