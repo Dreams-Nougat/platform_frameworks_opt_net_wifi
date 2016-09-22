@@ -9,3 +9,11 @@ UUID: f08d07b7_0c2c9f9f
 Bytes: 41
 Should this be in the exit of this state?
 
+290:16-290:51
+Thu Sep 22 22:57:53 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_0c2c9f9f
+UUID: f08d07b7_6c97e395
+Bytes: 177
+We're handling the supplicant state change broadcast here.  The parent state (in this case DefaultState) will handle the state transition, as I've outlined in the comment below.
+
