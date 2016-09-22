@@ -55,6 +55,13 @@ UUID: 10cc5bf8_a69c865e
 Bytes: 4
 Done
 
+159
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_e112626b
+Bytes: 77
+It seems like this line was removed between PS3 and PS5. Is that intentional?
+
 155:0-166:21
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
