@@ -1,0 +1,70 @@
+Revision: b1d702718f685238d6ea714a00c8716c250a8393
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiMetrics.java
+
+860
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_a10c5a4e
+Bytes: 147
+Consider adding a comment that |mLock| must be held, when calling this method. (I see that you removed the synchronized block between PS3 and PS5.)
+
+File: tests/wifitests/src/com/android/server/wifi/WifiMetricsTest.java
+
+655:21-655:44
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_015bce26
+Bytes: 362
+It might be clearer to just hard-code 2 here. It's reasonably easy for me to check 2 against the generateRssiDelta() call-sites above. It's harder for me to tie things together with the constant defined outside of this method.
+
+(I'm not arguing for hard-coding in implementation code, of course. But I think tests are often easier to read with less abstraction.)
+
+689:21-689:44
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_01a50e0f
+Bytes: 52
+As above, this might be clearer as a literal number.
+
+715:60-715:68
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_018e6e87
+Bytes: 29
+Alternatively, 0L might work.
+
+715:0-724:66
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_6189725b
+Bytes: 519
+I wonder if it might make sense to do something like what you've done for generateRssiDelta(), and move this code out to a helper method. Maybe call it generateConnectionStart().
+
+Of course, the benefit of reducing cut-and-paste needs to be balanced against the cost of introducing an abstraction. But I think that, across the four test cases that use this pattern of code, the only thing that varies is the ScanResult.
+
+Having a helper with one parameter seems like a net win (versus duplicating the 10 lines of code).
+
+773:44-773:74
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_c145e6fa
+Bytes: 266
+I'm not sure about this part. If we report the connection as failed, then we'd skip the rssi delta accounting, even if the scan result were non-null, right?
+
+If that's correct, then we can't be sure that this test passed because null scan-result is handled properly.
+
+791:61-791:65
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_81383e8a
+Bytes: 111
+Similar to the comment at line 773. A null scan-result is, in itself, a reason not to record an rssi delta, no?
+
+796:44-796:74
+Thu Sep 22 20:23:15 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_2135aa90
+Bytes: 28
+Same comment as at line 773.
+
