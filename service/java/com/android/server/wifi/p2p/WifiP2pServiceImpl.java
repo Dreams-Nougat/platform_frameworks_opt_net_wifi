@@ -230,6 +230,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
        the ranges defined in Tethering.java */
     private static final String SERVER_ADDRESS = "192.168.49.1";
 
+    private static final int UNKNOWN_PID = -1;
     /**
      * Error code definition.
      * see the Table.8 in the WiFi Direct specification for the detail.
@@ -322,6 +323,8 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
             switch (msg.what) {
               case WifiP2pManager.SET_DEVICE_NAME:
               case WifiP2pManager.SET_WFD_INFO:
+                    enforceWifiDisplayPermission(msg.sendingUid);
+                    /* Fall through */
               case WifiP2pManager.DISCOVER_PEERS:
               case WifiP2pManager.STOP_DISCOVERY:
               case WifiP2pManager.CONNECT:
@@ -411,6 +414,12 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         }
     }
 
+    private void enforceWifiDisplayPermission(int uid) {
+        mContext.enforcePermission(
+                android.Manifest.permission.CONFIGURE_WIFI_DISPLAY,
+                UNKNOWN_PID, uid, "WifiP2pService");
+    }
+
     private void stopIpManager() {
         if (mIpManager != null) {
             mIpManager.stop();
@@ -493,6 +502,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
     @Override
     public void setMiracastMode(int mode) {
         enforceConnectivityInternalPermission();
+        enforceWifiDisplayPermission(getCallingUid());
         mP2pStateMachine.sendMessage(SET_MIRACAST_MODE, mode);
     }
 
