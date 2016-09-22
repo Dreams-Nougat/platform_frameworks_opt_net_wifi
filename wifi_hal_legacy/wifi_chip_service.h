@@ -49,9 +49,18 @@ class WifiChipService : public V1_0::IWifiChip {
   Return<void> requestFirmwareDebugDump() override;
 
  private:
+  static void SetupForCallback(WifiChipService* service);
+  static bool CheckCallbackAndCleanup();
+  static void DriverMemoryDumpCallback(char* buffer, int buffer_size);
+  static void FirmwareMemoryDumpCallback(char* buffer, int buffer_size);
+
   WifiHalService* hal_service_;
   wifi_interface_handle interface_handle_;
   std::set<sp<V1_0::IWifiChipEventCallback>> callbacks_;
+
+  // state for callbacks with no data parameter
+  static WifiChipService* chip_service_;
+  static bool callback_called_;
 };
 
 }  // namespace wifi
