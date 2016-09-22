@@ -1478,7 +1478,10 @@ public class WifiServiceImpl extends IWifiManager.Stub {
                     + ", uid=" + Binder.getCallingUid());
             return;
         }
-        if (args.length > 0 && WifiMetrics.PROTO_DUMP_ARG.equals(args[0])) {
+        if (args.length > 0 && "reset".equals(args[0])) {
+            Log.e(TAG, "NNN Resetting supplicant state");
+            mWifiStateMachine.resetSupplicantState();
+        } else if (args.length > 0 && WifiMetrics.PROTO_DUMP_ARG.equals(args[0])) {
             // WifiMetrics proto bytes were requested. Dump only these.
             mWifiStateMachine.updateWifiMetrics();
             mWifiMetrics.dump(fd, pw, args);

@@ -287,6 +287,7 @@ public class SupplicantStateTracker extends StateMachine {
         @Override
         public boolean processMessage(Message message) {
             if (message.what == WifiStateMachine.CMD_RESET_SUPPLICANT_STATE) {
+                Log.e(TAG, "NNN Responding to reset_supplicant from " + getSupplicantStateName());
                 sendSupplicantStateChangedBroadcast(SupplicantState.DISCONNECTED, false);
             }
 

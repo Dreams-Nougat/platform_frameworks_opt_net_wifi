@@ -347,6 +347,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     private final NetworkCapabilities mDfltNetworkCapabilities;
     private SupplicantStateTracker mSupplicantStateTracker;
 
+    void resetSupplicantState() {
+        mSupplicantStateTracker.sendMessage(CMD_RESET_SUPPLICANT_STATE);
+    }
+
     private int mWifiLinkLayerStatsSupported = 4; // Temporary disable
 
     // Whether the state machine goes thru the Disconnecting->Disconnected->ObtainingIpAddress
