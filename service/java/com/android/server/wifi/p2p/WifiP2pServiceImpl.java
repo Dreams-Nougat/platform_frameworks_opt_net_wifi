@@ -322,6 +322,8 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
             switch (msg.what) {
               case WifiP2pManager.SET_DEVICE_NAME:
               case WifiP2pManager.SET_WFD_INFO:
+                    enforceWifiDisplayPermission(msg.sendingUid);
+                    /* Fall through */
               case WifiP2pManager.DISCOVER_PEERS:
               case WifiP2pManager.STOP_DISCOVERY:
               case WifiP2pManager.CONNECT:
@@ -411,6 +413,12 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         }
     }
 
+    private void enforceWifiDisplayPermission(int uid) {
+        mContext.enforcePermission(
+                android.Manifest.permission.CONFIGURE_WIFI_DISPLAY,
+                uid, -1, "WifiP2pService");
+    }
+
     private void stopIpManager() {
         if (mIpManager != null) {
             mIpManager.stop();
@@ -493,6 +501,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
     @Override
     public void setMiracastMode(int mode) {
         enforceConnectivityInternalPermission();
+        enforceWifiDisplayPermission(getCallingUid());
         mP2pStateMachine.sendMessage(SET_MIRACAST_MODE, mode);
     }
 
