@@ -9,6 +9,16 @@ UUID: f074270d_0bc6e141
 Bytes: 52
 Don't interleave static/non-static imports like this
 
+22
+Thu Sep 22 05:46:55 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f074270d_0bc6e141
+UUID: d0e00315_c0196ee5
+Bytes: 73
+Done. 
+
+Interestingly, the checkstyle script doesn't complain about this.
+
 88:16-88:33
 Wed Sep 21 15:01:33 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,12 +26,34 @@ UUID: 70d83709_0bf03eef
 Bytes: 182
 Do we need the WifiConfigManager instance passed to the dummy evaluator? As far as network selector tests are concerned, it should only be concerned with the output of the evaluator.
 
+88:16-88:33
+Thu Sep 22 05:46:55 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 70d83709_0bf03eef
+UUID: d0e00315_402e9eff
+Bytes: 586
+True. The WifiNetworkSelector tests cares only if a new network selection made. If we always return a mocked WIfiConfiguration from evaluateNetworks(), WifiNetworkSelector will run into null exception because of
+
+mCurrentBssid = selectedNetwork.getNetworkSelectionStatus().getCandidate().BSSID;
+
+So we will have to mock getNetworkSelectionStatus(), getCandidate() as well. Given the WifiConfigManager methods used below are already setup and mocked in WifiNetworkSelectorTestUtil, I think it's more straight forward to just use them here.
+
+Let me know if you feel strongly against this.
+
 112:12-115:87
 Wed Sep 21 15:01:33 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 70d83709_cbdb166d
 Bytes: 159
 We probably don't need these details in these tests. This evaluator should only return a network config required. Doesn't need to call in to WifiConfigManager.
+
+112:12-115:87
+Thu Sep 22 05:46:55 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 70d83709_cbdb166d
+UUID: d0e00315_c06bae19
+Bytes: 10
+See above.
 
 File: tests/wifitests/src/com/android/server/wifi/WifiNetworkSelectorTestUtil.java
 
