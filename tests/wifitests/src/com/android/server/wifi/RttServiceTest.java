@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.IWificond;
 import android.net.wifi.RttManager;
 import android.net.wifi.RttManager.ParcelableRttParams;
 import android.net.wifi.RttManager.ResponderConfig;
@@ -64,6 +65,8 @@ public class RttServiceTest {
     @Mock
     WifiNative mWifiNative;
     TestLooper mLooper;
+    @Mock
+    IWificond mWificond;
 
     RttService.RttServiceImpl mRttServiceImpl;
     ArgumentCaptor<BroadcastReceiver> mBroadcastReceiverCaptor = ArgumentCaptor
@@ -74,7 +77,7 @@ public class RttServiceTest {
         MockitoAnnotations.initMocks(this);
         TestUtil.installWlanWifiNative(mWifiNative);
         mLooper = new TestLooper();
-        mRttServiceImpl = new RttService.RttServiceImpl(mContext, mLooper.getLooper());
+        mRttServiceImpl = new RttService.RttServiceImpl(mContext, mLooper.getLooper(), mWificond);
         mRttServiceImpl.startService();
     }
 
