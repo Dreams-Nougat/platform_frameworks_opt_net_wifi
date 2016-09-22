@@ -1,0 +1,11 @@
+Revision: 8e1a42edb0c6726b985798a3f3f89fb21b1c39e2
+Patch-set: 7
+File: service/java/com/android/server/wifi/ExternalScoreEvaluator.java
+
+320
+Thu Sep 22 18:11:26 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_1e07a978
+Bytes: 61
+So ExternalScoreEvaluator logs get prefixed, but these don't?
+
