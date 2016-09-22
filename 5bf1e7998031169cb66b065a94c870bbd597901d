@@ -1,0 +1,18 @@
+Revision: 5bf1e7998031169cb66b065a94c870bbd597901d
+Patch-set: 1
+File: service/java/com/android/server/wifi/RttService.java
+
+175
+Thu Sep 22 20:11:27 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_c15ac6ef
+Bytes: 200
+I think you need to register this event handler before you retrieve the list right?  It lets you avoid a race where an interface is created after you get the list but before you register the listener.
+
+196
+Thu Sep 22 20:11:27 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_815d9ee6
+Bytes: 175
+How does this class handle threading concerns?  Presumably we're going to use the wificond handle from a state machine running on a different thread that this (binder) thread.
+
