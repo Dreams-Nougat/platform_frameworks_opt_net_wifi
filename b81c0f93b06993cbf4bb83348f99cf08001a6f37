@@ -1,0 +1,11 @@
+Revision: b81c0f93b06993cbf4bb83348f99cf08001a6f37
+Patch-set: 9
+File: wifi_hal_legacy/wifi_hal_legacy.rc
+
+2:10-2:14
+Thu Sep 22 20:07:55 2016 +0000
+Author: Iliyan Malchev <1000866@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: b04b8ffc_41ed5617
+Bytes: 63
+When support for class hal lands, this will need to move to it.
+
