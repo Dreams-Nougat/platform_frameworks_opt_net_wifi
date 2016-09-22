@@ -17,3 +17,11 @@ UUID: f08d07b7_6c97e395
 Bytes: 177
 We're handling the supplicant state change broadcast here.  The parent state (in this case DefaultState) will handle the state transition, as I've outlined in the comment below.
 
+290:16-290:51
+Thu Sep 22 23:08:40 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_6c97e395
+UUID: f08d07b7_6cdfe324
+Bytes: 101
+As discussed, putting this in @exit() might result in duplicate broadcasts. So, i guess this is fine.
+
