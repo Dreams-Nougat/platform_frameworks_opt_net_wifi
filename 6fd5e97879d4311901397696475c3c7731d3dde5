@@ -9,3 +9,11 @@ UUID: f08d07b7_b094d990
 Bytes: 76
 This feels sort of hacky. Why can't this just be passed into the constructor
 
+142
+Fri Sep 23 19:54:16 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_b094d990
+UUID: f08d07b7_51839606
+Bytes: 202
+ScoreCache is not an input parameter. It's created by the constructor instead. Let me know if you have better way to mock this. I don't think we want to make ScoreCache an input just because of testing.
+
