@@ -9,6 +9,14 @@ UUID: b04b8ffc_a10c5a4e
 Bytes: 147
 Consider adding a comment that |mLock| must be held, when calling this method. (I see that you removed the synchronized block between PS3 and PS5.)
 
+860
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_a10c5a4e
+UUID: f08d07b7_ac464b07
+Bytes: 4
+Done
+
 File: tests/wifitests/src/com/android/server/wifi/WifiMetricsTest.java
 
 655:21-655:44
@@ -20,6 +28,15 @@ It might be clearer to just hard-code 2 here. It's reasonably easy for me to che
 
 (I'm not arguing for hard-coding in implementation code, of course. But I think tests are often easier to read with less abstraction.)
 
+655:21-655:44
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_015bce26
+UUID: f08d07b7_2cfcfb9c
+Bytes: 84
+Done.
+I totally agree. I assumed I wouldn't be able to get away with any hardcoding.
+
 689:21-689:44
 Thu Sep 22 20:23:15 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -27,12 +44,28 @@ UUID: b04b8ffc_01a50e0f
 Bytes: 52
 As above, this might be clearer as a literal number.
 
+689:21-689:44
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_01a50e0f
+UUID: f08d07b7_4cf947ac
+Bytes: 4
+Done
+
 715:60-715:68
 Thu Sep 22 20:23:15 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: b04b8ffc_018e6e87
 Bytes: 29
 Alternatively, 0L might work.
+
+715:60-715:68
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_018e6e87
+UUID: f08d07b7_8c034fb2
+Bytes: 4
+Done
 
 715:0-724:66
 Thu Sep 22 20:23:15 2016 +0000
@@ -45,6 +78,14 @@ Of course, the benefit of reducing cut-and-paste needs to be balanced against th
 
 Having a helper with one parameter seems like a net win (versus duplicating the 10 lines of code).
 
+715:0-724:66
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_6189725b
+UUID: f08d07b7_d52cf7a5
+Bytes: 4
+Done
+
 773:44-773:74
 Thu Sep 22 20:23:15 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -54,6 +95,14 @@ I'm not sure about this part. If we report the connection as failed, then we'd s
 
 If that's correct, then we can't be sure that this test passed because null scan-result is handled properly.
 
+773:44-773:74
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_c145e6fa
+UUID: f08d07b7_15273fc0
+Bytes: 15
+Correct. Fixed.
+
 791:61-791:65
 Thu Sep 22 20:23:15 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -61,10 +110,26 @@ UUID: b04b8ffc_81383e8a
 Bytes: 111
 Similar to the comment at line 773. A null scan-result is, in itself, a reason not to record an rssi delta, no?
 
+791:61-791:65
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_81383e8a
+UUID: f08d07b7_cb0ff49a
+Bytes: 4
+Done
+
 796:44-796:74
 Thu Sep 22 20:23:15 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: b04b8ffc_2135aa90
 Bytes: 28
 Same comment as at line 773.
+
+796:44-796:74
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_2135aa90
+UUID: f08d07b7_eb14b0af
+Bytes: 4
+Done
 
