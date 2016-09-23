@@ -1,0 +1,11 @@
+Revision: 6fd5e97879d4311901397696475c3c7731d3dde5
+Patch-set: 5
+File: tests/wifitests/src/com/android/server/wifi/ExternalScoreEvaluatorTest.java
+
+142
+Fri Sep 23 17:35:45 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_b094d990
+Bytes: 76
+This feels sort of hacky. Why can't this just be passed into the constructor
+
