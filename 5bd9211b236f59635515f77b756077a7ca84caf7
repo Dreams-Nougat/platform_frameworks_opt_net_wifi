@@ -1,0 +1,20 @@
+Revision: 5bd9211b236f59635515f77b756077a7ca84caf7
+Patch-set: 8
+File: service/java/com/android/server/wifi/ExternalScoreEvaluator.java
+
+47:0-48:46
+Fri Sep 23 00:29:55 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_a673c7db
+Bytes: 30
+can this not be final as well?
+
+File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+576
+Fri Sep 23 00:29:55 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_c629b3ad
+Bytes: 36
+This doesn't do anything. remove it?
+
