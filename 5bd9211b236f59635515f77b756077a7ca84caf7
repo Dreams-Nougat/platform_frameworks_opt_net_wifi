@@ -9,6 +9,14 @@ UUID: f08d07b7_a673c7db
 Bytes: 30
 can this not be final as well?
 
+47:0-48:46
+Fri Sep 23 02:40:52 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_a673c7db
+UUID: f08d07b7_dc79845a
+Bytes: 133
+mScoreCache cannot be final. It gets assigned in setScoreCache() for testing in patch #9. In patch #10 mScoreManager is set to final.
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
 
 576
@@ -17,4 +25,12 @@ Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: f08d07b7_c629b3ad
 Bytes: 36
 This doesn't do anything. remove it?
+
+576
+Fri Sep 23 02:40:52 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_c629b3ad
+UUID: f08d07b7_fc6e4091
+Bytes: 4
+Done
 
