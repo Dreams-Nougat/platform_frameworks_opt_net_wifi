@@ -1,0 +1,11 @@
+Revision: 047c9cc84293f449b1ecb2d560cf10a0ecb81c4f
+Patch-set: 1
+File: libwifi_system/interface_tool.cpp
+
+34:0-49:1
+Fri Sep 23 18:13:09 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_8b016c15
+Bytes: 124
+I guess this is not intended to be placed in anonymous namespace, cause you defined it in header file as well as mock class?
+
