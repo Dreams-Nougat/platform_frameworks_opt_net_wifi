@@ -9,3 +9,11 @@ UUID: f08d07b7_8b016c15
 Bytes: 124
 I guess this is not intended to be placed in anonymous namespace, cause you defined it in header file as well as mock class?
 
+34:0-49:1
+Fri Sep 23 18:14:49 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_8b016c15
+UUID: f08d07b7_8b3b2cd4
+Bytes: 56
+sorry I read the wrong function name. It has no problem.
+
