@@ -62,6 +62,14 @@ UUID: b04b8ffc_e112626b
 Bytes: 77
 It seems like this line was removed between PS3 and PS5. Is that intentional?
 
+159
+Fri Sep 23 18:00:22 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: b04b8ffc_e112626b
+UUID: f08d07b7_4ccce7b2
+Bytes: 235
+It's still here (updateMetricsFromWifiConfiguration()) in PS5, being used to update RouterFingerprint specific metrics. Nothing has changed in the updateMetricsFromWifiConfig..() method in PS5 (moved my changes to startConnectionEvent)
+
 155:0-166:21
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
