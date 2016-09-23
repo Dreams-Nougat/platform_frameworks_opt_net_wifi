@@ -25,6 +25,14 @@ UUID: f08d07b7_f0f661f1
 Bytes: 68
 I commented on that CL. I don't really understand why it's required.
 
+47:0-48:46
+Fri Sep 23 19:55:38 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_f0f661f1
+UUID: f08d07b7_31d0caf0
+Bytes: 19
+See my reply there.
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
 
 576
