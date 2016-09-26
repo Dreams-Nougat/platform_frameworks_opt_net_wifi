@@ -21,3 +21,11 @@ Thanks for the explanation : )
 I change it to a 'message' based implementation.
 It seems that I can't change this entire Handler class to static because it needs to access sendMessage().
 
+314
+Mon Sep 26 23:29:54 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 452373ec_cad2e3f0
+UUID: e5b2a710_df4f1f35
+Bytes: 140
+You would definitely need to pass an instance of the state machine in to this object if you made it static.  Your call, I'm fine either way.
+
