@@ -1028,6 +1028,26 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             Log.e(TAG, "Failed to tear down interfaces via wificond");
         }
 
+        try {
+            // A runtime crash can leave IP addresses configured, and this
+            // affects connectivity when supplicant starts up. Ensure we have no
+            // IP addresses before a supplicant start.
+            mNwService.clearInterfaceAddresses(mInterfaceName);
+
+            // Set privacy extensions
+            mNwService.setInterfaceIpv6PrivacyExtensions(mInterfaceName, true);
+
+            // IPv6 is enabled only as long as access point is connected since:
+            // - IPv6 addresses and routes stick around after disconnection
+            // - kernel is unaware when connected and fails to start IPv6 negotiation
+            // - kernel can start autoconfiguration when 802.1x is not complete
+            mNwService.disableIpv6(mInterfaceName);
+        } catch (RemoteException re) {
+            loge("Unable to change interface settings: " + re);
+        } catch (IllegalStateException ie) {
+            loge("Unable to change interface settings: " + ie);
+        }
+
         //start the state machine
         start();
 
@@ -3454,20 +3474,25 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mWifiNative.disconnect();
     }
 
-    private static IClientInterface setupDriverForClientMode(IWificond wificond) {
-        if (wificond == null) {
+    private IClientInterface setupDriverForClientMode() {
+        if (mWificond == null) {
             Log.e(TAG, "Failed to get reference to wificond");
             return null;
         }
 
         IClientInterface clientInterface = null;
         try {
-            clientInterface = wificond.createClientInterface();
+            clientInterface = mWificond.createClientInterface();
         } catch (RemoteException e1) { }
 
         if (clientInterface == null) {
             Log.e(TAG, "Could not get IClientInterface instance from wificond");
             return null;
+        }
+
+        if (!mWifiNative.startHal()) {
+            // starting HAL is optional
+            Log.e(TAG, "Failed to start HAL for client mode");
         }
 
         return clientInterface;
@@ -3967,40 +3992,12 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 case CMD_START_SUPPLICANT:
                     // Refresh our reference to wificond.  This allows us to tolerate restarts.
                     mWificond = mWifiInjector.makeWificond();
-                    mClientInterface = setupDriverForClientMode(mWificond);
+                    mClientInterface = setupDriverForClientMode();
                     if (mClientInterface == null ||
                             !mDeathRecipient.linkToDeath(mClientInterface.asBinder())) {
                         setWifiState(WifiManager.WIFI_STATE_UNKNOWN);
                         cleanup();
                         break;
-                    }
-
-                    try {
-                        // A runtime crash can leave the interface up and
-                        // IP addresses configured, and this affects
-                        // connectivity when supplicant starts up.
-                        // Ensure interface is down and we have no IP
-                        // addresses before a supplicant start.
-                        mNwService.setInterfaceDown(mInterfaceName);
-                        mNwService.clearInterfaceAddresses(mInterfaceName);
-
-                        // Set privacy extensions
-                        mNwService.setInterfaceIpv6PrivacyExtensions(mInterfaceName, true);
-
-                        // IPv6 is enabled only as long as access point is connected since:
-                        // - IPv6 addresses and routes stick around after disconnection
-                        // - kernel is unaware when connected and fails to start IPv6 negotiation
-                        // - kernel can start autoconfiguration when 802.1x is not complete
-                        mNwService.disableIpv6(mInterfaceName);
-                    } catch (RemoteException re) {
-                        loge("Unable to change interface settings: " + re);
-                    } catch (IllegalStateException ie) {
-                        loge("Unable to change interface settings: " + ie);
-                    }
-
-                    if (!mWifiNative.startHal()) {
-                        // starting HAL is optional
-                        Log.e(TAG, "Failed to start HAL for client mode");
                     }
 
                     try {
