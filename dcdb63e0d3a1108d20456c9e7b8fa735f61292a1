@@ -1,0 +1,11 @@
+Revision: dcdb63e0d3a1108d20456c9e7b8fa735f61292a1
+Patch-set: 6
+File: tests/wifitests/src/com/android/server/wifi/WifiMetricsTest.java
+
+761
+Mon Sep 26 17:50:30 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c574c3bf_7319c092
+Bytes: 136
+Any reason not to use generateRssiDelta() here? If not, please update this method to do so. If yes, please add a comment explaining why.
+

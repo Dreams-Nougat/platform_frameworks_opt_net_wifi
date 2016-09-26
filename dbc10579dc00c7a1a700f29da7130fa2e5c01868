@@ -70,6 +70,14 @@ UUID: f08d07b7_4ccce7b2
 Bytes: 235
 It's still here (updateMetricsFromWifiConfiguration()) in PS5, being used to update RouterFingerprint specific metrics. Nothing has changed in the updateMetricsFromWifiConfig..() method in PS5 (moved my changes to startConnectionEvent)
 
+159
+Mon Sep 26 17:50:30 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_4ccce7b2
+UUID: c574c3bf_93625c33
+Bytes: 57
+Right you are. Not sure how I got confused on that point.
+
 155:0-166:21
 Wed Sep 21 23:33:54 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
