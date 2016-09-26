@@ -33,6 +33,14 @@ UUID: f08d07b7_31d0caf0
 Bytes: 19
 See my reply there.
 
+47:0-48:46
+Mon Sep 26 23:32:11 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_31d0caf0
+UUID: e5b2a710_9f27576f
+Bytes: 121
+Alright, made this mScoreCache final by building a real WifiScoreCache in the unit tests instead of using the mocked one.
+
 File: service/java/com/android/server/wifi/WifiNetworkSelector.java
 
 576
