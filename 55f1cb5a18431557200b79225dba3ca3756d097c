@@ -1,0 +1,20 @@
+Revision: 55f1cb5a18431557200b79225dba3ca3756d097c
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiNative.java
+
+542:36-542:43
+Mon Sep 26 16:49:46 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_defec6fa
+Bytes: 12
+nit: finally
+
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+4041
+Mon Sep 26 16:49:46 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_5ea2b6af
+Bytes: 41
+I don't think this method exists any more
+
