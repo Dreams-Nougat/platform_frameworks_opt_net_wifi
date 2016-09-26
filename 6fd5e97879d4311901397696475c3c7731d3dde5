@@ -17,3 +17,11 @@ UUID: f08d07b7_51839606
 Bytes: 202
 ScoreCache is not an input parameter. It's created by the constructor instead. Let me know if you have better way to mock this. I don't think we want to make ScoreCache an input just because of testing.
 
+142
+Mon Sep 26 23:33:09 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_51839606
+UUID: e5b2a710_9f3e3775
+Bytes: 85
+Alright, now creates real score cache for unit tests instead of using the mocked one.
+
