@@ -1,0 +1,13 @@
+Revision: 0c09e474a6605376ce078b62b67ce689885f9929
+Patch-set: 2
+File: service/java/com/android/server/wifi/RttService.java
+
+314
+Mon Sep 26 15:59:15 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f08d07b7_be22dab1
+Bytes: 389
+These methods probably have to post a message to the state machine with the object that they received.  The danger is that accessing these internal fields is still not thread safe because this method is called on some random binder thread (not the state machine thread).
+
+Probably the whole class should be static so you're not tempted to access fields that are owned by the state machine.
+
