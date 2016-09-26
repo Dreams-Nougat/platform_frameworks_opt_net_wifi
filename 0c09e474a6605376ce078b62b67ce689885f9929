@@ -11,3 +11,13 @@ These methods probably have to post a message to the state machine with the obje
 
 Probably the whole class should be static so you're not tempted to access fields that are owned by the state machine.
 
+314
+Mon Sep 26 20:49:13 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f08d07b7_be22dab1
+UUID: 452373ec_cad2e3f0
+Bytes: 186
+Thanks for the explanation : )
+I change it to a 'message' based implementation.
+It seems that I can't change this entire Handler class to static because it needs to access sendMessage().
+
