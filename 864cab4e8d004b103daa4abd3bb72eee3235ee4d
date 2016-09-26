@@ -1,0 +1,11 @@
+Revision: 864cab4e8d004b103daa4abd3bb72eee3235ee4d
+Patch-set: 9
+File: tests/wifitests/src/com/android/server/wifi/ExternalScoreEvaluatorTest.java
+
+90:24-90:40
+Mon Sep 26 23:35:11 2016 +0000
+Author: Mitchell Wills <1079753@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e5b2a710_1f1467fb
+Bytes: 37
+don't think you need this throws here
+
