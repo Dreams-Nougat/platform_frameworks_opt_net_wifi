@@ -1,0 +1,11 @@
+Revision: 643dd03261476fecc2b86b773afd8dc38334892c
+Patch-set: 3
+File: service/java/com/android/server/wifi/RttService.java
+
+729
+Mon Sep 26 23:29:54 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e5b2a710_5f142f4e
+Bytes: 56
+It's super weird to me that both of these methods exist.
+
