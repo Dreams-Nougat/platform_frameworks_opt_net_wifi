@@ -29,3 +29,11 @@ UUID: e5b2a710_df4f1f35
 Bytes: 140
 You would definitely need to pass an instance of the state machine in to this object if you made it static.  Your call, I'm fine either way.
 
+314
+Tue Sep 27 00:08:38 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_df4f1f35
+UUID: e5b2a710_62e6323b
+Bytes: 48
+I choose to pass an state machine instance here.
+
