@@ -1,0 +1,18 @@
+Revision: 95be8d1d6c7028141ee0dbc48f493df3fba57896
+Patch-set: 4
+File: service/java/com/android/server/wifi/RttService.java
+
+323:11-323:47
+Tue Sep 27 00:34:11 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e5b2a710_85bb882d
+Bytes: 136
+Can't you just use the reference of the containing class?   I'm surprised your linter didn't complain that you were shadowing that name.
+
+397
+Tue Sep 27 00:34:11 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e5b2a710_45c5809e
+Bytes: 45
+Probably need to check if this returned null?
+
