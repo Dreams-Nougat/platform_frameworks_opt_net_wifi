@@ -9,3 +9,11 @@ UUID: e5b2a710_5f142f4e
 Bytes: 56
 It's super weird to me that both of these methods exist.
 
+729
+Tue Sep 27 00:08:38 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_5f142f4e
+UUID: e5b2a710_02dc0e6b
+Bytes: 78
+Are you referring to onStart() and onBootPhase(), which both update the mImpl?
+
