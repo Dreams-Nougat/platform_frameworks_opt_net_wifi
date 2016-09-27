@@ -9,10 +9,27 @@ UUID: e5b2a710_85bb882d
 Bytes: 136
 Can't you just use the reference of the containing class?   I'm surprised your linter didn't complain that you were shadowing that name.
 
+323:11-323:47
+Tue Sep 27 00:45:19 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_85bb882d
+UUID: e5b2a710_c5f870ad
+Bytes: 4
+Done
+
 397
 Tue Sep 27 00:34:11 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: e5b2a710_45c5809e
 Bytes: 45
 Probably need to check if this returned null?
+
+397
+Tue Sep 27 00:45:19 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_45c5809e
+UUID: e5b2a710_c5cf507c
+Bytes: 131
+If it is null it will crashes at the following line anyway.
+I guess crash is good for us because we don't have better choices here.
 
