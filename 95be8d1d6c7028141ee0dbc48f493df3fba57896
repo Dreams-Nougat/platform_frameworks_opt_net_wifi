@@ -41,3 +41,11 @@ UUID: e5b2a710_d16eee24
 Bytes: 377
 I think that's what I'm trying to get at.  It's not ok to crash the system server because wificond is temporarily unavailable (i.e. a wificond crash should not also turn into a system server crash).  When we see that wificond is not available, we should give up, and go back to DefaultState. Later when the WSM finds wificond again, we can try again to enter the enabled state.
 
+397
+Tue Sep 27 16:22:23 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_d16eee24
+UUID: e5b2a710_f1920aaf
+Bytes: 13
+Understood :)
+
