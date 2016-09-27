@@ -25,3 +25,15 @@ I guess you can use mContext.enforceCallingPermission instead.  Then you can add
 
 Basically enforcing the permission when giving out the messenger object instead of on receiving a message from the messenger,  since all messages to the ClientHandler will be coming from the messenger.
 
+417:8-419:43
+Tue Sep 27 16:59:17 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_3684e8b9
+UUID: e5b2a710_c3e06589
+Bytes: 629
+I updated the order of the arguments, the call should now match that of the prototype. 
+
+Regarding moving this check to getMessenger(), the reason I did not do this is because getMessenger() returns a messenger that is used for all Async channel communication for P2p Service. Miracast service needs additional permissions. It wouldn't be right to deny P2p Service because the caller does not have Wifi Display config permissions, so this permission is enforced only for Miracast related message/handlers. 
+
+Ideally we would want all WFD related API's over AIDL, all P2P related handlers of Async channel. For WFD it is split up.
+
