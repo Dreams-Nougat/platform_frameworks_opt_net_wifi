@@ -288,7 +288,8 @@ public class WifiInjector {
         return new SoftApManager(
                 mWifiServiceHandlerThread.getLooper(),
                 wifiNative, countryCode,
-                allowed2GChannels, listener, apInterface);
+                allowed2GChannels, listener, apInterface,
+                nmService);
     }
 
     /**
