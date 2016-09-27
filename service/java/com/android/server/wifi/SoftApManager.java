@@ -22,9 +22,9 @@ import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
 import android.net.wifi.IApInterface;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
-import android.os.IBinder.DeathRecipient;
+import android.net.wifi.WifiManager;
+import android.os.INetworkManagementService;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
@@ -32,6 +32,7 @@ import android.util.Log;
 
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
+import com.android.server.net.BaseNetworkObserver;
 import com.android.server.wifi.util.ApConfigUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -56,6 +57,8 @@ public class SoftApManager {
 
     private final IApInterface mApInterface;
 
+    private final INetworkManagementService mNwService;
+
     /**
      * Listener for soft AP state changes.
      */
@@ -73,7 +76,8 @@ public class SoftApManager {
                          String countryCode,
                          ArrayList<Integer> allowed2GChannels,
                          Listener listener,
-                         IApInterface apInterface) {
+                         IApInterface apInterface,
+                         INetworkManagementService nms) {
         mStateMachine = new SoftApStateMachine(looper);
 
         mWifiNative = wifiNative;
@@ -81,6 +85,7 @@ public class SoftApManager {
         mAllowed2GChannels = allowed2GChannels;
         mListener = listener;
         mApInterface = apInterface;
+        mNwService = nms;
     }
 
     /**
@@ -214,12 +219,31 @@ public class SoftApManager {
         public static final int CMD_START = 0;
         public static final int CMD_STOP = 1;
         public static final int CMD_AP_INTERFACE_BINDER_DEATH = 2;
+        public static final int CMD_INTERFACE_STATUS_CHANGED = 3;
 
         private final State mIdleState = new IdleState();
         private final State mStartedState = new StartedState();
 
         private final StateMachineDeathRecipient mDeathRecipient =
                 new StateMachineDeathRecipient(this, CMD_AP_INTERFACE_BINDER_DEATH);
+
+        private NetworkObserver mNetworkObserver;
+
+        private class NetworkObserver extends BaseNetworkObserver {
+            private final String mIfaceName;
+
+            NetworkObserver(String ifaceName) {
+                mIfaceName = ifaceName;
+            }
+
+            @Override
+            public void interfaceLinkStateChanged(String iface, boolean up) {
+                if (mIfaceName.equals(iface)) {
+                    SoftApStateMachine.this.sendMessage(
+                            CMD_INTERFACE_STATUS_CHANGED, up ? 1 : 0, 0, this);
+                }
+            }
+        }
 
         SoftApStateMachine(Looper looper) {
             super(TAG, looper);
@@ -235,6 +259,13 @@ public class SoftApManager {
             @Override
             public void enter() {
                 mDeathRecipient.unlinkToDeath();
+                try {
+                    if (mNetworkObserver != null) {
+                        mNwService.unregisterObserver(mNetworkObserver);
+                        mNetworkObserver = null;
+                    }
+                } catch (RemoteException e) {
+                }
             }
 
             @Override
@@ -249,6 +280,16 @@ public class SoftApManager {
                             break;
                         }
 
+                        try {
+                            mNetworkObserver = new NetworkObserver(mApInterface.getInterfaceName());
+                            mNwService.registerObserver(mNetworkObserver);
+                        } catch (RemoteException e) {
+                            mDeathRecipient.unlinkToDeath();
+                            updateApState(WifiManager.WIFI_AP_STATE_FAILED,
+                                          WifiManager.SAP_START_FAILURE_GENERAL);
+                            break;
+                        }
+
                         int result = startSoftAp((WifiConfiguration) message.obj);
                         if (result != SUCCESS) {
                             int failureReason = WifiManager.SAP_START_FAILURE_GENERAL;
@@ -256,11 +297,14 @@ public class SoftApManager {
                                 failureReason = WifiManager.SAP_START_FAILURE_NO_CHANNEL;
                             }
                             mDeathRecipient.unlinkToDeath();
+                            try {
+                                mNwService.unregisterObserver(mNetworkObserver);
+                            } catch (RemoteException e) {
+                            }
                             updateApState(WifiManager.WIFI_AP_STATE_FAILED, failureReason);
                             break;
                         }
 
-                        updateApState(WifiManager.WIFI_AP_STATE_ENABLED, 0);
                         transitionTo(mStartedState);
                         break;
                     default:
@@ -273,9 +317,34 @@ public class SoftApManager {
         }
 
         private class StartedState extends State {
+            private boolean mIfaceIsUp;
+
+            @Override
+            public void enter() {
+                mIfaceIsUp = false;
+            }
+
             @Override
             public boolean processMessage(Message message) {
                 switch (message.what) {
+                    case CMD_INTERFACE_STATUS_CHANGED:
+                        if (message.obj != mNetworkObserver) {
+                            // This is from some time before the most recent configuration.
+                            break;
+                        }
+                        boolean isUp = message.arg1 == 1;
+                        if (isUp == mIfaceIsUp) {
+                            // We're only watching for transitions from down to up and vice versa.
+                            break;
+                        }
+                        mIfaceIsUp = isUp;
+                        if (isUp) {
+                            Log.d(TAG, "SoftAp is ready for use");
+                            updateApState(WifiManager.WIFI_AP_STATE_ENABLED, 0);
+                        } else {
+                            // TODO: handle the case where the interface was up, but goes down
+                        }
+                        break;
                     case CMD_START:
                         /* Already started, ignore this command. */
                         break;
