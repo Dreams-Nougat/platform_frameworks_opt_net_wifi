@@ -1,0 +1,17 @@
+Revision: 2883a8be17011b784c56123a50d0cb8563ba5df1
+Patch-set: 3
+File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
+
+417:8-419:43
+Tue Sep 27 05:46:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e5b2a710_d6db84e2
+Bytes: 413
+Hmm, I am not familiar with this code. Upon code search,  this is the function signature that I found (https://cs.corp.google.com/android/frameworks/base/core/java/android/content/Context.java?q=enforcePerm&sq=package:android&l=3779
+):
+
+public abstract void enforcePermission(
+            @NonNull String permission, int pid, int uid, @Nullable String message);
+
+which doesn't seem to match up with the call here.
+
