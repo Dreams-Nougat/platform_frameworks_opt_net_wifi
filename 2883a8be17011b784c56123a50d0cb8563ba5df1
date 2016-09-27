@@ -15,3 +15,13 @@ public abstract void enforcePermission(
 
 which doesn't seem to match up with the call here.
 
+417:8-419:43
+Tue Sep 27 06:06:28 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e5b2a710_d6db84e2
+UUID: e5b2a710_3684e8b9
+Bytes: 398
+I guess you can use mContext.enforceCallingPermission instead.  Then you can add this permission check in getMessenger() and remove the permission check in the message handling in ClientHandler. 
+
+Basically enforcing the permission when giving out the messenger object instead of on receiving a message from the messenger,  since all messages to the ClientHandler will be coming from the messenger.
+
