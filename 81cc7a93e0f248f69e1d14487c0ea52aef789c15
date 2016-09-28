@@ -14,3 +14,11 @@ In location - turn off WiFi scanning - disconnect from Ap... While phone in scan
 
 --> the broadcast is not sent
 
+102
+Wed Sep 28 16:55:23 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 45ba9338_b1079324
+UUID: 45ba9338_11b13f4e
+Bytes: 58
+https://android-review.googlesource.com/280745 to add this
+
