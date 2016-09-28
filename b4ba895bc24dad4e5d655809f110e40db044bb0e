@@ -11,3 +11,11 @@ If we turn off wifi in the midst of a single scan, this will  send the "DISCONNE
 
 Is that OK?
 
+103:25-103:35
+Wed Sep 28 20:13:09 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 45ba9338_670d6df2
+UUID: 45ba9338_bdb48287
+Bytes: 100
+I think this might be better than for last remembered state to be SCANNING until WiFi is re-enabled.
+
