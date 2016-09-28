@@ -1,0 +1,16 @@
+Revision: 81cc7a93e0f248f69e1d14487c0ea52aef789c15
+Patch-set: 3
+File: service/java/com/android/server/wifi/SupplicantStateTracker.java
+
+102
+Wed Sep 28 16:45:14 2016 +0000
+Author: BINESH BALASINGH <1094463@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 45ba9338_b1079324
+Bytes: 263
+need to change the above to addState(mHandshakeState, mConnectionActiveState); ?
+
+We did see an issue in the following case :
+In location - turn off WiFi scanning - disconnect from Ap... While phone in scanning state.. turn off wifi
+
+--> the broadcast is not sent
+
