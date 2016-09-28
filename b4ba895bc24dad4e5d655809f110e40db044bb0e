@@ -19,3 +19,11 @@ UUID: 45ba9338_bdb48287
 Bytes: 100
 I think this might be better than for last remembered state to be SCANNING until WiFi is re-enabled.
 
+103:25-103:35
+Wed Sep 28 20:23:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 45ba9338_bdb48287
+UUID: 45ba9338_5d175654
+Bytes: 17
+That makes sense.
+
