@@ -1,0 +1,13 @@
+Revision: b4ba895bc24dad4e5d655809f110e40db044bb0e
+Patch-set: 1
+File: service/java/com/android/server/wifi/SupplicantStateTracker.java
+
+103:25-103:35
+Wed Sep 28 18:36:40 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 45ba9338_670d6df2
+Bytes: 159
+If we turn off wifi in the midst of a single scan, this will  send the "DISCONNECTED" broadcast even if we were not in the midst of a connection. 
+
+Is that OK?
+
