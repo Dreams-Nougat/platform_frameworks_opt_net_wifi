@@ -1,0 +1,11 @@
+Revision: b5ceab8a78388c207987ab0d46a98f1390a27cbe
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+399:16-399:33
+Thu Sep 29 22:11:29 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c22d9995_1fe2b390
+Bytes: 107
+The config for the ap will be added here (and then added to the message).  For now it is using the default.
+
