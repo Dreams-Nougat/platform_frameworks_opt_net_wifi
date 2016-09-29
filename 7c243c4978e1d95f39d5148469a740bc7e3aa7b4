@@ -1,0 +1,11 @@
+Revision: 7c243c4978e1d95f39d5148469a740bc7e3aa7b4
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+3478:8-3481:9
+Thu Sep 29 03:32:03 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 45ba9338_cded4e7d
+Bytes: 182
+it seems like this is split from the makeWificond call.  Maybe that is intentional - but since the log message seems like we just tried to get a reference, it is pretty disconnected.
+

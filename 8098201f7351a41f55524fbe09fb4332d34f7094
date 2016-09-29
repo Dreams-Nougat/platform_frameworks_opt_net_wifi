@@ -1,0 +1,11 @@
+Revision: 8098201f7351a41f55524fbe09fb4332d34f7094
+Base-for-patch-set: 2
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+3978:20-3978:25
+Thu Sep 29 03:32:03 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 45ba9338_cd842ebd
+Bytes: 186
+Since this is run when we start supplicant, could we somehow have leftover state from entering softap mode?  (I haven't looked at this part closely..  so take that with a grain of salt.)
+
