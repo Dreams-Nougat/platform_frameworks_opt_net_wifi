@@ -1,0 +1,50 @@
+Revision: ffffa76ec4437e08312ebda04a5d1840aa80d4ab
+Patch-set: 2
+File: service/java/com/android/server/wifi/SoftApManager.java
+
+286:26-286:31
+Thu Sep 29 03:06:31 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e51d474e_0408163a
+Bytes: 61
+You don't want to unregister/set to null in this catch block?
+
+300:28-303:29
+Thu Sep 29 03:06:31 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e51d474e_e4121a6d
+Bytes: 287
+You probably want to also set
+
+    mNetworkObserver = null
+
+no?
+
+If so, might as well have the IdleState.onEnter() version in separate method like
+
+    private void unregisterNetworkObserver() {
+        try {
+            ...
+        } ...
+    }
+
+and just call it from the two call sites.
+
+324:29-324:34
+Thu Sep 29 03:06:31 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: e51d474e_24051221
+Bytes: 323
+Can you use mNwService.getInterfaceConfig(ifname)?
+
+Then you can be level-triggered as well in here, i.e.
+
+    if (mIfaceIsUp) {
+        notifyAboutTheUpness();
+    }
+
+    private void notifyAboutTheUpness() {
+        Log.d(TAG, "SoftAp is ready for use");
+        updateApState(WifiManager.WIFI_AP_STATE_ENABLED, 0);
+    }
+
