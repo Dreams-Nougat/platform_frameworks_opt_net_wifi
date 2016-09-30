@@ -9,6 +9,14 @@ UUID: c22d9995_c878eeb6
 Bytes: 27
 I'm unsure what this means.
 
+390:49-390:79
+Fri Sep 30 17:33:03 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: c22d9995_c878eeb6
+UUID: c22d9995_036a59a5
+Bytes: 10
+rephrased.
+
 391:23-391:36
 Fri Sep 30 16:30:56 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -19,4 +27,12 @@ It's not really clear what case you're referring to here, probably better to say
 1) RttService watches for WIFI_STATE_ENABLED broadcasts
 2) WifiStateMachine sends these broadcasts in the SupplicantStarted state
 3) Since WSM will only be in SupplicantStarted for as long as wificond is alive, we don't subscribe to wificond's death explicitly.
+
+391:23-391:36
+Fri Sep 30 17:33:03 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: c22d9995_081dd682
+UUID: c22d9995_236d55be
+Bytes: 4
+Done
 
