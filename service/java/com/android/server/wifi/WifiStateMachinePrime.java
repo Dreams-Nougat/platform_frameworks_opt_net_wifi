@@ -30,6 +30,8 @@ import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
 
 import java.util.HashMap;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * This class provides the implementation for different WiFi operating modes.
@@ -46,6 +48,9 @@ public class WifiStateMachinePrime {
     private WifiInjector mWifiInjector;
     private Looper mLooper;
     private IWificond mWificond;
+
+    private Queue<WifiConfiguration> mApConfigQueue =
+            new ConcurrentLinkedQueue<WifiConfiguration>();
 
     // Create the base modes for WSM.
     private State mClientModeState = new ClientModeState();
@@ -154,6 +159,11 @@ public class WifiStateMachinePrime {
                 tearDownInterfaces();
                 mModeStateMachine.quit();
                 mModeStateMachine = null;
+                // clean out any ap configs that might be lingering
+                if (!mApConfigQueue.isEmpty()) {
+                    Log.e(TAG, "AP config queue was not empty.");
+                    mApConfigQueue.clear();
+                }
                 break;
             default:
                 return false;
@@ -254,6 +264,12 @@ public class WifiStateMachinePrime {
                     break;
                 case CMD_START_AP_FAILURE:
                     Log.e(TAG, "Failed to start SoftApMode.  Waiting for next mode command.");
+                    // since we did not use the config, remove the first one.
+                    WifiConfiguration config = mApConfigQueue.poll();
+                    if (config != null && config.SSID != null) {
+                        // Save valid configs for future calls.
+                        mWifiInjector.getWifiApConfigStore().setApConfiguration(config);
+                    }
                     break;
                 case CMD_AP_STOPPED:
                     Log.d(TAG, "SoftApModeActiveState stopped.  Waiting for next mode command.");
@@ -324,7 +340,12 @@ public class WifiStateMachinePrime {
             if (message.what != CMD_START_AP) {
                 throw new RuntimeException("Illegal transition to SoftApState: " + message);
             }
-            WifiConfiguration config = (WifiConfiguration) message.obj;
+            WifiConfiguration config = mApConfigQueue.poll();
+            if (config != null && config.SSID != null) {
+                Log.d(TAG, "Passing config to SoftApManager! " + config);
+            } else {
+                config = null;
+            }
             this.mActiveModeManager = mWifiInjector.makeSoftApManager(
                     new SoftApListener(), ((SoftAPModeState) mSoftAPModeState).getInterface(),
                     config);
@@ -396,7 +417,11 @@ public class WifiStateMachinePrime {
     /**
      * Method to enable soft ap for wifi hotspot.
      */
-    public void enterSoftAPMode() {
+    public void enterSoftAPMode(WifiConfiguration wifiConfig) {
+        if (wifiConfig == null) {
+            wifiConfig = new WifiConfiguration();
+        }
+        mApConfigQueue.offer(wifiConfig);
         changeMode(ModeStateMachine.CMD_START_SOFT_AP_MODE);
     }
 
