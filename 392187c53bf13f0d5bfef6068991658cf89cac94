@@ -1,0 +1,22 @@
+Revision: 392187c53bf13f0d5bfef6068991658cf89cac94
+Patch-set: 6
+File: service/java/com/android/server/wifi/RttService.java
+
+390:49-390:79
+Fri Sep 30 16:30:56 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c22d9995_c878eeb6
+Bytes: 27
+I'm unsure what this means.
+
+391:23-391:36
+Fri Sep 30 16:30:56 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c22d9995_081dd682
+Bytes: 355
+It's not really clear what case you're referring to here, probably better to say explicitly:
+
+1) RttService watches for WIFI_STATE_ENABLED broadcasts
+2) WifiStateMachine sends these broadcasts in the SupplicantStarted state
+3) Since WSM will only be in SupplicantStarted for as long as wificond is alive, we don't subscribe to wificond's death explicitly.
+
