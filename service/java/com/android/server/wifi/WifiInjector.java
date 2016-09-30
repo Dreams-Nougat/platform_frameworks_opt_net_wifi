@@ -83,6 +83,7 @@ public class WifiInjector {
     private final IpConfigStore mIpConfigStore;
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
+    private final WifiNetworkSelector mWifiNetworkSelector;
     private WifiScanner mWifiScanner;
 
     private final boolean mUseRealLogger;
@@ -154,6 +155,8 @@ public class WifiInjector {
         mWifiLastResortWatchdog = new WifiLastResortWatchdog(mWifiController, mWifiMetrics);
         mWifiMulticastLockManager = new WifiMulticastLockManager(mWifiStateMachine,
                 BatteryStatsService.getService());
+        mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager,
+                mWifiStateMachine.getWifiInfo(), mClock);
     }
 
     /**
@@ -321,5 +324,12 @@ public class WifiInjector {
                     mWifiStateMachineHandlerThread.getLooper());
         }
         return mWifiScanner;
+    }
+
+    /**
+     * Obtain an instance of WifiNetworkSelector.
+     */
+    public WifiNetworkSelector getWifiNetworkSelector() {
+        return mWifiNetworkSelector;
     }
 }
