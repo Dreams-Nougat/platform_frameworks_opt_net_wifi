@@ -9,3 +9,11 @@ UUID: 45ba9338_cd842ebd
 Bytes: 186
 Since this is run when we start supplicant, could we somehow have leftover state from entering softap mode?  (I haven't looked at this part closely..  so take that with a grain of salt.)
 
+3978:20-3978:25
+Fri Sep 30 17:53:58 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 45ba9338_cd842ebd
+UUID: c22d9995_fe0fe08f
+Bytes: 306
+I guess that's a fair point. Technically, there is no synchronization between the teardown of the tethering logic and the setup of the next interface.  We simply send a signal to hostapd and mark the interface as down.  That means that whatever IP setup was done on the interface is probably still in play.
+
