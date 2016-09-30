@@ -30,6 +30,9 @@ import com.android.internal.util.Protocol;
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * This class provides the implementation for different WiFi operating modes.
  *
@@ -46,6 +49,8 @@ public class WifiStateMachinePrime {
     private final INetworkManagementService mNMService;
 
     private IWificond mWificond;
+
+    private Queue<WifiConfiguration> mApConfigQueue = new ConcurrentLinkedQueue<>();
 
     /* The base for wifi message types */
     static final int BASE = Protocol.BASE_WIFI;
@@ -100,8 +105,19 @@ public class WifiStateMachinePrime {
 
     /**
      * Method to enable soft ap for wifi hotspot.
+     *
+     * The WifiConfiguration is generally going to be null to indicate that the
+     * currently saved config in WifiApConfigManager should be used.  When the config is
+     * not null, it will be saved in the WifiApConfigManager. This save is performed in the
+     * constructor of SoftApManager.
+     *
+     * @param wifiConfig WifiConfiguration for the hostapd softap
      */
-    public void enterSoftAPMode() {
+    public void enterSoftAPMode(WifiConfiguration wifiConfig) {
+        if (wifiConfig == null) {
+            wifiConfig = new WifiConfiguration();
+        }
+        mApConfigQueue.offer(wifiConfig);
         changeMode(ModeStateMachine.CMD_START_SOFT_AP_MODE);
     }
 
@@ -128,12 +144,10 @@ public class WifiStateMachinePrime {
                 Log.e(TAG, "Received call to disable wifi when it is already disabled.");
                 return;
             }
-            // state machine was not initialized yet, we must be starting up
-            mModeStateMachine = new ModeStateMachine(newMode);
-        } else {
-            // we have a current state, go ahead and prep for the new state
-            mModeStateMachine.sendMessage(newMode);
+            // state machine was not initialized yet, we must be starting up.
+            mModeStateMachine = new ModeStateMachine();
         }
+        mModeStateMachine.sendMessage(newMode);
     }
 
     private class ModeStateMachine extends StateMachine {
@@ -154,7 +168,7 @@ public class WifiStateMachinePrime {
         private final State mScanOnlyModeActiveState = new ScanOnlyModeActiveState();
         private final State mSoftAPModeActiveState = new SoftAPModeActiveState();
 
-        ModeStateMachine(int initialMode) {
+        ModeStateMachine() {
             super(TAG, mLooper);
 
             // CHECKSTYLE:OFF IndentationCheck
@@ -167,24 +181,8 @@ public class WifiStateMachinePrime {
             addState(mWifiDisabledState);
             // CHECKSTYLE:ON IndentationCheck
 
-            State startingState;
-            switch(initialMode) {
-                case CMD_START_CLIENT_MODE:
-                    startingState = mClientModeState;
-                    break;
-                case CMD_START_SCAN_ONLY_MODE:
-                    startingState = mScanOnlyModeState;
-                    break;
-                case CMD_START_SOFT_AP_MODE:
-                    startingState = mSoftAPModeState;
-                    break;
-                default:
-                    Log.e(TAG, "Attempting to start WifiStateMachinePrime "
-                            + "in an invalid operating mode: " + initialMode);
-                    throw new IllegalArgumentException("Invalid wifi operating mode");
-            }
-            Log.d(TAG, "Switching from WifiDisabled to " + startingState.getName());
-            setInitialState(startingState);
+            Log.d(TAG, "Starting Wifi in WifiDisabledState");
+            setInitialState(mWifiDisabledState);
             start();
         }
 
@@ -275,6 +273,13 @@ public class WifiStateMachinePrime {
 
             @Override
             public void enter() {
+                final Message message = mModeStateMachine.getCurrentMessage();
+                if (message.what != ModeStateMachine.CMD_START_SOFT_AP_MODE) {
+                    Log.d(TAG, "Entering SoftAPMode (idle): " + message);
+                    return;
+                }
+
+                // Continue with setup since we are changing modes
                 mApInterface = null;
                 mWificond = mWifiInjector.makeWificond();
                 if (mWificond == null) {
@@ -292,7 +297,7 @@ public class WifiStateMachinePrime {
                     mModeStateMachine.sendMessage(CMD_START_AP_FAILURE);
                     return;
                 }
-                mModeStateMachine.sendMessage(CMD_START_AP);
+                mModeStateMachine.transitionTo(mSoftAPModeActiveState);
             }
 
             @Override
@@ -303,14 +308,19 @@ public class WifiStateMachinePrime {
 
                 switch(message.what) {
                     case CMD_START_AP:
-                        Log.d(TAG, "Transitioning to softapmodeactivestate");
-                        mModeStateMachine.transitionTo(mSoftAPModeActiveState);
+                        Log.d(TAG, "Received CMD_START_AP (now invalid message) - dropping");
                         break;
                     case CMD_STOP_AP:
                         // not in active state, nothing to stop.
                         break;
                     case CMD_START_AP_FAILURE:
                         Log.e(TAG, "Failed to start SoftApMode.  Wait for next mode command.");
+                        // since we did not use the config, remove the first one.
+                        WifiConfiguration config = mApConfigQueue.poll();
+                        if (config != null && config.SSID != null) {
+                            // Save valid configs for future calls.
+                            mWifiInjector.getWifiApConfigStore().setApConfiguration(config);
+                        }
                         break;
                     case CMD_AP_STOPPED:
                         Log.d(TAG, "SoftApModeActiveState stopped.  Wait for next mode command.");
@@ -335,10 +345,15 @@ public class WifiStateMachinePrime {
             @Override
             public void enter() {
                 // make sure everything is torn down
+                Log.d(TAG, "Entering WifiDisabledState");
             }
 
             @Override
             public boolean processMessage(Message message) {
+                Log.d(TAG, "received a message in WifiDisabledState: " + message);
+                if (checkForAndHandleModeChange(message)) {
+                    return HANDLED;
+                }
                 return NOT_HANDLED;
             }
 
@@ -390,15 +405,13 @@ public class WifiStateMachinePrime {
             @Override
             public void enter() {
                 Log.d(TAG, "Entering SoftApModeActiveState");
-                final Message message = mModeStateMachine.getCurrentMessage();
-                if (message.what != CMD_START_AP) {
-                    throw new RuntimeException("Illegal transition to SoftApState: " + message);
+                WifiConfiguration config = mApConfigQueue.poll();
+                if (config != null && config.SSID != null) {
+                    Log.d(TAG, "Passing config to SoftApManager! " + config);
+                } else {
+                    config = null;
                 }
-                // The WifiConfiguration is generally going to be null to indicate that the
-                // currently saved config in WifiApConfigManager should be used.  When the config is
-                // not null, it will be saved in the WifiApConfigManager.  This save is performed in
-                // the constructor of SoftApManager.
-                WifiConfiguration config = (WifiConfiguration) message.obj;
+
                 this.mActiveModeManager = mWifiInjector.makeSoftApManager(mNMService,
                         new SoftApListener(), ((SoftAPModeState) mSoftAPModeState).getInterface(),
                         config);
@@ -409,7 +422,7 @@ public class WifiStateMachinePrime {
             public boolean processMessage(Message message) {
                 switch(message.what) {
                     case CMD_START_AP:
-                        Log.d(TAG, "Received CMD_START_AP with SoftApMode already active.  drop");
+                        Log.d(TAG, "Received CMD_START_AP when active - invalid message - drop");
                         break;
                     case CMD_STOP_AP:
                         mActiveModeManager.stop();
