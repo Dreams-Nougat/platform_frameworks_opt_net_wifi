@@ -877,8 +877,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mWifiDiagnostics = mWifiInjector.makeWifiDiagnostics(mWifiNative);
 
         mWifiInfo = new WifiInfo();
-        mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager,
-                mWifiInfo, mWifiInjector.getClock());
         mSupplicantStateTracker =
                 mFacade.makeSupplicantStateTracker(context, mWifiConfigManager, getHandler());
 
@@ -4153,6 +4151,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             // wifi scanning service is initialized
             if (mWifiScanner == null) {
                 mWifiScanner = mWifiInjector.getWifiScanner();
+                mWifiNetworkSelector = mWifiInjector.getWifiNetworkSelector();
 
                 synchronized (mWifiReqCountLock) {
                     mWifiConnectivityManager = new WifiConnectivityManager(mContext,
