@@ -1,0 +1,11 @@
+Revision: 351b679d42a1500fac62db2038bd5a0748da5554
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+2091:19-2091:61
+Tue Oct 04 20:52:09 2016 +0000
+Author: Hall Liu <1087703@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 42ec493c_22da300c
+Bytes: 59
+Does running with only the proto dump arg not work anymore?
+
