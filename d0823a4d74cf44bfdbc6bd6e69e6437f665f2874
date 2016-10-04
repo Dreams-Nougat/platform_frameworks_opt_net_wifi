@@ -9,6 +9,14 @@ UUID: 0275f106_855d62ee
 Bytes: 47
 I think these two lines are not needed anymore.
 
+498:0-499:92
+Tue Oct 04 17:31:26 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0275f106_855d62ee
+UUID: 22775548_0e622b36
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 4154:16-4154:78
@@ -17,4 +25,12 @@ Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 0275f106_c50bdaca
 Bytes: 221
 Instead of doing delayed initialization, what about have the WifiInjector construct WifiNetworkSelector before WifiStateMachine.  So then you can just initialize mWifiNetworkSelector in the WifiStateMachine's constructor.
+
+4154:16-4154:78
+Tue Oct 04 17:31:26 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0275f106_c50bdaca
+UUID: 22775548_2e5fe772
+Bytes: 4
+Done
 
