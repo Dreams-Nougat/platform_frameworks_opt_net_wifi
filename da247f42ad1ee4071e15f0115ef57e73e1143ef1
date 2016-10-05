@@ -1,0 +1,9 @@
+Verified+1: Glen Kuhne <kuh@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Roshan Pius <rpius@google.com>
+Code-Review+1: Hall Liu <hallliu@google.com>
+Submitted-by: Glen Kuhne <kuh@google.com>
+Submitted-at: Wed, 05 Oct 2016 17:16:30 +0000
+Reviewed-on: https://android-review.googlesource.com/282684
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
