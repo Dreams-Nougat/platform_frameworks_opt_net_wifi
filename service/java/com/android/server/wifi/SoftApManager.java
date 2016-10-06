@@ -16,10 +16,18 @@
 
 package com.android.server.wifi;
 
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_DISABLED;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_DISABLING;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_ENABLED;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_ENABLING;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_FAILED;
+
 import static com.android.server.wifi.util.ApConfigUtil.ERROR_GENERIC;
 import static com.android.server.wifi.util.ApConfigUtil.ERROR_NO_CHANNEL;
 import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.IApInterface;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
@@ -27,6 +35,7 @@ import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.util.Log;
 
 import com.android.internal.util.State;
@@ -43,6 +52,8 @@ import java.util.Locale;
 public class SoftApManager implements ActiveModeManager {
     private static final String TAG = "SoftApManager";
 
+    private final Context mContext;
+
     private final WifiNative mWifiNative;
 
     private final String mCountryCode;
@@ -54,6 +65,8 @@ public class SoftApManager implements ActiveModeManager {
     private final IApInterface mApInterface;
 
     private final WifiApConfigStore mWifiApConfigStore;
+
+    private int mCurrentState;
 
     /**
      * Listener for soft AP state changes.
@@ -67,7 +80,8 @@ public class SoftApManager implements ActiveModeManager {
         void onStateChanged(int state, int failureReason);
     }
 
-    public SoftApManager(Looper looper,
+    public SoftApManager(Context context,
+                         Looper looper,
                          WifiNative wifiNative,
                          String countryCode,
                          Listener listener,
@@ -75,7 +89,7 @@ public class SoftApManager implements ActiveModeManager {
                          WifiApConfigStore wifiApConfigStore,
                          WifiConfiguration config) {
         mStateMachine = new SoftApStateMachine(looper);
-
+        mContext = context;
         mWifiNative = wifiNative;
         mCountryCode = countryCode;
         mListener = listener;
@@ -84,6 +98,7 @@ public class SoftApManager implements ActiveModeManager {
         if (config != null) {
             mWifiApConfigStore.setApConfiguration(config);
         }
+        mCurrentState = WifiManager.WIFI_AP_STATE_DISABLED;
     }
 
     /**
@@ -110,6 +125,20 @@ public class SoftApManager implements ActiveModeManager {
         if (mListener != null) {
             mListener.onStateChanged(state, reason);
         }
+        int previousState = mCurrentState;
+        mCurrentState = state;
+        // now send out broadcast updating the state
+        final Intent intent = new Intent(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+        intent.putExtra(WifiManager.EXTRA_WIFI_AP_STATE, state);
+        intent.putExtra(WifiManager.EXTRA_PREVIOUS_WIFI_AP_STATE, previousState);
+        if (state == WifiManager.WIFI_AP_STATE_FAILED) {
+            //only set reason number when softAP start failed
+            intent.putExtra(WifiManager.EXTRA_WIFI_AP_FAILURE_REASON, reason);
+        }
+        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+        Log.d(TAG, "Sending StickyBroadcast: new AP state: " + getApStateName(state)
+                + " previous state: " + getApStateName(previousState));
     }
 
     /**
@@ -122,6 +151,7 @@ public class SoftApManager implements ActiveModeManager {
             Log.e(TAG, "Unable to start soft AP without valid configuration");
             return ERROR_GENERIC;
         }
+        Log.d(TAG, "Starting SoftAp with SSID: " + config.SSID);
 
         /* Make a copy of configuration for updating AP band and channel. */
         WifiConfiguration localConfig = new WifiConfiguration(config);
@@ -301,6 +331,27 @@ public class SoftApManager implements ActiveModeManager {
                 return HANDLED;
             }
         }
+    }
 
+    /**
+     * Helper class mapping the SoftAP states to Strings.
+     * @param int state State value
+     * @return String word describing state
+     */
+    protected String getApStateName(int state) {
+        switch (state) {
+            case WIFI_AP_STATE_DISABLING:
+                return "disabling";
+            case WIFI_AP_STATE_DISABLED:
+                return "disabled";
+            case WIFI_AP_STATE_ENABLING:
+                return "enabling";
+            case WIFI_AP_STATE_ENABLED:
+                return "enabled";
+            case WIFI_AP_STATE_FAILED:
+                return "failed";
+            default:
+                return "[invalid state]";
+        }
     }
 }
