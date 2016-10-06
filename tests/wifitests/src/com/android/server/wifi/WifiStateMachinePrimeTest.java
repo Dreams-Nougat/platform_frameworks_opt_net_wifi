@@ -19,11 +19,14 @@ package com.android.server.wifi;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.INetworkManagementService;
+import android.os.UserHandle;
 import android.os.test.TestLooper;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
@@ -31,6 +34,7 @@ import android.util.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -54,6 +58,7 @@ public class WifiStateMachinePrimeTest {
     @Mock WifiInjector mWifiInjector;
     @Mock WifiApConfigStore mWifiApConfigStore;
     TestLooper mLooper;
+    @Mock Context mContext;
     @Mock IWificond mWificond;
     @Mock IApInterface mApInterface;
     @Mock INetworkManagementService mNMService;
@@ -77,7 +82,7 @@ public class WifiStateMachinePrimeTest {
 
     private WifiStateMachinePrime createWifiStateMachinePrime() {
         when(mWifiInjector.makeWificond()).thenReturn(null);
-        return new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService);
+        return new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService, mContext);
     }
 
     /**
@@ -118,9 +123,10 @@ public class WifiStateMachinePrimeTest {
         mWifiStateMachinePrime.enterSoftAPMode(wifiConfig);
         mLooper.dispatchAll();
         Log.e("WifiStateMachinePrimeTest", "check fromState: " + fromState);
-        if (!fromState.equals(WIFI_DISABLED_STATE_STRING)) {
-            verify(mWificond).tearDownInterfaces();
-        }
+        // we will clean up interfaces (just in case) when we enter SoftApModeState and also if we
+        // created a new mode state machine
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
+        mLooper.dispatchAll();
         assertEquals(SOFT_AP_MODE_ACTIVE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
         verify(mSoftApManager).start();
     }
@@ -135,7 +141,7 @@ public class WifiStateMachinePrimeTest {
     public void testWificondExistsOnStartup() throws Exception {
         when(mWifiInjector.makeWificond()).thenReturn(mWificond);
         WifiStateMachinePrime testWifiStateMachinePrime =
-                new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService);
+                new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService, mContext);
         verify(mWificond).tearDownInterfaces();
     }
 
@@ -172,7 +178,7 @@ public class WifiStateMachinePrimeTest {
         mWifiStateMachinePrime.disableWifi();
         mLooper.dispatchAll();
         verify(mSoftApManager).stop();
-        verify(mWificond).tearDownInterfaces();
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
         assertEquals(WIFI_DISABLED_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
     }
 
@@ -205,7 +211,7 @@ public class WifiStateMachinePrimeTest {
         mWifiStateMachinePrime.enterClientMode();
         mLooper.dispatchAll();
         verify(mSoftApManager).stop();
-        verify(mWificond).tearDownInterfaces();
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
         assertEquals(CLIENT_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
     }
 
@@ -217,10 +223,19 @@ public class WifiStateMachinePrimeTest {
      */
     @Test
     public void testWificondNullWhenSwitchingToApMode() throws Exception {
+        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
+
         when(mWifiInjector.makeWificond()).thenReturn(null);
         mWifiStateMachinePrime.enterSoftAPMode(null);
         mLooper.dispatchAll();
         assertEquals(SOFT_AP_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        assertEquals(WifiManager.WIFI_AP_STATE_FAILED,
+                     intent.getValue().getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE,
+                                                   WifiManager.WIFI_AP_STATE_FAILED));
+        assertEquals(WifiManager.WIFI_AP_STATE_DISABLED,
+                     intent.getValue().getIntExtra(WifiManager.EXTRA_PREVIOUS_WIFI_AP_STATE,
+                                                   WifiManager.WIFI_AP_STATE_FAILED));
     }
 
     /**
@@ -231,11 +246,20 @@ public class WifiStateMachinePrimeTest {
      */
     @Test
     public void testAPInterfaceFailedWhenSwitchingToApMode() throws Exception {
+        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
+
         when(mWifiInjector.makeWificond()).thenReturn(mWificond);
         when(mWificond.createApInterface()).thenReturn(null);
         mWifiStateMachinePrime.enterSoftAPMode(null);
         mLooper.dispatchAll();
         assertEquals(SOFT_AP_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        assertEquals(WifiManager.WIFI_AP_STATE_FAILED,
+                     intent.getValue().getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE,
+                                                   WifiManager.WIFI_AP_STATE_FAILED));
+        assertEquals(WifiManager.WIFI_AP_STATE_DISABLED,
+                     intent.getValue().getIntExtra(WifiManager.EXTRA_PREVIOUS_WIFI_AP_STATE,
+                                                   WifiManager.WIFI_AP_STATE_FAILED));
     }
 
     /**
