@@ -46,6 +46,7 @@ import com.android.internal.util.StateMachine;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * WifiController is the class used to manage on/off state of WifiStateMachine for various operating
@@ -94,6 +95,7 @@ public class WifiController extends StateMachine {
 
     /* References to values tracked in WifiService */
     private final WifiStateMachine mWifiStateMachine;
+    private final WifiStateMachinePrime mWifiStateMachinePrime;
     private final WifiSettingsStore mSettingsStore;
     private final WifiLockManager mWifiLockManager;
 
@@ -143,14 +145,26 @@ public class WifiController extends StateMachine {
     private NoLockHeldState mNoLockHeldState = new NoLockHeldState();
     private EcmState mEcmState = new EcmState();
 
+    /**
+     * One of:  {@link WifiManager#WIFI_AP_STATE_DISABLED},
+     *          {@link WifiManager#WIFI_AP_STATE_DISABLING},
+     *          {@link WifiManager#WIFI_AP_STATE_ENABLED},
+     *          {@link WifiManager#WIFI_AP_STATE_ENABLING},
+     *          {@link WifiManager#WIFI_AP_STATE_FAILED}
+     */
+    private final AtomicInteger mWifiApState =
+            new AtomicInteger(WifiManager.WIFI_AP_STATE_DISABLED);
+
     WifiController(Context context, WifiStateMachine wsm, WifiSettingsStore wss,
-            WifiLockManager wifiLockManager, Looper looper, FrameworkFacade f) {
+            WifiLockManager wifiLockManager, Looper looper, FrameworkFacade f,
+            WifiStateMachinePrime wifiStateMachinePrime) {
         super(TAG, looper);
         mFacade = f;
         mContext = context;
         mWifiStateMachine = wsm;
         mSettingsStore = wss;
         mWifiLockManager = wifiLockManager;
+        mWifiStateMachinePrime = wifiStateMachinePrime;
 
         mAlarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         Intent idleIntent = new Intent(ACTION_DEVICE_IDLE, null);
@@ -202,9 +216,10 @@ public class WifiController extends StateMachine {
                             mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(
                                     WifiManager.EXTRA_NETWORK_INFO);
                         } else if (action.equals(WifiManager.WIFI_AP_STATE_CHANGED_ACTION)) {
-                            int state = intent.getIntExtra(
-                                    WifiManager.EXTRA_WIFI_AP_STATE,
-                                    WifiManager.WIFI_AP_STATE_FAILED);
+                            int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_AP_STATE,
+                                                           WifiManager.WIFI_AP_STATE_FAILED);
+                            mWifiApState.set(state);
+                            loge(TAG + " received wifi ap state update: " + state);
                             if (state == WifiManager.WIFI_AP_STATE_FAILED) {
                                 loge(TAG + "SoftAP start failed");
                                 sendMessage(CMD_AP_START_FAILURE);
@@ -478,6 +493,7 @@ public class WifiController extends StateMachine {
                         }
                         mWifiStateMachine.setHostApRunning((WifiConfiguration) msg.obj,
                                 true);
+                        mWifiStateMachinePrime.enterSoftAPMode((WifiConfiguration) msg.obj);
                         transitionTo(mApEnabledState);
                     }
                     break;
@@ -696,22 +712,28 @@ public class WifiController extends StateMachine {
                 case CMD_AIRPLANE_TOGGLED:
                     if (mSettingsStore.isAirplaneModeOn()) {
                         mWifiStateMachine.setHostApRunning(null, false);
+                        mWifiStateMachinePrime.disableWifi();
                         mPendingState = mApStaDisabledState;
                     }
                     break;
                 case CMD_WIFI_TOGGLED:
                     if (mSettingsStore.isWifiToggleEnabled()) {
                         mWifiStateMachine.setHostApRunning(null, false);
+                        mWifiStateMachinePrime.disableWifi();
                         mPendingState = mDeviceActiveState;
                     }
                     break;
                 case CMD_SET_AP:
                     if (msg.arg1 == 0) {
                         mWifiStateMachine.setHostApRunning(null, false);
+                        mWifiStateMachinePrime.disableWifi();
                         mPendingState = getNextWifiState();
                     }
                     break;
                 case CMD_AP_STOPPED:
+                    // Since WifiStateMachinePrime controls softap mode, need to let
+                    // WifiStateMachine know that AP mode ended.
+                    mWifiStateMachine.sendMessage(WifiStateMachine.CMD_AP_STOPPED);
                     if (mPendingState == null) {
                         /**
                          * Stop triggered internally, either tether notification
@@ -731,10 +753,14 @@ public class WifiController extends StateMachine {
                 case CMD_EMERGENCY_MODE_CHANGED:
                     if (msg.arg1 == 1) {
                         mWifiStateMachine.setHostApRunning(null, false);
+                        mWifiStateMachinePrime.disableWifi();
                         mPendingState = mEcmState;
                     }
                     break;
                 case CMD_AP_START_FAILURE:
+                    // Since WifiStateMachinePrime controls softap mode, need to let
+                    // WifiStateMachine know that AP mode failed to start.
+                    mWifiStateMachine.sendMessage(WifiStateMachine.CMD_AP_STOPPED);
                     transitionTo(getNextWifiState());
                     break;
                 default:
@@ -912,6 +938,15 @@ public class WifiController extends StateMachine {
                 transitionTo(mScanOnlyLockHeldState);
                 break;
         }
+    }
+
+    /**
+     * Method to return the current WifiApState.
+     * @return int Current state as defined by WifiManager.
+     */
+    public int getWifiApState() {
+        loge(TAG + " returning wifiApState: " + mWifiApState.get());
+        return mWifiApState.get();
     }
 
     @Override
