@@ -3924,16 +3924,21 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             mWifiMonitor.stopAllMonitoring();
 
             mDeathRecipient.unlinkToDeath();
-            if (mWificond != null) {
-                try {
-                    mWificond.tearDownInterfaces();
-                } catch (RemoteException e) {
-                    // There is very little we can do here
-                    Log.e(TAG, "Failed to tear down interfaces via wificond");
+            // Only tear down interfaces if we aren't going in to softap mode.  This is handled by
+            // WifiStateMachinePrime.
+            final Message message = getCurrentMessage();
+            if (message != null && message.what != CMD_START_AP) {
+                if (mWificond != null) {
+                    try {
+                        mWificond.tearDownInterfaces();
+                    } catch (RemoteException e) {
+                        // There is very little we can do here
+                        Log.e(TAG, "Failed to tear down interfaces via wificond");
+                    }
+                    mWificond = null;
                 }
-                mWificond = null;
+                mWifiNative.stopHal();
             }
-            mWifiNative.stopHal();
         }
 
         @Override
@@ -4429,15 +4434,18 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     transitionTo(mInitialState);
                     break;
                 case CMD_STOP_SUPPLICANT_FAILED:
+                    //  Temporarily supress this message handling while transitioning to
+                    //  WifiStateMachinePrime
                     if (message.arg1 == mSupplicantStopFailureToken) {
                         loge("Timed out on a supplicant stop, kill and proceed");
                         handleSupplicantConnectionLoss(true);
-                        transitionTo(mInitialState);
+                        //transitionTo(mInitialState);
                     }
                     break;
+                case CMD_START_AP:
+                    transitionTo(mSoftApState);
                 case CMD_START_SUPPLICANT:
                 case CMD_STOP_SUPPLICANT:
-                case CMD_START_AP:
                 case CMD_STOP_AP:
                 case CMD_SET_OPERATIONAL_MODE:
                     deferMessage(message);
@@ -6622,15 +6630,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             if (message.what != CMD_START_AP) {
                 throw new RuntimeException("Illegal transition to SoftApState: " + message);
             }
-
+            /*
             IApInterface apInterface = setupDriverForSoftAp();
             if (apInterface == null) {
                 setWifiApState(WIFI_AP_STATE_FAILED,
                         WifiManager.SAP_START_FAILURE_GENERAL);
-                /**
+            */    /**
                  * Transition to InitialState to reset the
                  * driver/HAL back to the initial state.
                  */
+            /*
                 transitionTo(mInitialState);
                 return;
             }
@@ -6643,6 +6652,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                                                              apInterface,
                                                              config);
             mSoftApManager.start();
+            */
         }
 
         @Override
@@ -6659,7 +6669,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     /* Ignore start command when it is starting/started. */
                     break;
                 case CMD_STOP_AP:
-                    mSoftApManager.stop();
+                    //mSoftApManager.stop();
                     break;
                 case CMD_START_AP_FAILURE:
                     transitionTo(mInitialState);
