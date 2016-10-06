@@ -64,6 +64,7 @@ public class WifiInjector {
     private final WifiApConfigStore mWifiApConfigStore;
     private final WifiNative mWifiNative;
     private final WifiStateMachine mWifiStateMachine;
+    private final WifiStateMachinePrime mWifiStateMachinePrime;
     private final WifiSettingsStore mSettingsStore;
     private final WifiCertManager mCertManager;
     private final WifiNotificationController mNotificationController;
@@ -149,6 +150,10 @@ public class WifiInjector {
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
                 mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
+        IBinder b = mFrameworkFacade.getService(Context.NETWORKMANAGEMENT_SERVICE);
+        INetworkManagementService nmService = INetworkManagementService.Stub.asInterface(b);
+        mWifiStateMachinePrime = new WifiStateMachinePrime(this,
+                mWifiStateMachineHandlerThread.getLooper(), nmService, mContext);
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
@@ -156,7 +161,8 @@ public class WifiInjector {
                 mFrameworkFacade, null, this);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
         mWifiController = new WifiController(mContext, mWifiStateMachine, mSettingsStore,
-                mLockManager, mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
+                mLockManager, mWifiServiceHandlerThread.getLooper(), mFrameworkFacade,
+                mWifiStateMachinePrime);
         mWifiLastResortWatchdog = new WifiLastResortWatchdog(mWifiController, mWifiMetrics);
         mWifiMulticastLockManager = new WifiMulticastLockManager(mWifiStateMachine,
                 BatteryStatsService.getService());
@@ -213,6 +219,10 @@ public class WifiInjector {
 
     public WifiStateMachine getWifiStateMachine() {
         return mWifiStateMachine;
+    }
+
+    public WifiStateMachinePrime getWifiStateMachinePrime() {
+        return mWifiStateMachinePrime;
     }
 
     public WifiSettingsStore getWifiSettingsStore() {
@@ -295,7 +305,7 @@ public class WifiInjector {
                                            SoftApManager.Listener listener,
                                            IApInterface apInterface,
                                            WifiConfiguration config) {
-        return new SoftApManager(mWifiServiceHandlerThread.getLooper(),
+        return new SoftApManager(mContext, mWifiServiceHandlerThread.getLooper(),
                                  mWifiNative, mCountryCode.getCountryCode(),
                                  listener, apInterface, nmService,
                                  mWifiApConfigStore, config);
