@@ -16,6 +16,8 @@
 
 package com.android.server.wifi;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
@@ -23,6 +25,7 @@ import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.util.ArrayMap;
 import android.util.Log;
 
@@ -46,6 +49,7 @@ public class WifiStateMachinePrime {
 
     private WifiInjector mWifiInjector;
     private Looper mLooper;
+    private Context mContext;
     private IWificond mWificond;
 
     private Queue<WifiConfiguration> mApConfigQueue = new ConcurrentLinkedQueue<>();
@@ -62,9 +66,10 @@ public class WifiStateMachinePrime {
     /* Soft access point teardown is completed. */
     static final int CMD_AP_STOPPED                                     = BASE + 24;
 
-    WifiStateMachinePrime(WifiInjector wifiInjector, Looper looper) {
+    WifiStateMachinePrime(WifiInjector wifiInjector, Looper looper, Context context) {
         mWifiInjector = wifiInjector;
         mLooper = looper;
+        mContext = context;
 
         // Clean up existing interfaces in wificond.
         // This ensures that wificond continue to work if java framework restarts.
@@ -206,11 +211,11 @@ public class WifiStateMachinePrime {
                     mModeStateMachine.transitionTo(mSoftAPModeState);
                     break;
                 case ModeStateMachine.CMD_DISABLE_WIFI:
-                    Log.d(TAG, "disabling wifi, calling exit on " + getCurrentMode());
-                    mModeStateMachine.getCurrentState().exit();
-                    tearDownInterfaces();
-                    mModeStateMachine.quit();
-                    mModeStateMachine = null;
+                    if (mModeStateMachine != null) {
+                        Log.d(TAG, "disabling wifi, calling exit on " + getCurrentMode());
+                        mModeStateMachine.getCurrentState().exit();
+                        mModeStateMachine = null;
+                    }
                     // clean out any ap configs that might be lingering
                     if (!mApConfigQueue.isEmpty()) {
                         Log.e(TAG, "AP config queue was not empty.");
@@ -252,7 +257,8 @@ public class WifiStateMachinePrime {
 
             @Override
             public void exit() {
-                tearDownInterfaces();
+                // Do not tear down interfaces here since this mode is not actively controlled yet.
+                // tearDownInterfaces();
             }
         }
 
@@ -271,8 +277,7 @@ public class WifiStateMachinePrime {
 
             @Override
             public void exit() {
-                // Do not tear down interfaces yet since this mode is not actively controlled or
-                // used in tests at this time.
+                // Do not tear down interfaces yet since this mode is not actively controlled yet.
                 // tearDownInterfaces();
             }
         }
@@ -291,6 +296,8 @@ public class WifiStateMachinePrime {
                 }
 
                 try {
+                    // When the other modes are activated - tearDownInterfaces can be removed.
+                    mWificond.tearDownInterfaces();
                     mApInterface = mWificond.createApInterface();
                 } catch (RemoteException e1) { }
 
@@ -324,6 +331,16 @@ public class WifiStateMachinePrime {
                             // Save valid configs for future calls.
                             mWifiInjector.getWifiApConfigStore().setApConfiguration(config);
                         }
+                        // send a broadcast that SoftAp Failed to start.
+                        final Intent intent = new Intent(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+                        intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+                        intent.putExtra(WifiManager.EXTRA_WIFI_AP_STATE,
+                                        WifiManager.WIFI_AP_STATE_FAILED);
+                        intent.putExtra(WifiManager.EXTRA_PREVIOUS_WIFI_AP_STATE,
+                                        WifiManager.WIFI_AP_STATE_DISABLED);
+                        intent.putExtra(WifiManager.EXTRA_WIFI_AP_FAILURE_REASON,
+                                        WifiManager.SAP_START_FAILURE_GENERAL);
+                        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
                         break;
                     case CMD_AP_STOPPED:
                         Log.d(TAG, "SoftApModeActiveState stopped.  Wait for next mode command.");
@@ -355,9 +372,15 @@ public class WifiStateMachinePrime {
 
             @Override
             public void exit() {
-                // clean up objects from an active state - check with mode handlers to make sure
-                // they are stopping properly.
-                mActiveModeManager.stop();
+                // clean up objects from an active state - check with mode handlers to make
+                // sure they are stopping properly.
+                try {
+                    mActiveModeManager.stop();
+                    Log.e(TAG, "Called stop on active mode manager "
+                            + "- cleaning up from errored exit.");
+                } catch (NullPointerException e) {
+                    Log.d(TAG, "ActiveModeManager was null, must have been properly stopped.");
+                }
             }
         }
 
@@ -380,9 +403,18 @@ public class WifiStateMachinePrime {
                 @Override
                 public void onStateChanged(int state, int reason) {
                     if (state == WifiManager.WIFI_AP_STATE_DISABLED) {
-                        mModeStateMachine.sendMessage(CMD_AP_STOPPED);
+                        try {
+                            mModeStateMachine.sendMessage(CMD_AP_STOPPED);
+                        } catch (NullPointerException e) {
+                            Log.d(TAG, "SoftApModeActiveState stopped and now wifi is disabled.");
+                        }
                     } else if (state == WifiManager.WIFI_AP_STATE_FAILED) {
-                        mModeStateMachine.sendMessage(CMD_START_AP_FAILURE);
+                        try {
+                            mModeStateMachine.sendMessage(CMD_START_AP_FAILURE);
+                        } catch (NullPointerException e) {
+                            Log.e(TAG, "Failed to start SoftApMode "
+                                    + "and wifi must have been disabled.");
+                        }
                     }
                 }
             }
@@ -421,9 +453,14 @@ public class WifiStateMachinePrime {
                         mModeStateMachine.transitionTo(mSoftAPModeState);
                         break;
                     case CMD_AP_STOPPED:
-                        Log.d(TAG, "SoftApModeActiveState stopped."
-                                + "  Return to SoftApMode (inactive).");
-                        mModeStateMachine.transitionTo(mSoftAPModeState);
+                        try {
+                            mModeStateMachine.transitionTo(mSoftAPModeState);
+                            Log.d(TAG, "SoftApModeActiveState stopped. "
+                                    + " Return to SoftApMode (inactive).");
+                        } catch (NullPointerException e) {
+                            Log.d(TAG, "SoftApModeActiveState stopped and now wifi is disabled.");
+                        }
+                        mActiveModeManager = null;
                         break;
                     default:
                         return NOT_HANDLED;

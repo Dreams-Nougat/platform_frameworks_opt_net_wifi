@@ -624,7 +624,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     @Override
     public int getWifiApEnabledState() {
         enforceAccessPermission();
-        return mWifiStateMachine.syncGetWifiApState();
+        return mWifiController.getWifiApState();
     }
 
     /**
