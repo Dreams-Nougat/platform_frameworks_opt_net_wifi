@@ -16,10 +16,18 @@
 
 package com.android.server.wifi;
 
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_DISABLED;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_DISABLING;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_ENABLED;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_ENABLING;
+import static android.net.wifi.WifiManager.WIFI_AP_STATE_FAILED;
+
 import static com.android.server.wifi.util.ApConfigUtil.ERROR_GENERIC;
 import static com.android.server.wifi.util.ApConfigUtil.ERROR_NO_CHANNEL;
 import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.InterfaceConfiguration;
 import android.net.wifi.IApInterface;
 import android.net.wifi.WifiConfiguration;
@@ -29,6 +37,7 @@ import android.os.INetworkManagementService;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.util.Log;
 
 import com.android.internal.util.State;
@@ -46,6 +55,8 @@ import java.util.Locale;
 public class SoftApManager implements ActiveModeManager {
     private static final String TAG = "SoftApManager";
 
+    private final Context mContext;
+
     private final WifiNative mWifiNative;
 
     private final String mCountryCode;
@@ -59,6 +70,8 @@ public class SoftApManager implements ActiveModeManager {
     private final INetworkManagementService mNwService;
     private final WifiApConfigStore mWifiApConfigStore;
 
+    private int mCurrentState;
+
     /**
      * Listener for soft AP state changes.
      */
@@ -71,7 +84,8 @@ public class SoftApManager implements ActiveModeManager {
         void onStateChanged(int state, int failureReason);
     }
 
-    public SoftApManager(Looper looper,
+    public SoftApManager(Context context,
+                         Looper looper,
                          WifiNative wifiNative,
                          String countryCode,
                          Listener listener,
@@ -80,7 +94,7 @@ public class SoftApManager implements ActiveModeManager {
                          WifiApConfigStore wifiApConfigStore,
                          WifiConfiguration config) {
         mStateMachine = new SoftApStateMachine(looper);
-
+        mContext = context;
         mWifiNative = wifiNative;
         mCountryCode = countryCode;
         mListener = listener;
@@ -90,6 +104,7 @@ public class SoftApManager implements ActiveModeManager {
         if (config != null) {
             mWifiApConfigStore.setApConfiguration(config);
         }
+        mCurrentState = WifiManager.WIFI_AP_STATE_DISABLED;
     }
 
     /**
@@ -104,7 +119,9 @@ public class SoftApManager implements ActiveModeManager {
      * Stop soft AP.
      */
     public void stop() {
-        mStateMachine.sendMessage(SoftApStateMachine.CMD_STOP);
+        // explicitly exit the current state this is a no-op if it is not running, otherwise it will
+        // stop and clean up the state.
+        mStateMachine.getCurrentState().exit();
     }
 
     /**
@@ -116,6 +133,20 @@ public class SoftApManager implements ActiveModeManager {
         if (mListener != null) {
             mListener.onStateChanged(state, reason);
         }
+        int previousState = mCurrentState;
+        mCurrentState = state;
+        // now send out broadcast updating the state
+        final Intent intent = new Intent(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+        intent.putExtra(WifiManager.EXTRA_WIFI_AP_STATE, state);
+        intent.putExtra(WifiManager.EXTRA_PREVIOUS_WIFI_AP_STATE, previousState);
+        if (state == WifiManager.WIFI_AP_STATE_FAILED) {
+            //only set reason number when softAP start failed
+            intent.putExtra(WifiManager.EXTRA_WIFI_AP_FAILURE_REASON, reason);
+        }
+        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+        Log.d(TAG, "Sending StickyBroadcast: new AP state: " + getApStateName(state)
+                + " previous state: " + getApStateName(previousState));
     }
 
     /**
@@ -128,6 +159,7 @@ public class SoftApManager implements ActiveModeManager {
             Log.e(TAG, "Unable to start soft AP without valid configuration");
             return ERROR_GENERIC;
         }
+        Log.d(TAG, "Starting SoftAp with SSID: " + config.SSID);
 
         // Make a copy of configuration for updating AP band and channel.
         WifiConfiguration localConfig = new WifiConfiguration(config);
@@ -258,6 +290,16 @@ public class SoftApManager implements ActiveModeManager {
             start();
         }
 
+        private void unregisterObserver() {
+            if (mNetworkObserver == null) {
+                return;
+            }
+            try {
+                mNwService.unregisterObserver(mNetworkObserver);
+            } catch (RemoteException e) { }
+            mNetworkObserver = null;
+        }
+
         private class IdleState extends State {
             @Override
             public void enter() {
@@ -309,16 +351,6 @@ public class SoftApManager implements ActiveModeManager {
 
                 return HANDLED;
             }
-
-            private void unregisterObserver() {
-                if (mNetworkObserver == null) {
-                    return;
-                }
-                try {
-                    mNwService.unregisterObserver(mNetworkObserver);
-                } catch (RemoteException e) { }
-                mNetworkObserver = null;
-            }
         }
 
         private class StartedState extends State {
@@ -365,15 +397,15 @@ public class SoftApManager implements ActiveModeManager {
                         // Already started, ignore this command.
                         break;
                     case CMD_AP_INTERFACE_BINDER_DEATH:
-                    case CMD_STOP:
+                        // Shut down due to failure
                         updateApState(WifiManager.WIFI_AP_STATE_DISABLING, 0);
                         stopSoftAp();
-                        if (message.what == CMD_AP_INTERFACE_BINDER_DEATH) {
-                            updateApState(WifiManager.WIFI_AP_STATE_FAILED,
-                                    WifiManager.SAP_START_FAILURE_GENERAL);
-                        } else {
-                            updateApState(WifiManager.WIFI_AP_STATE_DISABLED, 0);
-                        }
+                        updateApState(WifiManager.WIFI_AP_STATE_FAILED,
+                                WifiManager.SAP_START_FAILURE_GENERAL);
+                        transitionTo(mIdleState);
+                        break;
+                    case CMD_STOP:
+                        // service cleanup occurs in exit
                         transitionTo(mIdleState);
                         break;
                     default:
@@ -381,7 +413,40 @@ public class SoftApManager implements ActiveModeManager {
                 }
                 return HANDLED;
             }
-        }
 
+            @Override
+            public void exit() {
+                if (mCurrentState == WifiManager.WIFI_AP_STATE_ENABLED
+                        || mCurrentState == WifiManager.WIFI_AP_STATE_ENABLING) {
+                    // We are enabled or enabling so we should shut down
+                    updateApState(WifiManager.WIFI_AP_STATE_DISABLING, 0);
+                    stopSoftAp();
+                    unregisterObserver();
+                    updateApState(WifiManager.WIFI_AP_STATE_DISABLED, 0);
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper class mapping the SoftAP states to Strings.
+     * @param int state State value
+     * @return String word describing state
+     */
+    protected String getApStateName(int state) {
+        switch (state) {
+            case WIFI_AP_STATE_DISABLING:
+                return "disabling";
+            case WIFI_AP_STATE_DISABLED:
+                return "disabled";
+            case WIFI_AP_STATE_ENABLING:
+                return "enabling";
+            case WIFI_AP_STATE_ENABLED:
+                return "enabled";
+            case WIFI_AP_STATE_FAILED:
+                return "failed";
+            default:
+                return "[invalid state]";
+        }
     }
 }
