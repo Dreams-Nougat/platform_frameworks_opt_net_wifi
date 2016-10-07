@@ -1,0 +1,11 @@
+Revision: a05ebf34b60db62318c9867289bc77f93e219a82
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+4116:20-4119:26
+Fri Oct 07 17:19:59 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7fc72882_0d4201f9
+Bytes: 420
+In the case of bypassing ScanMode, I think this would do the trick.  This is not the only option however.  In the situation where we were starting up ClientMode (so we are in SupplicantScanningState, but we see a CMD_SET_OPERATIONAL_MODE for SoftAp (wifi hotspot) we would most likely end up losing the operational mode switch.  This is definitely one of the reasons I am refactoring this code (actively in development).
+
