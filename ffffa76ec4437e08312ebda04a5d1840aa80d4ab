@@ -9,6 +9,14 @@ UUID: e51d474e_0408163a
 Bytes: 61
 You don't want to unregister/set to null in this catch block?
 
+286:26-286:31
+Tue Oct 11 23:44:05 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e51d474e_0408163a
+UUID: c22d9995_d1ee520f
+Bytes: 186
+I think if we fail to register, it has to be because mNwService is dead, making attempts to unregister sort of pointless.  But I guess it can't hurt?  Certainly I want to set it to null.
+
 300:28-303:29
 Thu Sep 29 03:06:31 2016 +0000
 Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -30,6 +38,14 @@ If so, might as well have the IdleState.onEnter() version in separate method lik
 
 and just call it from the two call sites.
 
+300:28-303:29
+Tue Oct 11 23:44:05 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e51d474e_e4121a6d
+UUID: c22d9995_71255eb0
+Bytes: 10
+Good call.
+
 324:29-324:34
 Thu Sep 29 03:06:31 2016 +0000
 Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -47,4 +63,12 @@ Then you can be level-triggered as well in here, i.e.
         Log.d(TAG, "SoftAp is ready for use");
         updateApState(WifiManager.WIFI_AP_STATE_ENABLED, 0);
     }
+
+324:29-324:34
+Tue Oct 11 23:44:05 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e51d474e_24051221
+UUID: c22d9995_acb12d9a
+Bytes: 28
+I'll do something like that.
 
