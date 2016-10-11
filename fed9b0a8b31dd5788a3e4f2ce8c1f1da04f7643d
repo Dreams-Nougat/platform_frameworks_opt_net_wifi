@@ -1,0 +1,59 @@
+Revision: fed9b0a8b31dd5788a3e4f2ce8c1f1da04f7643d
+Patch-set: 3
+File: service/java/com/android/server/wifi/ActiveModeManager.java
+
+25:0-27:21
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_6c7c44ba
+Bytes: 1
+?
+
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+36
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_8c334860
+Bytes: 192
+nit: don't need this, and it's probably dangerous to have our own notion of this, given that we can be in 1 or 2 states at a time, and the control of that is in the hands of a different thread
+
+38
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_cc663050
+Bytes: 94
+Can all of these states be members of the state machine?  That would seem more natural for me.
+
+47:12-47:19
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_2cd23cfc
+Bytes: 281
+Can we use an ArrayMap?
+
+https://developer.android.com/reference/android/support/v4/util/ArrayMap.html
+
+This seems really small and we can save a chunk of memory this way.  But I'm really unsure why we need this mapping anyway, given that it is 1:1 with the corresponding commands.
+
+52:41-52:55
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_2ce95ca6
+Bytes: 35
+nit: don't need these template args
+
+102
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_6cca8416
+Bytes: 44
+Can we do work like this with a constructor?
+
+109:19-109:24
+Tue Oct 11 18:22:52 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_ac39ec29
+Bytes: 60
+nit: in all these places can we use HANDLED and NOT_HANDLED?
+
