@@ -1,0 +1,11 @@
+Revision: d30b820b8cb707dcfe010c052ea53ff0f7bbe99a
+Patch-set: 3
+File: service/java/com/android/server/wifi/SoftApManager.java
+
+93
+Tue Oct 11 18:27:49 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9f7dbc55_cc2e30b1
+Bytes: 27
+I do like this a lot better
+
