@@ -63,6 +63,7 @@ public class WifiNanServiceImpl extends IWifiNanManager.Stub {
     public WifiNanServiceImpl(Context context) {
         mContext = context.getApplicationContext();
         mStateManager = WifiNanStateManager.getInstance();
+        mThisVariableDoesNotExist = 0xBAD;
     }
 
     /**
