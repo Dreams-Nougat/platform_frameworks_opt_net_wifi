@@ -63,6 +63,7 @@ public class WifiAwareServiceImpl extends IWifiAwareManager.Stub {
     public WifiAwareServiceImpl(Context context) {
         mContext = context.getApplicationContext();
         mStateManager = WifiAwareStateManager.getInstance();
+        mThisVariableDoesNotExist = 0xBAD;
     }
 
     /**
