@@ -6492,9 +6492,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     class WpsRunningState extends State {
         // Tracks the source to provide a reply
         private Message mSourceMessage;
+        private boolean mNeedLoadNetworks;
         @Override
         public void enter() {
             mSourceMessage = Message.obtain(getCurrentMessage());
+            mNeedLoadNetworks = true;
         }
         @Override
         public boolean processMessage(Message message) {
@@ -6516,6 +6518,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                             WifiManager.WPS_OVERLAP_ERROR);
                     mSourceMessage.recycle();
                     mSourceMessage = null;
+                    mNeedLoadNetworks = false;
                     transitionTo(mDisconnectedState);
                     break;
                 case WifiMonitor.WPS_FAIL_EVENT:
@@ -6524,6 +6527,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                         replyToMessage(mSourceMessage, WifiManager.WPS_FAILED, message.arg1);
                         mSourceMessage.recycle();
                         mSourceMessage = null;
+                        mNeedLoadNetworks = false;
                         transitionTo(mDisconnectedState);
                     } else {
                         if (mVerboseLoggingEnabled) {
@@ -6536,6 +6540,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                             WifiManager.WPS_TIMED_OUT);
                     mSourceMessage.recycle();
                     mSourceMessage = null;
+                    mNeedLoadNetworks = false;
                     transitionTo(mDisconnectedState);
                     break;
                 case WifiManager.START_WPS:
@@ -6596,7 +6601,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
         @Override
         public void exit() {
-            mWifiConfigManager.loadFromStore();
+            if (mNeedLoadNetworks) {
+                mWifiConfigManager.loadConfiguredNetworks();
+            }
         }
     }
 
