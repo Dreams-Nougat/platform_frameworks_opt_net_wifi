@@ -11,3 +11,11 @@ I think this check now should be something like:
 
 if (lastUserSelectedNetworkId != WifiConfiguration.INVALID_NETWORK_ID && lastUserSelectedNetworkId == network.networkId).
 
+162:8-162:59
+Mon Oct 17 18:01:52 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_aae910a3
+UUID: 7c8bb7e0_6a1a28e4
+Bytes: 181
+I did think about that. But, the first check is unnecessary because if it is -1, then the second check would anyway fail? We can't have a valid network config with -1 as network ID.
+
