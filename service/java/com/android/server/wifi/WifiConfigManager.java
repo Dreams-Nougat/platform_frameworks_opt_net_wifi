@@ -1682,6 +1682,9 @@ public class WifiConfigManager {
      * @return network Id corresponding to the last selected network.
      */
     public String getLastSelectedNetworkConfigKey() {
+        if (mLastSelectedNetworkId == WifiConfiguration.INVALID_NETWORK_ID) {
+            return "";
+        }
         WifiConfiguration config = getInternalConfiguredNetwork(mLastSelectedNetworkId);
         if (config == null) {
             return "";
