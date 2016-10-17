@@ -1,0 +1,18 @@
+Revision: 78cfb7625ff8b074291ed08e3b62a9ecdc970411
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+199
+Mon Oct 17 17:11:43 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_f5e37a1c
+Bytes: 77
+Does this block?  Will it exit both the current state and all of its parents?
+
+205:27-205:32
+Mon Oct 17 17:11:43 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_35ea42f6
+Bytes: 24
+HANDLED and NOT_HANDLED?
+
