@@ -1,0 +1,38 @@
+Revision: 8235ef883655d2eca3c961de415ba4d5eaeb5ab7
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+48
+Mon Oct 17 17:05:48 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_3577a2b8
+Bytes: 27
+I guess these can be final?
+
+70
+Mon Oct 17 17:05:48 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_95a78ef5
+Bytes: 461
+Now it's really unclear why you need this.
+
+From outside WifiStateMachinePrime I would kind of expect to call methods (requestClientMode(), requestApMode() etc).
+
+Inside WifiStateMachinePrime, those should deliver one of CMD_START_* to the state machine.
+
+Maybe this will become more obvious in later CLs.  If that's the answer, don't spend time justifying it, this is really easy to remove later if it turns out to be unnecessary.  I'll trust whatever you say.
+
+85
+Mon Oct 17 17:05:48 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_35c56298
+Bytes: 78
+It isn't obvious to me why you need this (especially since you don't call it).
+
+86:12-86:27
+Mon Oct 17 17:05:48 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c8bb7e0_b56ad2c7
+Bytes: 41
+Shouldn't this happen in the constructor?
+
