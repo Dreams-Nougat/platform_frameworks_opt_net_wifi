@@ -73,6 +73,7 @@ import android.widget.TextView;
 
 import com.android.internal.R;
 import com.android.internal.util.AsyncChannel;
+import com.android.server.wifi.util.WifiAsyncChannel;
 import com.android.internal.util.Protocol;
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
@@ -111,8 +112,8 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
     private DhcpResults mDhcpResults;
 
     private P2pStateMachine mP2pStateMachine;
-    private AsyncChannel mReplyChannel = new AsyncChannel();
-    private AsyncChannel mWifiChannel;
+    private WifiAsyncChannel mReplyChannel = new WifiAsyncChannel(TAG);
+    private WifiAsyncChannel mWifiChannel;
 
     private static final Boolean JOIN_GROUP = true;
     private static final Boolean FORM_GROUP = false;
@@ -368,7 +369,6 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         HandlerThread wifiP2pThread = new HandlerThread("WifiP2pService");
         wifiP2pThread.start();
         mClientHandler = new ClientHandler(wifiP2pThread.getLooper());
-
         mP2pStateMachine = new P2pStateMachine(TAG, wifiP2pThread.getLooper(), mP2pSupported);
         mP2pStateMachine.start();
     }
@@ -679,7 +679,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                 case AsyncChannel.CMD_CHANNEL_HALF_CONNECTED:
                     if (message.arg1 == AsyncChannel.STATUS_SUCCESSFUL) {
                         if (DBG) logd("Full connection with WifiStateMachine established");
-                        mWifiChannel = (AsyncChannel) message.obj;
+                        mWifiChannel = (WifiAsyncChannel) message.obj;
                     } else {
                         loge("Full connection failure, error = " + message.arg1);
                         mWifiChannel = null;
@@ -696,7 +696,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     break;
 
                 case AsyncChannel.CMD_CHANNEL_FULL_CONNECTION:
-                    AsyncChannel ac = new AsyncChannel();
+                    WifiAsyncChannel ac = new WifiAsyncChannel(TAG);
                     ac.connect(mContext, getHandler(), message.replyTo);
                     break;
                 case BLOCK_DISCOVERY:
