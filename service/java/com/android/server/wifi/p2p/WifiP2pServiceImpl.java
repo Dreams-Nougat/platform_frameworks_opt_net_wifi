@@ -79,6 +79,7 @@ import com.android.internal.util.StateMachine;
 import com.android.server.wifi.WifiMonitor;
 import com.android.server.wifi.WifiNative;
 import com.android.server.wifi.WifiStateMachine;
+import com.android.server.wifi.util.WifiAsyncChannel;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -111,7 +112,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
     private DhcpResults mDhcpResults;
 
     private P2pStateMachine mP2pStateMachine;
-    private AsyncChannel mReplyChannel = new AsyncChannel();
+    private AsyncChannel mReplyChannel = new WifiAsyncChannel(TAG);
     private AsyncChannel mWifiChannel;
 
     private static final Boolean JOIN_GROUP = true;
@@ -368,7 +369,6 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
         HandlerThread wifiP2pThread = new HandlerThread("WifiP2pService");
         wifiP2pThread.start();
         mClientHandler = new ClientHandler(wifiP2pThread.getLooper());
-
         mP2pStateMachine = new P2pStateMachine(TAG, wifiP2pThread.getLooper(), mP2pSupported);
         mP2pStateMachine.start();
     }
@@ -696,7 +696,7 @@ public class WifiP2pServiceImpl extends IWifiP2pManager.Stub {
                     break;
 
                 case AsyncChannel.CMD_CHANNEL_FULL_CONNECTION:
-                    AsyncChannel ac = new AsyncChannel();
+                    AsyncChannel ac = new WifiAsyncChannel(TAG);
                     ac.connect(mContext, getHandler(), message.replyTo);
                     break;
                 case BLOCK_DISCOVERY:
