@@ -1,0 +1,60 @@
+Revision: 7631779874f6daf60cf94528b753e49b612117a8
+Patch-set: 2
+File: service/java/com/android/server/wifi/util/WifiAsyncChannel.java
+
+34:43-34:61
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_28238b6e
+Bytes: 43
+consider no spaces, easier to greg logcats.
+
+37:19-37:23
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_0820c75d
+Bytes: 48
+only used in one function - just declare locally
+
+38:25-38:38
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_e84b3326
+Bytes: 44
+same - only used in one method, move into it
+
+48
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_684063fe
+Bytes: 112
+do you need some prefix here? There are methods where you print multiple messages - is the context always clear?
+
+59
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_c8506fd5
+Bytes: 83
+I thought you were also going to print (as PII) the other contents of the message!?
+
+84:39-84:45
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_a8453b11
+Bytes: 28
+is there a need to log this?
+
+100:15-100:29
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_884a771f
+Bytes: 42
+style: no need for additional parenthesis.
+
+103
+Thu Oct 20 07:44:29 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 7c0657a0_283a6b8c
+Bytes: 370
+Is there rest really necessary? I assume they are the cause of modifying the parent class. These are management messages - only sent once at beginning of setup. I'm curious if (1) they ever cause issues, and (2) if you're going to gain any insights from the contents of these messages. I believe that the setup code already prints out errors if the channel isn't set up.
+
