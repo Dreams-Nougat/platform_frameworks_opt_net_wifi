@@ -9,6 +9,14 @@ UUID: 7c0657a0_28238b6e
 Bytes: 43
 consider no spaces, easier to greg logcats.
 
+34:43-34:61
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c0657a0_28238b6e
+UUID: 9c886b74_50544568
+Bytes: 39
+==etan, although I'd spell it grep. :-P
+
 37:19-37:23
 Thu Oct 20 07:44:29 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -23,6 +31,21 @@ UUID: 7c0657a0_e84b3326
 Bytes: 44
 same - only used in one method, move into it
 
+45:15-45:45
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9c886b74_703e29f3
+Bytes: 498
+Similar to Etan's comment on line 34... Prefer not to use spaces, as it complicates log processing.
+
+Without spaces, we can do some pretty decent log processing using simple command-line tools like sed/awk/split/join. Spaces makes this much harder.
+
+Concretely, consider something like
+
+  mTag = serviceTag + "." + "asyncChannel";
+
+The dot syntax, and the change in ordering, conveys the idea that the async channel is part of the service, by borrowing from the syntax we use in source code itself.
+
 48
 Thu Oct 20 07:44:29 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -30,12 +53,78 @@ UUID: 7c0657a0_684063fe
 Bytes: 112
 do you need some prefix here? There are methods where you print multiple messages - is the context always clear?
 
+48
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c0657a0_684063fe
+UUID: 9c886b74_d0f6f520
+Bytes: 54
+==etan. maybe some sort of inbound/outbound indicator?
+
+49:0-54:9
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9c886b74_302e61ee
+Bytes: 407
+Prefer to isolate the WifiLog creation code, and the actual logging code. E.g.
+
+  private @NonNull void fetchOrInitLog() {
+    if (mLog == null) {
+       // ...
+    }
+    return mLog;
+  }
+
+  private void logMessage(Message msg) {
+    WifiLog log = fetchOrInitLog();
+    log.trace(...).c(msg.what)...;
+  }
+
+or even
+
+  private void logMessage(Message msg) {
+    fetchOrInitLog().trace(...).c(msg.what)...;
+  }
+
+55:8-55:27
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9c886b74_10ac7d40
+Bytes: 368
+I don't see why this would ever be null. So consider removing the check, and the else clause.
+
+However, if you keep the else clause, prefer to reverse the ordering of the clauses, and exit early in the error case. That makes it easier to see which path in the code represents forward progress.
+
+  if (mLog == null) {
+    Log.e(...);
+    return;
+  }
+
+  mLog.trace(...);
+
+56:24-56:49
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 9c886b74_300f414f
+Bytes: 172
+1) Not sure why we want a leading space here.
+2) Similar to elsewhere: prefer to have this information be machine parseable. E.g.
+      mLog.trace("message=% senderUid=%");
+
 59
 Thu Oct 20 07:44:29 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 7c0657a0_c8506fd5
 Bytes: 83
 I thought you were also going to print (as PII) the other contents of the message!?
+
+59
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c0657a0_c8506fd5
+UUID: 9c886b74_b0c7b1f7
+Bytes: 208
+I think Sohani's code here reflects my suggestion that the generic layer only log the known-safe bits. For anything else, I'd rather leave the logging to the class that has the context to understand the data.
 
 84:39-84:45
 Thu Oct 20 07:44:29 2016 +0000
@@ -57,4 +146,14 @@ Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 7c0657a0_283a6b8c
 Bytes: 370
 Is there rest really necessary? I assume they are the cause of modifying the parent class. These are management messages - only sent once at beginning of setup. I'm curious if (1) they ever cause issues, and (2) if you're going to gain any insights from the contents of these messages. I believe that the setup code already prints out errors if the channel isn't set up.
+
+103
+Thu Oct 20 20:24:58 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c0657a0_283a6b8c
+UUID: 9c886b74_10a1dd30
+Bytes: 251
+==etan here. These messages are more about the async-channel setup, than about application-layer work. It's like tracing TCP SYN/FIN versus tracing TCP data.
+
+(Note that removing these changes also eliminates the need for any changes to AsyncChannel.)
 
