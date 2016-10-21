@@ -9,10 +9,26 @@ UUID: 7c8bb7e0_f5e37a1c
 Bytes: 77
 Does this block?  Will it exit both the current state and all of its parents?
 
+199
+Fri Oct 21 06:38:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_f5e37a1c
+UUID: 7cce57f1_d7c966b5
+Bytes: 301
+I found that I can use the halting state (a hidden state in StateMachine that exits the current and all parent states).  This will keep us from having issues with messages coming in while we are trying to clean up.  Thanks for reminding me about this one!  I had forgotten that I wanted to try it out!
+
 205:27-205:32
 Mon Oct 17 17:11:43 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 7c8bb7e0_35ea42f6
 Bytes: 24
 HANDLED and NOT_HANDLED?
+
+205:27-205:32
+Fri Oct 21 06:38:39 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_35ea42f6
+UUID: 7cce57f1_37cf22b9
+Bytes: 4
+Done
 
