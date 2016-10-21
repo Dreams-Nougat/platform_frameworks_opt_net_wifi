@@ -9,6 +9,14 @@ UUID: 7c8bb7e0_3577a2b8
 Bytes: 27
 I guess these can be final?
 
+48
+Fri Oct 21 05:47:49 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_3577a2b8
+UUID: 7cce57f1_d7ccc61d
+Bytes: 4
+Done
+
 70
 Mon Oct 17 17:05:48 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -22,6 +30,14 @@ Inside WifiStateMachinePrime, those should deliver one of CMD_START_* to the sta
 
 Maybe this will become more obvious in later CLs.  If that's the answer, don't spend time justifying it, this is really easy to remove later if it turns out to be unnecessary.  I'll trust whatever you say.
 
+70
+Fri Oct 21 05:47:49 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_95a78ef5
+UUID: 7cce57f1_17df7ec1
+Bytes: 4
+Done
+
 85
 Mon Oct 17 17:05:48 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -29,10 +45,26 @@ UUID: 7c8bb7e0_35c56298
 Bytes: 78
 It isn't obvious to me why you need this (especially since you don't call it).
 
+85
+Fri Oct 21 05:47:49 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_35c56298
+UUID: 7cce57f1_9779aeee
+Bytes: 192
+I was going back and forth about creating the state machine before really needing it.  I decided against this and now I will pull setting the initial state up into the constructor.  good call!
+
 86:12-86:27
 Mon Oct 17 17:05:48 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 7c8bb7e0_b56ad2c7
 Bytes: 41
 Shouldn't this happen in the constructor?
+
+86:12-86:27
+Fri Oct 21 05:47:49 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7c8bb7e0_b56ad2c7
+UUID: 7cce57f1_f77e2ad2
+Bytes: 4
+Done
 
