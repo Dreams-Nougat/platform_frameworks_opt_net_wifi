@@ -1,0 +1,11 @@
+Revision: 750fc0410ef1df2415070fa8b84e8e44c0d6b74c
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiScoreReport.java
+
+158:7-158:51
+Fri Oct 21 22:36:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1c1b9b2a_a9290554
+Bytes: 74
+Could add the name of the variable CMD_RSSI_POLL? that sets this interval.
+
