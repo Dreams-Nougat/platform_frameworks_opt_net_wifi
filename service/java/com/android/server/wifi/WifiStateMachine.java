@@ -1274,7 +1274,14 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             // Trigger an immediate connection to the specified network. We're also noting the user
             // connect choice here, so that it will be considered in the next network selection.
             mWifiConnectivityManager.setUserConnectChoice(netId);
-            startConnectToNetwork(netId, SUPPLICANT_BSSID_ANY);
+            if (SupplicantState.isConnecting(mWifiInfo.getSupplicantState())
+                    && mWifiInfo.getNetworkId() == netId) {
+                // We're already connected to the user specified network, don't trigger a
+                // reconnection.
+                logi("connectToUserSelectNetwork already connecting/connected=" + netId);
+            } else {
+                startConnectToNetwork(netId, SUPPLICANT_BSSID_ANY);
+            }
         }
         return true;
     }
