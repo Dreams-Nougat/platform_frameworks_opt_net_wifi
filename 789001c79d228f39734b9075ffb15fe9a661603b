@@ -37,3 +37,11 @@ Yes, we still need to check if mWifiInfo.getNetworkId() == netId. That's why I o
 
 I also made a comment on adding a check of if (netId == WifiConfiguration.INVALID_NETWORK_ID) at the very beginning of this method. Does it make sense to you?
 
+1277:16-1277:75
+Mon Oct 24 18:05:06 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1c1b9b2a_54b60529
+UUID: 1c1b9b2a_3731cb4f
+Bytes: 152
+That is already handled in enableNetwork call above. It would reject a failure. If the app asks us to connect to an invalid network ID, we'll reject it.
+
