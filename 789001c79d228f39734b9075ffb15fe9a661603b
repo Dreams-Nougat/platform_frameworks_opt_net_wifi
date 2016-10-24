@@ -18,3 +18,11 @@ This check is probably redundant if we sanity check if netId == WifiConfiguratio
             mWifiInfo.setNetworkId(WifiConfiguration.INVALID_NETWORK_ID);
         }
 
+1277:16-1277:75
+Mon Oct 24 17:14:45 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1c1b9b2a_d445f562
+UUID: 1c1b9b2a_d4ba1519
+Bytes: 174
+I've removed the |isConnecting| check. We still need to check if we're connected to the same network. If it's connected to any other network, we need to let user override it.
+
