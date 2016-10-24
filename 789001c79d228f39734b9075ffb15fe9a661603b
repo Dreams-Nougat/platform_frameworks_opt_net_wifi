@@ -26,3 +26,14 @@ UUID: 1c1b9b2a_d4ba1519
 Bytes: 174
 I've removed the |isConnecting| check. We still need to check if we're connected to the same network. If it's connected to any other network, we need to let user override it.
 
+1277:16-1277:75
+Mon Oct 24 17:23:49 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1c1b9b2a_d4ba1519
+UUID: 1c1b9b2a_54b60529
+Bytes: 316
+Yes, we still need to check if mWifiInfo.getNetworkId() == netId. That's why I only highlighted the SupplicantState.isConnecting() part in my last comment.
+
+
+I also made a comment on adding a check of if (netId == WifiConfiguration.INVALID_NETWORK_ID) at the very beginning of this method. Does it make sense to you?
+
