@@ -9,3 +9,11 @@ UUID: 1c1b9b2a_a9290554
 Bytes: 74
 Could add the name of the variable CMD_RSSI_POLL? that sets this interval.
 
+158:7-158:51
+Mon Oct 24 21:51:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1c1b9b2a_a9290554
+UUID: 1c1b9b2a_d474d5f5
+Bytes: 33
+Actually POLL_RSSI_INTERVAL_MSECS
+
