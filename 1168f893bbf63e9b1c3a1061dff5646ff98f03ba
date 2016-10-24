@@ -19,6 +19,14 @@ UUID: 8164840b_07536055
 Bytes: 67
 very much a nit - maybe include units here and the following lines?
 
+66:51-66:55
+Mon Oct 24 23:53:12 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_07536055
+UUID: e147008e_3bf93714
+Bytes: 4
+Done
+
 344:69-344:92
 Mon Oct 24 21:57:18 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -26,10 +34,26 @@ UUID: 8164840b_073cc0f5
 Bytes: 34
 maybe rephrase to "Previous score"
 
+344:69-344:92
+Mon Oct 24 23:53:12 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_073cc0f5
+UUID: e147008e_7bf3bf33
+Bytes: 4
+Done
+
 438:19-438:23
 Mon Oct 24 21:57:18 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 8164840b_e703cc29
 Bytes: 120
 You can create a bug for this and then put the number in the comment.  the short form of the url is fine (b/<bugnumber>)
+
+438:19-438:23
+Mon Oct 24 23:53:12 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_e703cc29
+UUID: e147008e_5bf8830c
+Bytes: 4
+Done
 
