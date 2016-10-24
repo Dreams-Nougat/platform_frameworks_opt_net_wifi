@@ -39,7 +39,7 @@ public class WifiScoreReport {
     // TODO: Understand why these values are used
     private static final int MAX_BAD_LINKSPEED_COUNT = 6;
     private static final int SCAN_CACHE_VISIBILITY_MS = 12000;
-    private static final int HOME_VISIBLE_NETWORK_MAX_COUNT = 6;
+    private static final int HOME_VISIBLE_NETWORK_MAX_COUNT = 6; // TODO: WifiConfiguration says 4
     private static final int SCAN_CACHE_COUNT_PENALTY = 2;
     private static final int AGGRESSIVE_HANDOVER_PENALTY = 6;
     private static final int MIN_SUCCESS_COUNT = 5;
@@ -212,6 +212,9 @@ public class WifiScoreReport {
             currentConfiguration.setVisibility(
                     scanDetailCache.getVisibility(SCAN_CACHE_VISIBILITY_MS));
             if (currentConfiguration.visibility != null) {
+                if (mVerboseLoggingEnabled) {
+                    Log.d(TAG, "visibility=" + currentConfiguration.visibility);
+                }
                 if (currentConfiguration.visibility.rssi24 != WifiConfiguration.INVALID_RSSI
                         && currentConfiguration.visibility.rssi24
                         >= (currentConfiguration.visibility.rssi5 - SCAN_CACHE_COUNT_PENALTY)) {
@@ -447,5 +450,8 @@ public class WifiScoreReport {
         mReport = sb.toString();
         mReportValid = true;
         wifiMetrics.incrementWifiScoreCount(score);
+        if (mVerboseLoggingEnabled) {
+            Log.d(TAG, "mReport " + mReport);
+        }
     }
 }
