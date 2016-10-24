@@ -1,0 +1,35 @@
+Revision: 1168f893bbf63e9b1c3a1061dff5646ff98f03ba
+Patch-set: 2
+File: /COMMIT_MSG
+
+7:0-7:40
+Mon Oct 24 21:57:18 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8164840b_a78ab4a2
+Bytes: 182
+It is a nit (and a personal preference), but I like to put the class name first so it is obvious where the change lives.  So something like:
+WifiScoreReport: Add/update some comments
+
+File: service/java/com/android/server/wifi/WifiScoreReport.java
+
+66:51-66:55
+Mon Oct 24 21:57:18 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8164840b_07536055
+Bytes: 67
+very much a nit - maybe include units here and the following lines?
+
+344:69-344:92
+Mon Oct 24 21:57:18 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8164840b_073cc0f5
+Bytes: 34
+maybe rephrase to "Previous score"
+
+438:19-438:23
+Mon Oct 24 21:57:18 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8164840b_e703cc29
+Bytes: 120
+You can create a bug for this and then put the number in the comment.  the short form of the url is fine (b/<bugnumber>)
+
