@@ -24,6 +24,7 @@ import android.util.Log;
 import android.util.SparseIntArray;
 
 import com.android.server.wifi.hotspot2.NetworkDetail;
+import com.android.server.wifi.WifiMetricsProto;
 import com.android.server.wifi.util.InformationElementUtil;
 import com.android.server.wifi.util.ScanResultUtil;
 

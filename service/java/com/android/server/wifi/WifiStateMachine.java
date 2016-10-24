@@ -109,6 +109,7 @@ import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
 import com.android.server.connectivity.KeepalivePacketData;
 import com.android.server.wifi.hotspot2.Utils;
+import com.android.server.wifi.WifiMetricsProto;
 import com.android.server.wifi.p2p.WifiP2pServiceImpl;
 import com.android.server.wifi.util.TelephonyUtil;
 import com.android.server.wifi.util.TelephonyUtil.SimAuthRequestData;
