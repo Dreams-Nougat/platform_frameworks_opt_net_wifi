@@ -60,22 +60,20 @@ public class WifiPermissionsUtil {
     public boolean canAccessScanResults(String pkgName, int uid,
                 int minVersion) throws SecurityException {
         mAppOps.checkPackage(uid, pkgName);
-        // Location Permission is granted if Location Mode is enabled or if the
-        // caller has Location Permissions
-        boolean mLocationPermission = isLocationModeEnabled(pkgName, minVersion)
-                && checkCallersLocationPermission(pkgName, uid, minVersion);
         if (!checkCallerHasPeersMacAddressPermission(uid)
                 && !isCallerActiveNwScorer(uid)
-                && !mLocationPermission) {
+                && !isLocationModeEnabled(pkgName, minVersion)) {
+            return false;
+        }
+        if (!checkCallerHasPeersMacAddressPermission(uid)
+                && !isCallerActiveNwScorer(uid)
+                && !checkCallersLocationPermission(pkgName, uid, minVersion)) {
             return false;
         }
         if (!isScanAllowedbyApps(pkgName, uid)) {
             return false;
         }
-        if (!isCurrentProfile(uid)) {
-            return false;
-        }
-        if (!checkInteractAcrossUsersFull(uid)) {
+        if (!isCurrentProfile(uid) && !checkInteractAcrossUsersFull(uid)) {
             return false;
         }
         return true;
