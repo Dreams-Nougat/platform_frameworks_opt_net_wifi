@@ -9,6 +9,14 @@ UUID: a19ee87a_6732c656
 Bytes: 139
 The first line of the CL should say what it does, in verb form.  In this case it seems to be "WifiPermissionsUtil: Resolve refactoring bug"
 
+7
+Tue Oct 25 22:45:57 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: a19ee87a_6732c656
+UUID: a19ee87a_35b748bc
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
 
 63
@@ -18,10 +26,26 @@ UUID: a19ee87a_e7aa5625
 Bytes: 83
 It would still be nice to have comments for each of these relatively complex tests.
 
+63
+Tue Oct 25 22:45:57 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: a19ee87a_e7aa5625
+UUID: a19ee87a_d5dedcf5
+Bytes: 4
+Done
+
 70
 Tue Oct 25 22:01:36 2016 +0000
 Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: a19ee87a_07cf7a13
 Bytes: 61
 Could you document logic changes above in the commit message?
+
+70
+Tue Oct 25 22:45:57 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: a19ee87a_07cf7a13
+UUID: a19ee87a_ea221bbe
+Bytes: 83
+Sure, this is actually reverting back to the original code flow before refactoring.
 
