@@ -1,5 +1,28 @@
 Revision: 615f6b0e03fa9313db05e84c4653a162913c4808
 Patch-set: 1
+File: /COMMIT_MSG
+
+9:36-9:38
+Tue Oct 25 02:14:42 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0112549d_64916a2e
+Bytes: 2
+to
+
+10:23-10:30
+Tue Oct 25 02:14:42 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0112549d_a4aa4258
+Bytes: 35
+Do you mean "dumpsys wifi set-..."?
+
+16:6-16:9
+Tue Oct 25 02:14:42 2016 +0000
+Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0112549d_84a74692
+Bytes: 13
+same question
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 5616:20-5616:59
