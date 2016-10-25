@@ -1,0 +1,11 @@
+Revision: 615f6b0e03fa9313db05e84c4653a162913c4808
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+5616:20-5616:59
+Tue Oct 25 01:56:52 2016 +0000
+Author: Lorenzo Colitti <1000835@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0112549d_e48b9afe
+Bytes: 127
+It would seem more natural to put this if statement in the IpManager.Callback object instead (line 1117). But here is fine too.
+
