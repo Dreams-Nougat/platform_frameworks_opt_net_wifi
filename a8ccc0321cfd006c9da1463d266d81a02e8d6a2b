@@ -19,6 +19,14 @@ UUID: e147008e_6f1939ec
 Bytes: 25
 Not WifiScoreReportTests?
 
+7:0-7:34
+Tue Oct 25 04:39:14 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e147008e_6f1939ec
+UUID: e147008e_af5ce133
+Bytes: 47
+Good catch!  WifiScoreReportTest: add unittests
+
 File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
 
 40:4-42:35
