@@ -1,0 +1,8 @@
+Verified+1: Michael Plass <mplass@google.com>
+Code-Review+2: Rebecca Silberstein <silberst@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-by: Michael Plass <mplass@google.com>
+Submitted-at: Tue, 25 Oct 2016 02:10:34 +0000
+Reviewed-on: https://android-review.googlesource.com/292508
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
