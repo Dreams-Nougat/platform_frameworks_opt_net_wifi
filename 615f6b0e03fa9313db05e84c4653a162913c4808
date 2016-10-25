@@ -56,3 +56,11 @@ UUID: 0112549d_e48b9afe
 Bytes: 127
 It would seem more natural to put this if statement in the IpManager.Callback object instead (line 1117). But here is fine too.
 
+5616:20-5616:59
+Tue Oct 25 16:00:57 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0112549d_e48b9afe
+UUID: e147008e_b57ef01d
+Bytes: 273
+It makes sense to me for it to be here.  There is code in other parts of WifiStateMachine that conditionally perform actions due to events.  Some of them involve bookkeeping relative to the current WiFi configuration object, that that may be the direction we go eventually.
+
