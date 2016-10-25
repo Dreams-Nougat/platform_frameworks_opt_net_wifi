@@ -64,3 +64,11 @@ UUID: e147008e_b57ef01d
 Bytes: 273
 It makes sense to me for it to be here.  There is code in other parts of WifiStateMachine that conditionally perform actions due to events.  Some of them involve bookkeeping relative to the current WiFi configuration object, that that may be the direction we go eventually.
 
+5616:20-5616:59
+Tue Oct 25 16:17:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e147008e_b57ef01d
+UUID: e147008e_75e468c8
+Bytes: 182
+Let's chat about what can be pulled out of WifiStateMachine after I get the first phase of the client mode refactor done.  It might be more clear where and how to make a cut on this.
+
