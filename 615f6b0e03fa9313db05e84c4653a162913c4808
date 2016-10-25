@@ -9,6 +9,14 @@ UUID: 0112549d_64916a2e
 Bytes: 2
 to
 
+9:36-9:38
+Tue Oct 25 15:58:42 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0112549d_64916a2e
+UUID: e147008e_2ac55f4a
+Bytes: 4
+Done
+
 10:23-10:30
 Tue Oct 25 02:14:42 2016 +0000
 Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,12 +24,28 @@ UUID: 0112549d_a4aa4258
 Bytes: 35
 Do you mean "dumpsys wifi set-..."?
 
+10:23-10:30
+Tue Oct 25 15:58:42 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0112549d_a4aa4258
+UUID: e147008e_8acab356
+Bytes: 4
+Done
+
 16:6-16:9
 Tue Oct 25 02:14:42 2016 +0000
 Author: Erik Kline <1000451@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 0112549d_84a74692
 Bytes: 13
 same question
+
+16:6-16:9
+Tue Oct 25 15:58:42 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 0112549d_84a74692
+UUID: e147008e_ca9cbb56
+Bytes: 4
+Done
 
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
