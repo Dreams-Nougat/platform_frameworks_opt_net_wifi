@@ -59,6 +59,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiLinkLayerStats;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiScanner;
+import android.net.wifi.hotspot2.PasspointConfiguration;
 import android.os.AsyncTask;
 import android.os.BatteryStats;
 import android.os.Binder;
@@ -1041,6 +1042,24 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     @Override
     public int modifyPasspointManagementObject(String fqdn, List<PasspointManagementObjectDefinition> mos) {
         return mWifiStateMachine.syncModifyPasspointManagementObject(mWifiStateMachineChannel, fqdn, mos);
+    }
+
+    @Override
+    public boolean addPasspointConfiguration(PasspointConfiguration config) {
+        // TO BE IMPLEMENTED.
+        return false;
+    }
+
+    @Override
+    public boolean removePasspointConfiguration(String fqdn) {
+        // TO BE IMPLEMENTED.
+        return false;
+    }
+
+    @Override
+    public List<PasspointConfiguration> getPasspointConfigurations() {
+        // TO BE IMPLEMENTED.
+        return null;
     }
 
     /**
