@@ -1,0 +1,36 @@
+Revision: 4937e9fb437644b08746ead0326964203b398e76
+Patch-set: 3
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+68
+Tue Oct 25 23:20:49 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: a19ee87a_956054ec
+Bytes: 1433
+The way this comment is written makes more sense than the deMorganed version of the code below.  Would it make sense to write out out that way?
+
+    final boolean canUseLocation = checkCallerHasPeersMacAddressPermission(uid)
+            || isCallerActiveNwScorer(uid)
+            || isLocationModeEnabled(pkgName, minVersion);
+
+
+    if (!canUseLocation) {
+        return false;
+    }
+
+From here, it's actually makes it clearer what's going on in the second if statement in a similar manner.  Further, since it's clear that you're using the first two cases of the if-statement, you could consider even go further:
+
+    final bool isUidAllowedLocation  = checkCallerHasPeersMacAddressPermission(uid)
+            || isCallerActiveNwScorer(uid);
+
+    final bool doesSystemAllowLocation = checkCallersLocationPermission(pkgName, uid, minVersion));
+
+    final bool isCallerAllowedLocation = checkCallersLocationPermission(pkgName, uid, minVersion);
+
+    // If the this UID does not inherently have permission, it must either have system-level permission to location, or the caller's package itself must allow it. 
+    if (!isUidAllowedLocation && (!doesSystemAllowLocation || !isCallerAllowedLocation)) {
+        return false;
+    }
+
+You have unit tests to prove out whether this is correct, so you have room to make this more readable, and prevent other people from making mistakes with this logic.  Consider cleaning it up a little more.
+
