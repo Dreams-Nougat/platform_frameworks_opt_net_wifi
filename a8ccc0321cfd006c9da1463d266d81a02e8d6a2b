@@ -11,6 +11,14 @@ nit (and again, personal style)
 
 WifiScoreReport: add unittests
 
+7:0-7:34
+Tue Oct 25 03:46:08 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_8723f0c1
+UUID: e147008e_6f1939ec
+Bytes: 25
+Not WifiScoreReportTests?
+
 File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
 
 40:4-42:35
@@ -20,6 +28,14 @@ UUID: 8164840b_92f80c60
 Bytes: 73
 I think for these you can initialize in setUp() with an initMocks() call.
 
+40:4-42:35
+Tue Oct 25 03:46:08 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_92f80c60
+UUID: e147008e_6f9c99f5
+Bytes: 4
+Done
+
 61:0-61:59
 Mon Oct 24 22:45:12 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -27,12 +43,28 @@ UUID: 8164840b_d2fd244a
 Bytes: 94
 if you use the initMocks call here, then you should be able to delete this and lines 66 and 93
 
+61:0-61:59
+Tue Oct 25 03:46:08 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_d2fd244a
+UUID: e147008e_cf904ddb
+Bytes: 4
+Done
+
 80:4-86:5
 Mon Oct 24 22:45:12 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 8164840b_121b9ce4
 Bytes: 224
 this is good to do for initial development, but we probably don't need it in the submitted code - unless there is something we could test for...  is there a metrics thing we could check to make sure there are not any values?
+
+80:4-86:5
+Tue Oct 25 03:46:08 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_121b9ce4
+UUID: e147008e_0f2875f6
+Bytes: 40
+Yes, this can go away before submission.
 
 99:8-100:29
 Mon Oct 24 22:45:12 2016 +0000
@@ -44,4 +76,12 @@ networkAgent.sendNetworkScore(score);
 
 in the null case, is there something else we can check on?  Ah, how about verifying a call to mWifiMetrics for this line:
 wifiMetrics.incrementWifiScoreCount(score);
+
+99:8-100:29
+Tue Oct 25 03:46:08 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8164840b_323b4034
+UUID: e147008e_ef87099b
+Bytes: 42
+OK, I'll try to figure out how to do that.
 
