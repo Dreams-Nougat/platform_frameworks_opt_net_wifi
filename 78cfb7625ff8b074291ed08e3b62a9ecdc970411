@@ -17,6 +17,14 @@ UUID: 7cce57f1_d7c966b5
 Bytes: 301
 I found that I can use the halting state (a hidden state in StateMachine that exits the current and all parent states).  This will keep us from having issues with messages coming in while we are trying to clean up.  Thanks for reminding me about this one!  I had forgotten that I wanted to try it out!
 
+199
+Tue Oct 25 22:02:30 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 7cce57f1_d7c966b5
+UUID: a19ee87a_caaf5733
+Bytes: 282
+So the halting state didn't end up working out.  It is using exit() on the current state, which will then call stop for the active mode manager (if there is one).  I will make these blocking calls to avoid odd transitions between states with all of the teardown intermediate states.
+
 205:27-205:32
 Mon Oct 17 17:11:43 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
