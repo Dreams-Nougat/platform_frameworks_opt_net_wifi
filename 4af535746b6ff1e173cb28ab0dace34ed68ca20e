@@ -1,0 +1,11 @@
+Revision: 4af535746b6ff1e173cb28ab0dace34ed68ca20e
+Patch-set: 7
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+74:69-74:80
+Wed Oct 26 17:26:16 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_ec7cb32a
+Bytes: 242
+"return true" is not what you're doing.  Also, since the code literally says "return false", it might be worth paraphrasing the intent of that action instead of literally what it does.  For example "deny access", or "location is not allowed".
+
