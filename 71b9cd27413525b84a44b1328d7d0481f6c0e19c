@@ -1,0 +1,18 @@
+Revision: 71b9cd27413525b84a44b1328d7d0481f6c0e19c
+Patch-set: 10
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+69:11-69:19
+Wed Oct 26 21:52:48 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_dff18cc6
+Bytes: 16
+typo - Otherwise
+
+73:16-73:65
+Wed Oct 26 21:52:48 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_dfda2c34
+Bytes: 144
+will checkstyle let you indent this another 8?  with the || and && lined up, it is a little harder to parse (but the comment definitely helps!).
+
