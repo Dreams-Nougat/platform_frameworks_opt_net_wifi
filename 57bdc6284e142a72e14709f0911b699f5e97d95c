@@ -1,0 +1,123 @@
+Revision: 57bdc6284e142a72e14709f0911b699f5e97d95c
+Patch-set: 3
+File: service/java/com/android/server/wifi/util/WifiAsyncChannel.java
+
+42
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_c1941893
+Bytes: 364
+I believe an explicit call to the parent-class ctor is only needed when we need to provide parameters. So this line can be deleted.
+
+"If a constructor does not explicitly invoke a superclass constructor, the Java compiler automatically inserts a call to the no-argument constructor of the superclass."
+
+https://docs.oracle.com/javase/tutorial/java/IandI/super.html
+
+52
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_a15124da
+Bytes: 832
+This comment is overly verbose, or perhaps entirely unneeded. 
+
+Personally, I think "fetchOrInitLog()" strongly implies that we're trying to do work lazily. Hence, there's no need for a comment that explains that we're trying to do work lazily.
+
+If you don't buy that argument, I still think a much shorter comment will suffice:
+
+  // Lazy-initialize |mLog|.
+
+
+If it seems odd that I'm arguing for fewer comments, here's my rationale:
+- comments are a way of explaining things that the code
+  itself does not
+- it's better to make the code obvious (where possible)
+- where comments are necessary, they should be short enough for people to actually read. 
+- where long comments are necessary, they should use the "inverted-pyramid" style. e.g.
+
+  // Not safe for [use-case].
+  //
+  // [explanation of why, for people who really care]
+
+54:12-54:40
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_213eb47f
+Bytes: 119
+Not sure we need this local variable. Can we just chain the calls together?
+
+  WifiInjector.getInstance().makeLog(mTag)
+
+67:43-67:44
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_a1df6422
+Bytes: 611
+Hopefully not contradicting myself here, but I actually would use a space here, rather than a comma.
+
+Basically, I'm thinking of these as separate fields:
+  [action] [message] [sender]
+
+Now, strictly speaking, we might argue that these are not independent. [message] and [sender] are properties of [action]. But, in that case, the logical grouping would be more like
+
+  sendMessage,{message=% sendingUid=%}
+
+Since both |message|, and |sendingUid| are properties of the action.
+
+But that gets too hard to work with (using command-line tools). Hence the preference for just
+
+  "sendMessage message=% sendingUid=%"
+
+83:38-83:39
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_21b194e8
+Bytes: 14
+As at line 67.
+
+83:66-83:67
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_6c89c306
+Bytes: 161
+As earlier: avoid spaces, as they make machine-processing the messages harder. Here, you might consider
+
+  "replyToMessage inMessage=% sendingUid=% outMessage=%"
+
+86:16-86:31
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_ec9b13fc
+Bytes: 301
+Do we also want to log the uid for the outbound message?
+
+At first, I'd assumed not. But then I saw that we _do_ log the uid for an outbound message in sendMessage() and sendMessageSynchronously(). And I don't why replyToMessage should be different than the other two, w.r.t. logging the outbound uid.
+
+99:56-99:57
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_eccaf336
+Bytes: 14
+As at line 67.
+
+104:57-104:58
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_6cc1c3e7
+Bytes: 14
+As at line 67.
+
+104:32-104:57
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_cc73af0c
+Bytes: 320
+Prefer to stick with the pattern you have, of naming the trace message to mirror the method name. Granted, you've got two trace message here, but we can distinguish them in other ways. E.g.
+
+  sendMessageSynchronously.send
+  sendMessageSynchronously.recv
+
+Or
+
+  sendMessageSynchronously.out
+  sendMessageSynchronously.in
+
