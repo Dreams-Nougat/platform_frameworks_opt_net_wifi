@@ -78,6 +78,14 @@ Concretely, consider something like
 
 The dot syntax, and the change in ordering, conveys the idea that the async channel is part of the service, by borrowing from the syntax we use in source code itself.
 
+45:15-45:45
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 9c886b74_703e29f3
+UUID: 810004b4_8197c02e
+Bytes: 59
+Looks like this is done? (If so, please reply with "Done".)
+
 48
 Thu Oct 20 07:44:29 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -134,6 +142,14 @@ or even
     fetchOrInitLog().trace(...).c(msg.what)...;
   }
 
+49:0-54:9
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 9c886b74_302e61ee
+UUID: 21a03809_d63fba1b
+Bytes: 59
+Looks like this is done? (If so, please reply with "Done".)
+
 55:8-55:27
 Thu Oct 20 20:24:58 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -149,6 +165,14 @@ However, if you keep the else clause, prefer to reverse the ordering of the clau
   }
 
   mLog.trace(...);
+
+55:8-55:27
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 9c886b74_10ac7d40
+UUID: 810004b4_e1a79ca2
+Bytes: 59
+Looks like this is done? (If so, please reply with "Done".)
 
 56:24-56:49
 Thu Oct 20 20:24:58 2016 +0000
@@ -213,6 +237,14 @@ UUID: fc7c072f_a1620453
 Bytes: 67
 We could potentially log the message we are responding too as well.
 
+84:39-84:45
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: fc7c072f_a1620453
+UUID: 810004b4_61bb8cc6
+Bytes: 59
+Looks like this is done? (If so, please reply with "Done".)
+
 100:15-100:29
 Thu Oct 20 07:44:29 2016 +0000
 Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -236,4 +268,12 @@ Bytes: 251
 ==etan here. These messages are more about the async-channel setup, than about application-layer work. It's like tracing TCP SYN/FIN versus tracing TCP data.
 
 (Note that removing these changes also eliminates the need for any changes to AsyncChannel.)
+
+103
+Wed Oct 26 17:44:25 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 9c886b74_10a1dd30
+UUID: 810004b4_2c534b56
+Bytes: 171
+Sohani: any more thoughts here? Etan and I both wonder if these log messages will actually be useful. I think we both argue that we can do without this part of the change.
 
