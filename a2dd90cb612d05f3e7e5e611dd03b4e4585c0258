@@ -9,6 +9,14 @@ UUID: 8b6c9a82_9b1c1483
 Bytes: 106
 We should probably declare constants for these bundle keys. You can take it up in a separate CL if u want.
 
+5402:60-5402:65
+Wed Oct 26 21:53:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_9b1c1483
+UUID: 810004b4_1fcae458
+Bytes: 8
+Will do.
+
 File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
 
 43:40-43:72
@@ -19,4 +27,12 @@ Bytes: 449
 This is left to your preference. 
 You could have a private member variable for handling the callbacks instead of extending this class and passing that member to the PasspointEventHandler constructor. I kind of feel confused when the main class is also implementing a bunch of other interfaces. Then you also don't need to add the extra comments below to clarify what these methods are doing.
 /** Implementation of PasspointEventHandler.Callbacks. */
+
+43:40-43:72
+Wed Oct 26 21:53:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8b6c9a82_3b00880d
+UUID: 810004b4_9fdd54c8
+Bytes: 22
+I agreed, will update.
 
