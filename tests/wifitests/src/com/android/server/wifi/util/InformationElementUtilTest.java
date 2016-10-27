@@ -260,7 +260,7 @@ public class InformationElementUtilTest {
 
         String result = InformationElementUtil.Capabilities.buildCapabilities(ies, beaconCap);
 
-        assertEquals("[WPA2-PSK]", result);
+        assertEquals("[WPA2-PSK][GROUP_TKIP][PAIRWISE_CCMP+PAIRWISE_TKIP]", result);
     }
 
     /**
@@ -286,7 +286,7 @@ public class InformationElementUtilTest {
 
         String result = InformationElementUtil.Capabilities.buildCapabilities(ies, beaconCap);
 
-        assertEquals("[WPA-PSK]", result);
+        assertEquals("[WPA-PSK][GROUP_TKIP][PAIRWISE_CCMP+PAIRWISE_TKIP]", result);
     }
 
     /**

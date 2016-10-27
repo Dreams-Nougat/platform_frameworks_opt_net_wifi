@@ -18,6 +18,7 @@ package com.android.server.wifi.util;
 import static com.android.server.wifi.anqp.Constants.getInteger;
 
 import android.net.wifi.ScanResult.InformationElement;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.server.wifi.anqp.Constants;
@@ -321,6 +322,18 @@ public class InformationElementUtil {
         private static final int WPA2_AKM_EAP_SHA256 = 0x05ac0f00;
         private static final int WPA2_AKM_PSK_SHA256 = 0x06ac0f00;
 
+        private static final int WPA_CIPHER_NONE = 0x00f25000;
+        private static final int WPA_CIPHER_WEP40 = 0x01f25000;
+        private static final int WPA_CIPHER_TKIP = 0x02f25000;
+        private static final int WPA_CIPHER_CCMP = 0x04f25000;
+        private static final int WPA_CIPHER_WEP140 = 0x05f25000;
+
+        private static final int RSN_CIPHER_NONE = 0x00ac0f00;
+        private static final int RSN_CIPHER_WEP40 = 0x01ac0f00;
+        private static final int RSN_CIPHER_TKIP = 0x02ac0f00;
+        private static final int RSN_CIPHER_CCMP = 0x04ac0f00;
+        private static final int RSN_CIPHER_WEP140 = 0x05ac0f00;
+
         public Capabilities() {
         }
 
@@ -328,6 +341,8 @@ public class InformationElementUtil {
         //
         // | Element ID | Length | Version | Group Data Cipher Suite |
         //      1           1         2                 4
+        // | Group Cipher Suite |
+        //           4
         // | Pairwise Cipher Suite Count | Pairwise Cipher Suite List |
         //              2                            4 * m
         // | AKM Suite Count | AKM Suite List | RSN Capabilities |
@@ -347,20 +362,20 @@ public class InformationElementUtil {
                     return null;
                 }
 
-                // group data cipher suite
-                // here we simply advance the buffer position
-                buf.getInt();
-
                 // found the RSNE IE, hence start building the capability string
                 String security = "[WPA2";
 
+                String group_cipher = "";
+                // group data cipher suite
+                group_cipher += "GROUP_" + rsnCipherToString(buf.getInt());
+
+                String pairwise_cipher = "";
                 // pairwise cipher suite count
                 short cipherCount = buf.getShort();
-
-                // pairwise cipher suite list
+                // pairwise chipher suite list
                 for (int i = 0; i < cipherCount; i++) {
-                    // here we simply advance the buffer position
-                    buf.getInt();
+                    if (i != 0) pairwise_cipher += "+";
+                    pairwise_cipher += "PAIRWISE_" + rsnCipherToString(buf.getInt());
                 }
 
                 // AKM
@@ -407,11 +422,46 @@ public class InformationElementUtil {
 
                 // we parsed what we want at this point
                 security += "]";
+                if (!TextUtils.isEmpty(group_cipher)) {
+                    security += "[" + group_cipher + "]";
+                }
+                if (!TextUtils.isEmpty(pairwise_cipher)) {
+                    security += "[" + pairwise_cipher + "]";
+                }
+
                 return security;
             } catch (BufferUnderflowException e) {
                 Log.e("IE_Capabilities", "Couldn't parse RSNE, buffer underflow");
                 return null;
             }
+        }
+
+        private static String wpaCipherToString(int cipher) {
+            switch (cipher) {
+                case WPA_CIPHER_WEP40:
+                    return "WEP40";
+                case WPA_CIPHER_WEP140:
+                    return "WEP140";
+                case WPA_CIPHER_TKIP:
+                    return "TKIP";
+                case WPA_CIPHER_CCMP:
+                    return "CCMP";
+            }
+            return "?";
+        }
+
+        private static String rsnCipherToString(int cipher) {
+            switch (cipher) {
+                case RSN_CIPHER_WEP40:
+                    return "WEP40";
+                case RSN_CIPHER_WEP140:
+                    return "WEP140";
+                case RSN_CIPHER_TKIP:
+                    return "TKIP";
+                case RSN_CIPHER_CCMP:
+                    return "CCMP";
+            }
+            return "?";
         }
 
         private static boolean isWpaOneElement(InformationElement ie) {
@@ -430,6 +480,8 @@ public class InformationElementUtil {
         //
         // | Element ID | Length | OUI | Type | Version |
         //      1           1       3     1        2
+        // | Group Cipher Suite |
+        //           4
         // | Pairwise Cipher Suite Count | Pairwise Cipher Suite List |
         //              2                            4 * m
         // | AKM Suite Count | AKM Suite List |
@@ -455,17 +507,17 @@ public class InformationElementUtil {
                     return null;
                 }
 
+                String group_cipher = "";
                 // group data cipher suite
-                // here we simply advance buffer position
-                buf.getInt();
+                group_cipher += "GROUP_" + wpaCipherToString(buf.getInt());
 
+                String pairwise_cipher = "";
                 // pairwise cipher suite count
                 short cipherCount = buf.getShort();
-
                 // pairwise chipher suite list
                 for (int i = 0; i < cipherCount; i++) {
-                    // here we simply advance buffer position
-                    buf.getInt();
+                    if (i != 0) pairwise_cipher += "+";
+                    pairwise_cipher += "PAIRWISE_" + wpaCipherToString(buf.getInt());
                 }
 
                 // AKM
@@ -496,6 +548,13 @@ public class InformationElementUtil {
 
                 // we parsed what we want at this point
                 security += "]";
+                if (!TextUtils.isEmpty(group_cipher)) {
+                    security += "[" + group_cipher + "]";
+                }
+                if (!TextUtils.isEmpty(pairwise_cipher)) {
+                    security += "[" + pairwise_cipher + "]";
+                }
+
                 return security;
             } catch (BufferUnderflowException e) {
                 Log.e("IE_Capabilities", "Couldn't parse type 1 WPA, buffer underflow");
