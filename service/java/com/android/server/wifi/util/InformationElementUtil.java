@@ -321,6 +321,16 @@ public class InformationElementUtil {
         private static final int WPA2_AKM_EAP_SHA256 = 0x05ac0f00;
         private static final int WPA2_AKM_PSK_SHA256 = 0x06ac0f00;
 
+        private static final int WPA_CIPHER_WEP40 = 0x01f25000;
+        private static final int WPA_CIPHER_TKIP = 0x02f25000;
+        private static final int WPA_CIPHER_CCMP = 0x04f25000;
+        private static final int WPA_CIPHER_WEP140 = 0x05f25000;
+
+        private static final int RSN_CIPHER_WEP40 = 0x01ac0f00;
+        private static final int RSN_CIPHER_TKIP = 0x02ac0f00;
+        private static final int RSN_CIPHER_CCMP = 0x04ac0f00;
+        private static final int RSN_CIPHER_WEP140 = 0x05ac0f00;
+
         public Capabilities() {
         }
 
@@ -328,6 +338,8 @@ public class InformationElementUtil {
         //
         // | Element ID | Length | Version | Group Data Cipher Suite |
         //      1           1         2                 4
+        // | Group Cipher Suite |
+        //           4
         // | Pairwise Cipher Suite Count | Pairwise Cipher Suite List |
         //              2                            4 * m
         // | AKM Suite Count | AKM Suite List | RSN Capabilities |
@@ -347,20 +359,19 @@ public class InformationElementUtil {
                     return null;
                 }
 
-                // group data cipher suite
-                // here we simply advance the buffer position
-                buf.getInt();
-
                 // found the RSNE IE, hence start building the capability string
                 String security = "[WPA2";
 
+                // group data cipher suite
+                security += "-GROUP_" + rsnCipherToString(buf.getInt());
+
+
                 // pairwise cipher suite count
                 short cipherCount = buf.getShort();
-
                 // pairwise cipher suite list
                 for (int i = 0; i < cipherCount; i++) {
-                    // here we simply advance the buffer position
-                    buf.getInt();
+                    security +=  (i == 0) ? "-" : "+";
+                    security += "PAIRWISE_" + rsnCipherToString(buf.getInt());
                 }
 
                 // AKM
@@ -414,6 +425,34 @@ public class InformationElementUtil {
             }
         }
 
+        private static String wpaCipherToString(int cipher) {
+            switch (cipher) {
+                case WPA_CIPHER_WEP40:
+                    return "WEP40";
+                case WPA_CIPHER_WEP140:
+                    return "WEP140";
+                case WPA_CIPHER_TKIP:
+                    return "TKIP";
+                case WPA_CIPHER_CCMP:
+                    return "CCMP";
+            }
+            return "?";
+        }
+
+        private static String rsnCipherToString(int cipher) {
+            switch (cipher) {
+                case RSN_CIPHER_WEP40:
+                    return "WEP40";
+                case RSN_CIPHER_WEP140:
+                    return "WEP140";
+                case RSN_CIPHER_TKIP:
+                    return "TKIP";
+                case RSN_CIPHER_CCMP:
+                    return "CCMP";
+            }
+            return "?";
+        }
+
         private static boolean isWpaOneElement(InformationElement ie) {
             ByteBuffer buf = ByteBuffer.wrap(ie.bytes).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -430,6 +469,8 @@ public class InformationElementUtil {
         //
         // | Element ID | Length | OUI | Type | Version |
         //      1           1       3     1        2
+        // | Group Cipher Suite |
+        //           4
         // | Pairwise Cipher Suite Count | Pairwise Cipher Suite List |
         //              2                            4 * m
         // | AKM Suite Count | AKM Suite List |
@@ -456,16 +497,14 @@ public class InformationElementUtil {
                 }
 
                 // group data cipher suite
-                // here we simply advance buffer position
-                buf.getInt();
+                security += "-GROUP_" + wpaCipherToString(buf.getInt());
 
                 // pairwise cipher suite count
                 short cipherCount = buf.getShort();
-
                 // pairwise chipher suite list
                 for (int i = 0; i < cipherCount; i++) {
-                    // here we simply advance buffer position
-                    buf.getInt();
+                    security +=  (i == 0) ? "-" : "+";
+                    security += "PAIRWISE_" + wpaCipherToString(buf.getInt());
                 }
 
                 // AKM
