@@ -706,8 +706,12 @@ public class WifiNative {
                                     beaconCapBits.set(i);
                                 }
                             }
-                            flags = InformationElementUtil.Capabilities.
-                                buildCapabilities(infoElements, beaconCapBits);
+
+                            InformationElementUtil.Capabilities capabilities =
+                                    new InformationElementUtil.Capabilities();
+                            capabilities.from(infoElements, beaconCapBits);
+                            flags = capabilities.generateCapabilitiesString();
+                            Log.d(TAG, "NYWANG:" + wifiSsid + ":" + flags);
                             ScanDetail scan = new ScanDetail(networkDetail, wifiSsid, bssid, flags,
                                     level, freq, tsf, infoElements, anqpLines);
                             results.add(scan);
@@ -1843,8 +1847,10 @@ public class WifiNative {
                 beaconCapBits.set(i);
             }
         }
-        result.capabilities = InformationElementUtil.Capabilities.buildCapabilities(elements,
-                                               beaconCapBits);
+        InformationElementUtil.Capabilities capabilities =
+                new InformationElementUtil.Capabilities();
+        capabilities.from(elements, beaconCapBits);
+        result.capabilities = capabilities.generateCapabilitiesString();
 
         if(DBG) {
             Log.d(TAG, dbg + "SSID: " + result.SSID + " ChannelWidth is: " + result.channelWidth
