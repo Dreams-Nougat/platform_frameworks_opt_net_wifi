@@ -9,10 +9,26 @@ UUID: 810004b4_dff18cc6
 Bytes: 16
 typo - Otherwise
 
+69:11-69:19
+Thu Oct 27 15:56:11 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_dff18cc6
+UUID: 810004b4_cd727f03
+Bytes: 4
+Done
+
 73:16-73:65
 Wed Oct 26 21:52:48 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 810004b4_dfda2c34
 Bytes: 144
 will checkstyle let you indent this another 8?  with the || and && lined up, it is a little harder to parse (but the comment definitely helps!).
+
+73:16-73:65
+Thu Oct 27 15:56:11 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_dfda2c34
+UUID: 810004b4_ad6f4b16
+Bytes: 54
+CheckStyle seems to have no problem either ways. Done.
 
