@@ -14,3 +14,11 @@ can Context be treated like the other class variables?  Can we do:
 and after the initMocks(this) call then have:
 when(mContext.getResources()).thenReturn(mResources);
 
+63:0-63:39
+Tue Oct 25 16:33:40 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e147008e_cf884d70
+UUID: e147008e_b5df10bf
+Bytes: 34
+Yes, but why would that be better?
+
