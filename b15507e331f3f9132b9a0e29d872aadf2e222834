@@ -30,3 +30,11 @@ UUID: e147008e_355b0011
 Bytes: 114
 I don't think you will need the MockResources object - we should be able to return anything we need using Mockito.
 
+63:0-63:39
+Fri Oct 28 23:31:02 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e147008e_355b0011
+UUID: 663c06f3_53d8643a
+Bytes: 63
+Done in patchset 4. Had to mock the 11 resources that are used.
+
