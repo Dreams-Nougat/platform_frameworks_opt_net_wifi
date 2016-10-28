@@ -13,10 +13,26 @@ Bytes: 321
 
   protected void logOutboundMessage(Message msg) { return; }
 
+108
+Fri Oct 28 20:48:50 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_8522a6d4
+UUID: 663c06f3_6595e286
+Bytes: 573
+the key reason for overriding this method is the msg.obj = this statement on line 113. If this is not overridden, then the response object cannot be typecasted as WifiAsyncChannel. Those that typecast it as AsyncChannel, will still be able to use it but they won't have the logging mechanism.For reference, in WifiP2pServiceImpl, search for HALF_CONNECTED and you will see that it can be type casted into WifiAsyncChannel  because of this code. The reason we had to copy the entire code of this method is because that msg.obj had to be updated and its right in the  middle.
+
 133
 Fri Oct 28 20:36:16 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 663c06f3_a52d2aae
 Bytes: 28
 Same comment as at line 108.
+
+133
+Fri Oct 28 20:48:50 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_a52d2aae
+UUID: 663c06f3_c5894e76
+Bytes: 13
+Same as above
 
