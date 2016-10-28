@@ -12,6 +12,18 @@ Let's match wpa_supplicant's format. Below are some example from running wpa_cli
 [WPA2-PSK-CCMP][WPS][ESS]
 [WPA2-EAP+FT/EAP-CCMP][ESS][P2P][HS20]
 
+11:0-11:42
+Fri Oct 28 20:22:55 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_62931834
+UUID: 663c06f3_854bc69e
+Bytes: 411
+It seems that wpa supplicant only put pairwise cihper here:
+http://cs/android/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface.c?l=2448&rcl=2bbbbe6a01a24e3c7bf13c64851f4130125ff8d5
+
+However framework need both pairwise and group cipher.
+Per offline discussion, we decide to have some additional fields in ScanDetail to store these cipher information, while keep this capabilities string a "supplicant" style.
+
 File: service/java/com/android/server/wifi/util/InformationElementUtil.java
 
 371:29-371:30
