@@ -1,0 +1,11 @@
+Revision: abe531e40065051df284efbb5684d98af242dbff
+Patch-set: 3
+File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
+
+90:0-91:66
+Fri Oct 28 23:31:02 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_87e7d068
+Bytes: 70
+This is just me trying out this mockito pattern. Doesn't need to stay.
+
