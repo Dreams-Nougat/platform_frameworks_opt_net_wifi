@@ -22,3 +22,11 @@ UUID: e147008e_b5df10bf
 Bytes: 34
 Yes, but why would that be better?
 
+63:0-63:39
+Tue Oct 25 17:11:09 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: e147008e_b5df10bf
+UUID: e147008e_355b0011
+Bytes: 114
+I don't think you will need the MockResources object - we should be able to return anything we need using Mockito.
+
