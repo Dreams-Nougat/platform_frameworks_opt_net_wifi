@@ -1,0 +1,23 @@
+Revision: d6746ef87fc4b1a4c5f06f22bdf7ea12d16b026b
+Patch-set: 4
+File: /COMMIT_MSG
+
+11:0-11:42
+Fri Oct 28 18:36:15 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_62931834
+Bytes: 170
+Let's match wpa_supplicant's format. Below are some example from running wpa_cli:scan_results on Angler:
+
+[WPA2-PSK-CCMP][WPS][ESS]
+[WPA2-EAP+FT/EAP-CCMP][ESS][P2P][HS20]
+
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+371:29-371:30
+Fri Oct 28 18:36:15 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: a16b489a_b1aeabc9
+Bytes: 29
+Remove the letter 'h' please.
+
