@@ -1,0 +1,25 @@
+Revision: 24cf29e1b100a8f68c61d91ed65047557d561f19
+Patch-set: 3
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+370:32-370:40
+Fri Oct 28 00:22:49 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 81ce44ee_f216352d
+Bytes: 187
+What about move this "GROUP_" to 'String group_cipher = "GROUP_"' so they style is consistent with how we parse other information. If "GROUP" is always there, can we start with "[GROUP_"?
+
+425:21-425:52
+Fri Oct 28 00:22:49 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 81b56446_ede302bf
+Bytes: 88
+String 'group_cipher' cannot be empty since on line 370 it always starts with " GROUP_".
+
+450:12-450:23
+Fri Oct 28 00:22:49 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: c1667cd0_0160e9bb
+Bytes: 55
+Nit: add 'default: return "?"' to the switch statement?
+
