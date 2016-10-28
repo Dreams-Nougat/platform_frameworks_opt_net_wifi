@@ -13,6 +13,14 @@ I believe an explicit call to the parent-class ctor is only needed when we need 
 
 https://docs.oracle.com/javase/tutorial/java/IandI/super.html
 
+42
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_c1941893
+UUID: 810004b4_9239cc08
+Bytes: 4
+Done
+
 52
 Wed Oct 26 17:44:25 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -38,6 +46,14 @@ If it seems odd that I'm arguing for fewer comments, here's my rationale:
   //
   // [explanation of why, for people who really care]
 
+52
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_a15124da
+UUID: 810004b4_720b5840
+Bytes: 4
+Done
+
 54:12-54:40
 Wed Oct 26 17:44:25 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -46,6 +62,14 @@ Bytes: 119
 Not sure we need this local variable. Can we just chain the calls together?
 
   WifiInjector.getInstance().makeLog(mTag)
+
+54:12-54:40
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_213eb47f
+UUID: 810004b4_72e4f863
+Bytes: 4
+Done
 
 67:43-67:44
 Wed Oct 26 17:44:25 2016 +0000
@@ -67,6 +91,14 @@ But that gets too hard to work with (using command-line tools). Hence the prefer
 
   "sendMessage message=% sendingUid=%"
 
+67:43-67:44
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_a1df6422
+UUID: 810004b4_d21d047d
+Bytes: 4
+Done
+
 83:38-83:39
 Wed Oct 26 17:44:25 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -83,6 +115,14 @@ As earlier: avoid spaces, as they make machine-processing the messages harder. H
 
   "replyToMessage inMessage=% sendingUid=% outMessage=%"
 
+83:66-83:67
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_6c89c306
+UUID: 810004b4_b22210bd
+Bytes: 4
+Done
+
 86:16-86:31
 Wed Oct 26 17:44:25 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -92,12 +132,28 @@ Do we also want to log the uid for the outbound message?
 
 At first, I'd assumed not. But then I saw that we _do_ log the uid for an outbound message in sendMessage() and sendMessageSynchronously(). And I don't why replyToMessage should be different than the other two, w.r.t. logging the outbound uid.
 
+86:16-86:31
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_ec9b13fc
+UUID: 81b56446_6d80b244
+Bytes: 98
+As per discussion, we only have uid of the received messages since the binder populates the field.
+
 99:56-99:57
 Wed Oct 26 17:44:25 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 810004b4_eccaf336
 Bytes: 14
 As at line 67.
+
+99:56-99:57
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_eccaf336
+UUID: 810004b4_f22c88b0
+Bytes: 4
+Done
 
 104:57-104:58
 Wed Oct 26 17:44:25 2016 +0000
@@ -120,4 +176,12 @@ Or
 
   sendMessageSynchronously.out
   sendMessageSynchronously.in
+
+104:32-104:57
+Fri Oct 28 16:40:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_cc73af0c
+UUID: 810004b4_322f20a3
+Bytes: 4
+Done
 
