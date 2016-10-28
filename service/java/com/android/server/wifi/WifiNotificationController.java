@@ -137,6 +137,8 @@ final class WifiNotificationController {
                                     case CAPTIVE_PORTAL_CHECK:
                                         resetNotification();
                                         break;
+                                    default:
+                                        break;
                                 }
                             }
                         } else if (intent.getAction().equals(
