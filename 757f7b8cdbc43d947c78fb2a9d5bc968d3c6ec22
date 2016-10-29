@@ -1,0 +1,84 @@
+Revision: 757f7b8cdbc43d947c78fb2a9d5bc968d3c6ec22
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiScoreReport.java
+
+42:68-42:72
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_942772ce
+Bytes: 68
+please file a bug for this (and you can include the bug number here)
+
+File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
+
+60:24-60:27
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_d430da03
+Bytes: 99
+are these values from another file?  Maybe we should refer to those constants (if they are defined)
+
+91:4-92:7
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_742c6eb2
+Bytes: 14
+add blank line
+
+105:8-106:25
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_b42d56ae
+Bytes: 48
+These should probably be constants for the class
+
+128:7-128:31
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_143b62e6
+Bytes: 286
+One thing we are trying to start doing is to add details for the test in the comment.  Add things like:
+Test that setup succeeds.
+1. step 1 that does ___
+2. step 2 that does ____
+3. call calculate score (or whatever step n is).
+
+Expect: callback for Network agent should be called once.
+
+135:30-135:40
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_f437def5
+Bytes: 83
+If this is only one time, then we should see times(1) - i think that is the syntax.
+
+145:0-145:38
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_5444ca67
+Bytes: 107
+You shouldn't need to do this here.  You can just use mWifiInfo. (same for mNetworkAgent and mWifiMetrics).
+
+151:29-151:39
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_34494680
+Bytes: 155
+I think this should be times(1) - or actually.  it might default to times(1)...
+
+(also for other places where a method should only be called once in tests)
+
+165:36-165:53
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_7443ce5d
+Bytes: 39
+can we also test for an invalid report?
+
+186:29-186:39
+Sat Oct 29 05:19:27 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 663c06f3_943e52d0
+Bytes: 27
+this one should be times(8)
+
