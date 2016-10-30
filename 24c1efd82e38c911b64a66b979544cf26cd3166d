@@ -1,0 +1,27 @@
+Revision: 24c1efd82e38c911b64a66b979544cf26cd3166d
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiNative.java
+
+714:39-714:48
+Sun Oct 30 19:52:18 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_4be0d9b5
+Bytes: 12
+What's this?
+
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+377:28-377:35
+Sun Oct 30 19:52:18 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_4bc9b945
+Bytes: 6
+cipher
+
+578:16-578:45
+Sun Oct 30 19:52:18 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_2beb9d9d
+Bytes: 81
+Is this if statement needed given that the for() loop check keyManagement.size()?
+
