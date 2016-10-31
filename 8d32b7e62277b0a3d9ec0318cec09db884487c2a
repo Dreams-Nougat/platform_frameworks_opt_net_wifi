@@ -2,6 +2,13 @@ Revision: 8d32b7e62277b0a3d9ec0318cec09db884487c2a
 Patch-set: 5
 File: service/java/com/android/server/wifi/util/WifiAsyncChannel.java
 
+44:20-44:25
+Mon Oct 31 15:51:10 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_8ea73f94
+Bytes: 8
+nit: get
+
 108
 Fri Oct 28 20:36:16 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
