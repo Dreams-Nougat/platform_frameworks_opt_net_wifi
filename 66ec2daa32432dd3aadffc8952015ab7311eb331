@@ -1,0 +1,18 @@
+Revision: 66ec2daa32432dd3aadffc8952015ab7311eb331
+Patch-set: 6
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+348:0-349:22
+Mon Oct 31 17:27:00 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_99806be1
+Bytes: 142
+We already have the "Group Data Cipher Suite" above. 802.11 specs 8.4.2.27 calls it "Group Data Cipher Suite" instead of "Group Cipher Suite".
+
+465:13-465:31
+Mon Oct 31 17:27:00 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2675ae07_796acf2f
+Bytes: 24
+Group Data Cipher Suite?
+
