@@ -18,6 +18,14 @@ UUID: 663c06f3_d430da03
 Bytes: 99
 are these values from another file?  Maybe we should refer to those constants (if they are defined)
 
+60:24-60:27
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_d430da03
+UUID: 2675ae07_6eb4c387
+Bytes: 136
+The values come from an XML config file. I'll add a comment to that effect, but I don't think we want to load the config in a unit test.
+
 91:4-92:7
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -25,12 +33,28 @@ UUID: 663c06f3_742c6eb2
 Bytes: 14
 add blank line
 
+91:4-92:7
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_742c6eb2
+UUID: 2675ae07_1477e2f7
+Bytes: 4
+Done
+
 105:8-106:25
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 663c06f3_b42d56ae
 Bytes: 48
 These should probably be constants for the class
+
+105:8-106:25
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_b42d56ae
+UUID: 2675ae07_149e02f0
+Bytes: 201
+If they mattered to the test, that would sense, but I only declared them to give names to the otherwise mysterious arguments. I may end up mocking the detail cache anyway, so I'm leaving these for now.
 
 128:7-128:31
 Sat Oct 29 05:19:27 2016 +0000
@@ -45,6 +69,14 @@ Test that setup succeeds.
 
 Expect: callback for Network agent should be called once.
 
+128:7-128:31
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_143b62e6
+UUID: 2675ae07_34469e98
+Bytes: 27
+OK, I'll keep that in mind.
+
 135:30-135:40
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -52,12 +84,28 @@ UUID: 663c06f3_f437def5
 Bytes: 83
 If this is only one time, then we should see times(1) - i think that is the syntax.
 
+135:30-135:40
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_f437def5
+UUID: 2675ae07_b451ae4a
+Bytes: 4
+Done
+
 145:0-145:38
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 663c06f3_5444ca67
 Bytes: 107
 You shouldn't need to do this here.  You can just use mWifiInfo. (same for mNetworkAgent and mWifiMetrics).
+
+145:0-145:38
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_5444ca67
+UUID: 06cc2aaa_9a9e4d9b
+Bytes: 4
+Done
 
 151:29-151:39
 Sat Oct 29 05:19:27 2016 +0000
@@ -68,6 +116,14 @@ I think this should be times(1) - or actually.  it might default to times(1)...
 
 (also for other places where a method should only be called once in tests)
 
+151:29-151:39
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_34494680
+UUID: 06cc2aaa_ba9909b7
+Bytes: 50
+I think it does default, but I like times(1) here.
+
 165:36-165:53
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -75,10 +131,28 @@ UUID: 663c06f3_7443ce5d
 Bytes: 39
 can we also test for an invalid report?
 
+165:36-165:53
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_7443ce5d
+UUID: 2675ae07_ae679b42
+Bytes: 63
+We do, a few lines above.
+
+I'll add a test for reset(), though.
+
 186:29-186:39
 Sat Oct 29 05:19:27 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 663c06f3_943e52d0
 Bytes: 27
 this one should be times(8)
+
+186:29-186:39
+Tue Nov 01 00:03:43 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_943e52d0
+UUID: 06cc2aaa_1ad47d45
+Bytes: 4
+Done
 
