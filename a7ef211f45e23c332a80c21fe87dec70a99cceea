@@ -1,0 +1,74 @@
+Revision: a7ef211f45e23c332a80c21fe87dec70a99cceea
+Patch-set: 9
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+44
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_0c6007bc
+Bytes: 59
+nit: looks like most of these could validly be marked final
+
+69
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 06cc2aaa_8e904f67
+Bytes: 121
+Maybe more accurately:
+
+This ensures that the framework and wificond are in a consistent state after a framework restart.
+
+76:0-77:70
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 06cc2aaa_ee2b434b
+Bytes: 177
+This probably indicates that wificond died between our obtaining that reference to it and the request to tear down interfaces.  Maybe:
+
+"wificond died during framework startup"?
+
+125
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_92beecb4
+Bytes: 137
+I think this conditional predates the disabled state.  Wouldn't it make more sense to always deliver these messages to the state machine?
+
+130:15-130:76
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_0c2e4758
+Bytes: 215
+To the casual observer, it looks like you're lazily initializing the state machine for no obvious reason.  Could you call out why you're not just instantiating the state machine in the constructor with this comment?
+
+156:25-156:40
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 810004b4_d2a86478
+Bytes: 64
+Don't need this, you always deliver the intended mode afterward.
+
+277:15-293:17
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 06cc2aaa_cea3e799
+Bytes: 237
+Should this not go into the active state as part of its enter()?  Presumably you'd like to do all the things that might increase your chances of entering the active state each time you enter it (like setting up the underlying interface).
+
+294:16-294:60
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 06cc2aaa_c9c88145
+Bytes: 437
+What's the point of having a state which exists to transition into a child state, then sit around?  Would it not simplify the state machine to:
+  - have the three mode states (plus disabled)
+  - do the startup logic on the combined enter() methods in a helper function on receiving CMD_START_*
+  - write yourself a common helper object which retries sending a given command to a state (e.g. CMD_START_AP) with capped exponential backoff?
+
+396:71-396:74
+Tue Nov 01 17:26:59 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 06cc2aaa_8e9e0f4a
+Bytes: 89
+Maybe leave a comment that this field is probably null?  When will this ever be non-null?
+
