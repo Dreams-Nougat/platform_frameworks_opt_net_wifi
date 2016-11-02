@@ -880,6 +880,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
         mWifiConfigManager = mWifiInjector.getWifiConfigManager();
         mWifiSupplicantControl = mWifiInjector.getWifiSupplicantControl();
+        mWifiSupplicantControl.setSystemSupportsFastBssTransition(
+                mContext.getResources().getBoolean(R.bool.config_wifi_fast_bss_transition_enabled));
 
         mPasspointManager = mWifiInjector.getPasspointManager();
 
@@ -2122,6 +2124,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         pw.println("mUserWantsSuspendOpt " + mUserWantsSuspendOpt);
         pw.println("mSuspendOptNeedsDisabled " + mSuspendOptNeedsDisabled);
         pw.println("Supplicant status " + mWifiNative.status(true));
+        pw.println("mSystemSupportsFastBssTransition "
+                + mWifiSupplicantControl.getSystemSupportsFastBssTransition());
         if (mCountryCode.getCountryCodeSentToDriver() != null) {
             pw.println("CountryCode sent to driver " + mCountryCode.getCountryCodeSentToDriver());
         } else {
