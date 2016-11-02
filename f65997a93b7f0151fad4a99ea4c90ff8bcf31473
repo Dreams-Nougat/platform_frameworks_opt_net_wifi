@@ -9,12 +9,28 @@ UUID: 86b57a46_1fa5cf8a
 Bytes: 21
 nit: extra blank line
 
+107:5-107:6
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_1fa5cf8a
+UUID: 86b57a46_4a6b1712
+Bytes: 4
+Done
+
 143:0-143:65
 Wed Nov 02 16:52:45 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 86b57a46_ffdf2bef
 Bytes: 115
 I don't think this line is really needed.  You should be able to just pass in mWifiConfigManager in the line below.
+
+143:0-143:65
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_ffdf2bef
+UUID: 86b57a46_aaa28335
+Bytes: 4
+Done
 
 175:0-175:48
 Wed Nov 02 16:52:45 2016 +0000
@@ -23,12 +39,28 @@ UUID: 86b57a46_dfeea799
 Bytes: 137
 what do we expect to happen here?  is the score still calculated but then just not passed over to mNetworkAgent (bc it wasn't passed in)?
 
+175:0-175:48
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_dfeea799
+UUID: 86b57a46_4a315705
+Bytes: 4
+Done
+
 188:20-188:30
 Wed Nov 02 16:52:45 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 86b57a46_7ffe9b46
 Bytes: 15
 nit: calculated
+
+188:20-188:30
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_7ffe9b46
+UUID: 86b57a46_aa21e3bc
+Bytes: 40
+good catch -- codespell missed that one.
 
 231:0-231:68
 Wed Nov 02 16:52:45 2016 +0000
@@ -40,10 +72,26 @@ assertEquals(3, mWifiScoreReport.getLastBadLinkspeedcount());
 
 the nice thing there is that if it is not equals, you will get a helpful error message.
 
+231:0-231:68
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_1f330f57
+UUID: 86b57a46_458148e3
+Bytes: 4
+Done
+
 264:7-265:79
 Wed Nov 02 16:52:45 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 86b57a46_ffae0b3a
 Bytes: 73
 as with above, checking the actual values would probably be helpful here.
+
+264:7-265:79
+Wed Nov 02 22:35:28 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_ffae0b3a
+UUID: 86b57a46_4555c834
+Bytes: 94
+Done for numUserTriggeredWifiDisableLowRSSI. I don't want to over-constrain numTicksAtLowRSSI.
 
