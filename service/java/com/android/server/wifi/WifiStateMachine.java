@@ -880,6 +880,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
         mWifiConfigManager = mWifiInjector.getWifiConfigManager();
         mWifiSupplicantControl = mWifiInjector.getWifiSupplicantControl();
+        mWifiSupplicantControl.setSystemSupportsFastBssTransition(
+                mContext.getResources().getBoolean(R.bool.config_wifi_fast_bss_transition_enabled));
 
         mPasspointManager = mWifiInjector.getPasspointManager();
 
