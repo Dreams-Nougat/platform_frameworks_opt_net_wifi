@@ -41,6 +41,7 @@ import android.text.TextUtils;
 
 import com.android.internal.R;
 import com.android.server.wifi.WifiConfigStoreLegacy.WifiConfigStoreDataLegacy;
+import com.android.server.wifi.util.InformationElementUtil.Capabilities;
 
 import org.junit.After;
 import org.junit.Before;
@@ -2741,17 +2742,34 @@ public class WifiConfigManagerTest {
      */
     private ScanDetail createScanDetailForNetwork(
             WifiConfiguration configuration, String bssid, int level, int frequency) {
-        String caps;
+        Capabilities caps;
         if (configuration.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.WPA_PSK)) {
-            caps = "[WPA2-PSK-CCMP]";
+            caps = new Capabilities(ScanResult.PROTOCOL_WPA2,
+                                    new ArrayList<>(Arrays.asList(ScanResult.KEY_MGMT_PSK)),
+                                    new ArrayList<>(Arrays.asList(ScanResult.CIPHER_CCMP)),
+                                    ScanResult.CIPHER_CCMP,
+                                    false,
+                                    false);
         } else if (configuration.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.WPA_EAP)
                 || configuration.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.IEEE8021X)) {
-            caps = "[WPA2-EAP-CCMP]";
+            caps = new Capabilities(ScanResult.PROTOCOL_WPA2,
+                                    new ArrayList<>(Arrays.asList(ScanResult.KEY_MGMT_EAP)),
+                                    new ArrayList<>(Arrays.asList(ScanResult.CIPHER_CCMP)),
+                                    ScanResult.CIPHER_CCMP,
+                                    false,
+                                    false);
+
         } else if (configuration.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.NONE)
                 && WifiConfigurationUtil.hasAnyValidWepKey(configuration.wepKeys)) {
-            caps = "[WEP]";
+            caps = new Capabilities(ScanResult.PROTOCOL_NONE,
+                                    new ArrayList<>(Arrays.asList(ScanResult.KEY_MGMT_NONE)),
+                                    new ArrayList<>(0),
+                                    ScanResult.CIPHER_NONE,
+                                    false,
+                                    true);
+
         } else {
-            caps = "[]";
+            caps = null;
         }
         WifiSsid ssid = WifiSsid.createFromAsciiEncoded(configuration.getPrintableSsid());
         // Fill in 0's in the fields we don't care about.

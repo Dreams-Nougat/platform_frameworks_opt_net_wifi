@@ -21,10 +21,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.*;
 
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiSsid;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Pair;
+
+import com.android.server.wifi.util.InformationElementUtil.Capabilities;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,8 +49,15 @@ public class WifiLastResortWatchdogTest {
     private String[] mBssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4", "de:ad:ba:b1:e5:55",
             "c0:ff:ee:ee:e3:ee"};
     private int[] mFrequencies = {2437, 5180, 5180, 2437};
-    private String[] mCaps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]",
-            "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
+    private Capabilities  mSecureNetworkCapabilities = new Capabilities(
+                ScanResult.PROTOCOL_WPA2,
+                new ArrayList<>(Arrays.asList(ScanResult.KEY_MGMT_EAP)),
+                new ArrayList<>(Arrays.asList(ScanResult.CIPHER_CCMP)),
+                ScanResult.CIPHER_CCMP,
+                true,
+                false);
+    private Capabilities[] mCaps = {mSecureNetworkCapabilities, mSecureNetworkCapabilities,
+            mSecureNetworkCapabilities, mSecureNetworkCapabilities};
     private int[] mLevels = {-60, -86, -50, -62};
     private boolean[] mIsEphemeral = {false, false, false, false};
     private boolean[] mHasEverConnected = {false, false, false, false};
@@ -59,7 +69,7 @@ public class WifiLastResortWatchdogTest {
     }
 
     private List<Pair<ScanDetail, WifiConfiguration>> createFilteredQnsCandidates(String[] ssids,
-            String[] bssids, int[] frequencies, String[] caps, int[] levels,
+            String[] bssids, int[] frequencies, Capabilities[] caps, int[] levels,
             boolean[] isEphemeral) {
         List<Pair<ScanDetail, WifiConfiguration>> candidates = new ArrayList<>();
         long timeStamp = System.currentTimeMillis();
@@ -82,7 +92,7 @@ public class WifiLastResortWatchdogTest {
     }
 
     private List<Pair<ScanDetail, WifiConfiguration>> createFilteredQnsCandidates(String[] ssids,
-            String[] bssids, int[] frequencies, String[] caps, int[] levels,
+            String[] bssids, int[] frequencies, Capabilities[] caps, int[] levels,
             boolean[] isEphemeral, boolean[] hasEverConnected) {
         List<Pair<ScanDetail, WifiConfiguration>> candidates =
                 new ArrayList<Pair<ScanDetail, WifiConfiguration>>();
@@ -829,9 +839,9 @@ public class WifiLastResortWatchdogTest {
                 "c0:ff:ee:ee:e3:ee", "6c:f3:7f:ae:3c:f3", "6c:f3:7f:ae:3c:f4", "d3:ad:ba:b1:35:55",
                 "c0:ff:ee:ee:33:ee"};
         int[] frequencies = {2437, 5180, 5180, 2437, 2437, 5180, 5180, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]",
-                "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]",
-                "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mSecureNetworkCapabilities,
+                mSecureNetworkCapabilities, mSecureNetworkCapabilities, mSecureNetworkCapabilities,
+                mSecureNetworkCapabilities, mSecureNetworkCapabilities, mSecureNetworkCapabilities};
         int[] levels = {-60, -86, -50, -62, -60, -86, -50, -62};
         boolean[] isEphemeral = {false, false, false, false, false, false, false, false};
         boolean[] hasEverConnected = {false, false, false, false, false, false, false,
@@ -1434,8 +1444,9 @@ public class WifiLastResortWatchdogTest {
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4", "de:ad:ba:b1:e5:55",
                 "c0:ff:ee:ee:e3:ee", "6c:f3:7f:ae:3c:f3"};
         int[] frequencies = {2437, 5180, 5180, 2437, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]",
-                "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mSecureNetworkCapabilities,
+                mSecureNetworkCapabilities, mSecureNetworkCapabilities, mSecureNetworkCapabilities};
+
         int[] levels = {-60, -86, -50, -62, -60};
         boolean[] isEphemeral = {false, false, false, false, false};
         boolean[] hasEverConnected = {true, false, false, false, false};

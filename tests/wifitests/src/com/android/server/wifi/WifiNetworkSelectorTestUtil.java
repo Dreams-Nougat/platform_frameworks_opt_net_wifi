@@ -33,6 +33,7 @@ import android.net.wifi.WifiSsid;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
+import com.android.server.wifi.util.InformationElementUtil.Capabilities;
 import com.android.server.wifi.util.ScanResultUtil;
 
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class WifiNetworkSelectorTestUtil {
      * @return the constructed ScanDetail list and WifiConfiguration array
      */
     public static ScanDetailsAndWifiConfigs setupScanDetailsAndConfigStore(String[] ssids,
-                String[] bssids, int[] freqs, String[] caps, int[] levels, int[] securities,
+                String[] bssids, int[] freqs, Capabilities[] caps, int[] levels, int[] securities,
                 WifiConfigManager wifiConfigManager, Clock clock) {
         List<ScanDetail> scanDetails = buildScanDetails(ssids, bssids, freqs, caps, levels, clock);
         WifiConfiguration[] savedConfigs = generateWifiConfigurations(ssids, securities);
@@ -116,7 +117,7 @@ public class WifiNetworkSelectorTestUtil {
      * @return the constructed list of ScanDetail
      */
     public static List<ScanDetail> buildScanDetails(String[] ssids, String[] bssids, int[] freqs,
-                                            String[] caps, int[] levels, Clock clock) {
+                                            Capabilities[] caps, int[] levels, Clock clock) {
         List<ScanDetail> scanDetailList = new ArrayList<ScanDetail>();
 
         long timeStamp = clock.getElapsedSinceBootMillis();

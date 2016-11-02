@@ -711,8 +711,8 @@ public class WifiNative {
                                     new InformationElementUtil.Capabilities();
                             capabilities.from(infoElements, beaconCapBits);
                             flags = capabilities.generateCapabilitiesString();
-                            ScanDetail scan = new ScanDetail(networkDetail, wifiSsid, bssid, flags,
-                                    level, freq, tsf, infoElements, anqpLines);
+                            ScanDetail scan = new ScanDetail(networkDetail, wifiSsid, bssid,
+                                    capabilities, level, freq, tsf, infoElements, anqpLines);
                             results.add(scan);
                         } catch (IllegalArgumentException iae) {
                             Log.d(TAG, "Failed to parse information elements: " + iae);

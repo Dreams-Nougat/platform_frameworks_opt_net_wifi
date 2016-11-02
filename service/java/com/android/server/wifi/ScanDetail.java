@@ -27,6 +27,7 @@ import com.android.server.wifi.anqp.RawByteElement;
 import com.android.server.wifi.anqp.VenueNameElement;
 import com.android.server.wifi.hotspot2.NetworkDetail;
 import com.android.server.wifi.hotspot2.Utils;
+import com.android.server.wifi.util.InformationElementUtil.Capabilities;
 
 import java.util.List;
 import java.util.Map;
@@ -37,15 +38,21 @@ import java.util.Map;
 public class ScanDetail {
     private final ScanResult mScanResult;
     private volatile NetworkDetail mNetworkDetail;
+    private Capabilities mCapabilities;
     private long mSeen = 0;
 
     public ScanDetail(NetworkDetail networkDetail, WifiSsid wifiSsid, String bssid,
-            String caps, int level, int frequency, long tsf,
+            Capabilities caps, int level, int frequency, long tsf,
             ScanResult.InformationElement[] informationElements, List<String> anqpLines) {
         mNetworkDetail = networkDetail;
+        mCapabilities = caps;
+        String capStr = "";
+        if (mCapabilities != null) {
+            capStr = mCapabilities.generateCapabilitiesString();
+        }
         mScanResult = new ScanResult(wifiSsid, bssid, networkDetail.getHESSID(),
                 networkDetail.getAnqpDomainID(), networkDetail.getOsuProviders(),
-                caps, level, frequency, tsf);
+                capStr, level, frequency, tsf);
         mSeen = System.currentTimeMillis();
         mScanResult.seen = mSeen;
         mScanResult.channelWidth = networkDetail.getChannelWidth();
@@ -61,10 +68,16 @@ public class ScanDetail {
         }
     }
 
-    public ScanDetail(WifiSsid wifiSsid, String bssid, String caps, int level, int frequency,
+    public ScanDetail(WifiSsid wifiSsid, String bssid, Capabilities caps, int level, int frequency,
                       long tsf, long seen) {
         mNetworkDetail = null;
-        mScanResult = new ScanResult(wifiSsid, bssid, 0L, -1, null, caps, level, frequency, tsf);
+        mCapabilities = caps;
+        String capStr = "";
+        if (mCapabilities != null) {
+            capStr = mCapabilities.generateCapabilitiesString();
+        }
+
+        mScanResult = new ScanResult(wifiSsid, bssid, 0L, -1, null, capStr, level, frequency, tsf);
         mSeen = seen;
         mScanResult.seen = mSeen;
         mScanResult.channelWidth = 0;
@@ -116,6 +129,10 @@ public class ScanDetail {
 
     public ScanResult getScanResult() {
         return mScanResult;
+    }
+
+    public Capabilities getCapabilities() {
+        return mCapabilities;
     }
 
     public NetworkDetail getNetworkDetail() {

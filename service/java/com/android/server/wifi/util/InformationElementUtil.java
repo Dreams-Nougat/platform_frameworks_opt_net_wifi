@@ -341,6 +341,21 @@ public class InformationElementUtil {
         public Capabilities() {
         }
 
+        // Currently used for unit tests to contruct a fake security capabilities set.
+        public Capabilities(int protocol,
+                            ArrayList<Integer> keyManagement,
+                            ArrayList<Integer> pairwiseCipher,
+                            int groupCipher,
+                            boolean isESS,
+                            boolean isPrivacy) {
+            this.protocol = protocol;
+            this.keyManagement = new ArrayList<Integer>(keyManagement);
+            this.pairwiseCipher =  new ArrayList<Integer>(pairwiseCipher);
+            this.groupCipher = groupCipher;
+            this.isESS = isESS;
+            this.isPrivacy = isPrivacy;
+        }
+
         // RSNE format (size unit: byte)
         //
         // | Element ID | Length | Version | Group Data Cipher Suite |
