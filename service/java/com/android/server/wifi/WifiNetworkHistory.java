@@ -338,7 +338,6 @@ public class WifiNetworkHistory {
             int status = 0;
             long seen = 0;
             int rssi = WifiConfiguration.INVALID_RSSI;
-            String caps = null;
 
             WifiConfiguration config = null;
             while (true) {
@@ -491,7 +490,6 @@ public class WifiNetworkHistory {
                             freq = 0;
                             seen = 0;
                             rssi = WifiConfiguration.INVALID_RSSI;
-                            caps = "";
                             break;
                         case RSSI_KEY:
                             rssi = Integer.parseInt(value);
@@ -516,7 +514,7 @@ public class WifiNetworkHistory {
                                 if (getScanDetailCache(config, scanDetailCaches) != null) {
                                     WifiSsid wssid = WifiSsid.createFromAsciiEncoded(ssid);
                                     ScanDetail scanDetail = new ScanDetail(wssid, bssid,
-                                            caps, rssi, freq, (long) 0, seen);
+                                            null, rssi, freq, (long) 0, seen);
                                     getScanDetailCache(config, scanDetailCaches).put(scanDetail);
                                 }
                             }

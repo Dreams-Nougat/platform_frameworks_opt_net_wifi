@@ -67,7 +67,7 @@ public class AnqpCacheTest {
                 NetworkDetail nd = new NetworkDetail(bssid, ie,
                         new ArrayList<String>(), sChannels[i]);
                 mScanDetails[i] = new ScanDetail(nd, wifiSsid,
-                        bssid, "", sRSSIs[i], sChannels[i], Long.MAX_VALUE, ie, anqpLines);
+                        bssid, null, sRSSIs[i], sChannels[i], Long.MAX_VALUE, ie, anqpLines);
             }
         }
     }

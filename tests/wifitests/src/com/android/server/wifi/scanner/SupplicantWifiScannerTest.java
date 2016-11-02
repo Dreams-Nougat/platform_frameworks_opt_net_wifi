@@ -88,13 +88,13 @@ public class SupplicantWifiScannerTest extends BaseWifiScannerImplTest {
             new ScanPeriod(ScanPeriod.ReportType.FULL_AND_RESULT,
                     ScanResults.createOverflowing(0, 2,
                             new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 1"),
-                                    "00:00:00:00:00:00", "", -70, 2450, Long.MAX_VALUE, 0),
+                                    "00:00:00:00:00:00", null, -70, 2450, Long.MAX_VALUE, 0),
                             new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 2"),
-                                    "AA:BB:CC:DD:EE:FF", "", -66, 2400, Long.MAX_VALUE, 0),
+                                    "AA:BB:CC:DD:EE:FF", null, -66, 2400, Long.MAX_VALUE, 0),
                             new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 3"),
-                                    "00:00:00:00:00:00", "", -80, 2450, Long.MAX_VALUE, 0),
+                                    "00:00:00:00:00:00", null, -80, 2450, Long.MAX_VALUE, 0),
                             new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 4"),
-                                    "AA:BB:CC:11:22:33", "", -65, 2450, Long.MAX_VALUE, 0)),
+                                    "AA:BB:CC:11:22:33", null, -65, 2450, Long.MAX_VALUE, 0)),
                     expectedBandScanFreqs(WifiScanner.WIFI_BAND_24_GHZ))
         };
 

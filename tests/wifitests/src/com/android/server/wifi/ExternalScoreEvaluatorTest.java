@@ -34,11 +34,14 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.internal.R;
 import com.android.server.wifi.WifiNetworkSelectorTestUtil.ScanDetailsAndWifiConfigs;
+import com.android.server.wifi.util.InformationElementUtil.Capabilities;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,6 +66,20 @@ public class ExternalScoreEvaluatorTest {
 
         mExternalScoreEvaluator = new ExternalScoreEvaluator(mContext, mWifiConfigManager,
                 mClock, null);
+        mSecureNetworkCapabilities = new Capabilities(
+                ScanResult.PROTOCOL_WPA2,
+                new ArrayList<>(Arrays.asList(ScanResult.KEY_MGMT_EAP)),
+                new ArrayList<>(Arrays.asList(ScanResult.CIPHER_CCMP)),
+                ScanResult.CIPHER_CCMP,
+                true,
+                false);
+        mOpenNetworkCapabilities = new Capabilities(
+                ScanResult.PROTOCOL_NONE,
+                new ArrayList<>(0),
+                new ArrayList<>(0),
+                ScanResult.CIPHER_NONE,
+                true,
+                false);
     }
 
     /** Cleans up test. */
@@ -80,6 +97,8 @@ public class ExternalScoreEvaluatorTest {
     private Clock mClock = mock(Clock.class);
     private int mThresholdQualifiedRssi2G;
     private int mThresholdQualifiedRssi5G;
+    private Capabilities mSecureNetworkCapabilities;
+    private Capabilities mOpenNetworkCapabilities;
     private static final String TAG = "External Score Evaluator Unit Test";
 
     NetworkScoreManager getScoreManager() {
@@ -132,7 +151,7 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mOpenNetworkCapabilities};
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 10};
         Integer[] scores = {null, 120};
         boolean[] meteredHints = {false, true};
@@ -169,7 +188,8 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[ESS]", "[ESS]"};
+        Capabilities[] caps = {mOpenNetworkCapabilities, mOpenNetworkCapabilities};
+
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 8};
         Integer[] scores = {100, 120};
         boolean[] meteredHints = {true, true};
@@ -209,7 +229,8 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mOpenNetworkCapabilities};
+
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 10};
         Integer[] scores = {null, 120};
         boolean[] meteredHints = {false, true};
@@ -243,7 +264,8 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3"};
         int[] freqs = {5200};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities};
+
         int[] securities = {SECURITY_PSK};
         int[] levels = {mThresholdQualifiedRssi5G + 8};
         Integer[] scores = {120};
@@ -276,7 +298,7 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mSecureNetworkCapabilities};
         int[] securities = {SECURITY_PSK, SECURITY_PSK};
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 8};
         Integer[] scores = {100, 120};
@@ -309,7 +331,7 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mOpenNetworkCapabilities};
         int[] securities = {SECURITY_PSK, SECURITY_NONE};
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 8};
         Integer[] scores = {120, 120};
@@ -343,14 +365,17 @@ public class ExternalScoreEvaluatorTest {
         String[] savedSsids = {"\"test1\""};
         String[] savedBssids = {"6c:f3:7f:ae:8c:f3"};
         int[] savedFreqs = {2470};
-        String[] savedCaps = {"[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] savedCaps = {mSecureNetworkCapabilities};
+
+
         int[] savedSecurities = {SECURITY_PSK};
         int[] savedLevels = {mThresholdQualifiedRssi2G + 8};
         // Ephemeral network.
         String[] ephemeralSsids = {"\"test2\""};
         String[] ephemeralBssids = {"6c:f3:7f:ae:8c:f4"};
         int[] ephemeralFreqs = {2437};
-        String[] ephemeralCaps = {"[ESS]"};
+        Capabilities[] ephemeralCaps = {mOpenNetworkCapabilities};
+
         int[] ephemeralLevels = {mThresholdQualifiedRssi2G + 8};
         // Ephemeral network has higher score than the saved network.
         Integer[] scores = {100, 120};
@@ -395,7 +420,7 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mOpenNetworkCapabilities};
         int[] securities = {SECURITY_PSK, SECURITY_NONE};
         int[] levels = {mThresholdQualifiedRssi2G + 8, mThresholdQualifiedRssi2G + 8};
         Integer[] scores = {null, null};
@@ -426,7 +451,8 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[ESS]", "[ESS]"};
+        Capabilities[] caps = {mOpenNetworkCapabilities, mOpenNetworkCapabilities};
+
         int[] levels = {mThresholdQualifiedRssi2G + 28, mThresholdQualifiedRssi2G + 28};
         boolean[] meteredHints = {true, true};
         ScanResult[] scanResults = new ScanResult[2];
@@ -465,7 +491,7 @@ public class ExternalScoreEvaluatorTest {
         String[] ssids = {"\"test1\"", "\"test2\""};
         String[] bssids = {"6c:f3:7f:ae:8c:f3", "6c:f3:7f:ae:8c:f4"};
         int[] freqs = {2470, 2437};
-        String[] caps = {"[WPA2-EAP-CCMP][ESS]", "[WPA2-EAP-CCMP][ESS]"};
+        Capabilities[] caps = {mSecureNetworkCapabilities, mSecureNetworkCapabilities};
         int[] securities = {SECURITY_PSK, SECURITY_PSK};
         int[] levels = {mThresholdQualifiedRssi2G + 28, mThresholdQualifiedRssi2G + 28};
         boolean[] meteredHints = {false, false};

@@ -407,16 +407,16 @@ public abstract class BaseWifiScannerImplTest {
         long approxScanStartUs = mClock.getElapsedSinceBootMillis() * 1000;
         ArrayList<ScanDetail> rawResults = new ArrayList<>(Arrays.asList(
                         new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 1"),
-                                "00:00:00:00:00:00", "", -70, 2450,
+                                "00:00:00:00:00:00", null, -70, 2450,
                                 approxScanStartUs + 2000 * 1000, 0),
                         new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 2"),
-                                "AA:BB:CC:DD:EE:FF", "", -66, 2400,
+                                "AA:BB:CC:DD:EE:FF", null, -66, 2400,
                                 approxScanStartUs + 2500 * 1000, 0),
                         new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 3"),
-                                "00:00:00:00:00:00", "", -80, 2450,
+                                "00:00:00:00:00:00", null, -80, 2450,
                                 approxScanStartUs - 2000 * 1000, 0), // old result will be filtered
                         new ScanDetail(WifiSsid.createFromAsciiEncoded("TEST AP 4"),
-                                "AA:BB:CC:11:22:33", "", -65, 2450,
+                                "AA:BB:CC:11:22:33", null, -65, 2450,
                                 approxScanStartUs + 4000 * 1000, 0)));
 
         ArrayList<ScanResult> fullResults = new ArrayList<>();

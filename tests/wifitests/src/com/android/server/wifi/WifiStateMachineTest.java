@@ -261,7 +261,7 @@ public class WifiStateMachineTest {
         ScanResult.InformationElement ie[] = new ScanResult.InformationElement[1];
         ie[0] = ScanResults.generateSsidIe(sSSID);
         NetworkDetail nd = new NetworkDetail(sBSSID, ie, new ArrayList<String>(), sFreq);
-        ScanDetail detail = new ScanDetail(nd, sWifiSsid, sBSSID, "", rssi, sFreq,
+        ScanDetail detail = new ScanDetail(nd, sWifiSsid, sBSSID, null, rssi, sFreq,
                 Long.MAX_VALUE, /* needed so that scan results aren't rejected because
                                    there older than scan start */
                 ie, new ArrayList<String>());
