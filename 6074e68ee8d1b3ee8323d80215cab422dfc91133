@@ -1,0 +1,18 @@
+Revision: 6074e68ee8d1b3ee8323d80215cab422dfc91133
+Patch-set: 8
+File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
+
+169:30-169:38
+Wed Nov 02 22:40:01 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_eb764af9
+Bytes: 74
+I think the default is times(1), so I am pretty sure you can remove these.
+
+303:27-303:29
+Wed Nov 02 22:40:01 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_ab7562e9
+Bytes: 71
+Can we make this a static final for the test class (in case it changes)
+
