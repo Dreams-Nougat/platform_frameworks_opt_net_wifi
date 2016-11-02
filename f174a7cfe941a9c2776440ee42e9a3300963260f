@@ -1,0 +1,9 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Verified+1: Randy Pan <zpan@google.com>
+Code-Review+2: Peter Qiu <zqiu@google.com>
+Autosubmit+1: Randy Pan <zpan@google.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Wed, 02 Nov 2016 19:32:40 +0000
+Reviewed-on: https://android-review.googlesource.com/298200
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
