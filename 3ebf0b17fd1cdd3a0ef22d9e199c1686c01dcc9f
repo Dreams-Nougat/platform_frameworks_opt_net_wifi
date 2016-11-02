@@ -1,0 +1,11 @@
+Revision: 3ebf0b17fd1cdd3a0ef22d9e199c1686c01dcc9f
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiServiceImpl.java
+
+1035:11-1035:28
+Wed Nov 02 23:26:31 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_064103a5
+Bytes: 65
+nit: These should be marked with <TODO> and a buganizer 'b/' link
+
