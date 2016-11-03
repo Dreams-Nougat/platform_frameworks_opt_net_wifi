@@ -1,0 +1,11 @@
+Revision: 02a998f352244b5b2bb039f9a885862a91014e23
+Patch-set: 2
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+150
+Thu Nov 03 05:21:40 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_7cc05ee5
+Bytes: 107
+Consider logging a message so we know the existing one is overwritten?How likely will this scenario happen?
+
