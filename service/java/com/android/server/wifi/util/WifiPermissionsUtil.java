@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.UserInfo;
 import android.os.UserManager;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.android.server.wifi.WifiSettingsStore;
 
@@ -74,15 +75,20 @@ public class WifiPermissionsUtil {
         // If neither caller or app has location access, there is no need to check
         // any other permissions. Deny access to scan results.
         if (!canCallingUidAccessLocation && !canAppPackageUseLocation) {
+            Log.v(TAG, "Scan results access denied: Calling Uid and app package do not have"
+                    + " the permission to access scan results");
             return false;
         }
         // Check if Wifi Scan request is an operation allowed for this App.
         if (!isScanAllowedbyApps(pkgName, uid)) {
+            Log.v(TAG, "Scan results access denied: WIFI_SCAN is not an allowed operation");
             return false;
         }
         // If the User or profile is current, permission is granted
         // Otherwise, uid must have INTERACT_ACROSS_USERS_FULL permission.
         if (!isCurrentProfile(uid) && !checkInteractAcrossUsersFull(uid)) {
+            Log.v(TAG, "Scan results access denied: User or Profile is not current and uid "
+                    + "does not have INTERACT_ACROSS_USERS_FULL permission");
             return false;
         }
         return true;
