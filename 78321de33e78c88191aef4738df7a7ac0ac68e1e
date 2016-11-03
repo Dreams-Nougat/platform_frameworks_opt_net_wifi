@@ -1,0 +1,15 @@
+Revision: 78321de33e78c88191aef4738df7a7ac0ac68e1e
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+140
+Thu Nov 03 22:51:07 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_9c81bb4b
+Bytes: 310
+The down-side of going this way is that the compiler can't tell us if we forget to update this code, when we add a new enum value.
+
+So I think we're better off adding cases for each of the values we want to ignore. (Taking advantage of fall-through, of course, to minimize the number of lines.)
+
+Whaddya think?
+
