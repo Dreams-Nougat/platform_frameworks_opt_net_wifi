@@ -16,6 +16,24 @@ UUID: 86b57a46_62871860
 Bytes: 33
 Use bug numbers instead of ldap's
 
+150
+Thu Nov 03 21:00:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_7cc05ee5
+UUID: 86b57a46_965cfa60
+Bytes: 314
+Make sense to add a debug log.
+
+It will be unlikely for Release 1, can only happen when the user explicitly trying to install passpoint profile from the same provider multiple times.  For Release 2, this can happen when the OSU app tries to update the credential through remediation, which should be fairly normal.
+
+150:20-150:24
+Thu Nov 03 21:00:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_62871860
+UUID: 86b57a46_f62746e6
+Bytes: 8
+Will do.
+
 157:5-159:74
 Thu Nov 03 20:23:32 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -23,6 +41,16 @@ UUID: 86b57a46_0b274781
 Bytes: 270
 I highly recommend PasspointManager (similar to WifiConfigManager) keeping a master copy of the config and then passing out copies to external modules as needed.
 Otherwise, it becomes hard to keep track of where the configurations are getting modified in the wifi stack.
+
+157:5-159:74
+Thu Nov 03 21:00:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_0b274781
+UUID: 86b57a46_568f32b8
+Bytes: 140
+Yes, that's what I was thinking about.
+
+Will do that in a separate CL since it requires adding a copy constructor to PasspointConfiguration.
 
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
 
@@ -32,4 +60,12 @@ Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 86b57a46_227b506a
 Bytes: 43
 Add javadoc (even though it's quite simple)
+
+102
+Thu Nov 03 21:00:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_227b506a
+UUID: 86b57a46_76319605
+Bytes: 13
+Sure will do.
 
