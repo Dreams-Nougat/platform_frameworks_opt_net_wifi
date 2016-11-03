@@ -1,0 +1,11 @@
+Revision: 9d31ad0596555971395980fdd0a3ccbd5b1b1123
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiScoreReport.java
+
+30:3-30:39
+Thu Nov 03 17:05:25 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_e2594817
+Bytes: 117
+ooh!  When you start making functional changes to this file (while also adding new tests :) ), let's remove this too!
+
