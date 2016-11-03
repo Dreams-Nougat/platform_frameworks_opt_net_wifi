@@ -1,0 +1,29 @@
+Revision: 23abc575a77882e1182e8913ee1b6e83e98eb124
+Patch-set: 1
+File: /COMMIT_MSG
+
+17:62-17:66
+Thu Nov 03 00:50:40 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_41b015c1
+Bytes: 10
+bein what?
+
+File: service/java/com/android/server/wifi/anqp/NAIRealmData.java
+
+60:12-60:16
+Thu Nov 03 00:50:40 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_c1d085b3
+Bytes: 26
+replace this with a bug ID
+
+File: service/java/com/android/server/wifi/anqp/NAIRealmElement.java
+
+48:12-48:16
+Thu Nov 03 00:50:40 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_a1daa1cb
+Bytes: 36
+replace all of these with bug ids :)
+
