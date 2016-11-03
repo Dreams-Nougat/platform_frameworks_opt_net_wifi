@@ -2,6 +2,21 @@ Revision: 46f8fcf4ad9e6c64c18f139778e08310f4f09e76
 Patch-set: 2
 File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
 
+0
+Thu Nov 03 22:33:37 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_5c33d355
+Bytes: 741
+The log messages are really long. Can we make them easier to parse? (Even for people, trying to parse a series of long log messages is hard.) For example:
+
+  - "denied: caller not permitted"
+  - "denied: blocked by app-ops"
+  - "denied: profile not current"
+
+Rationale: the more verbose text can't fully capture the nuance of the permission logic anyway. All we really want to accomplish with the log message, is a) classify the failure into the broad categories, and b) provide a pointer to the relevant code.
+
+(The "pointer" is the text itself. We dereference that by grepping the source code. And, when grepping, shorter messages are easier to search for, since it's less likely that the string is broken across multiple lines of source.)
+
 78:80-78:85
 Thu Nov 03 05:14:19 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
