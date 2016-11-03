@@ -16,6 +16,14 @@ UUID: 86b57a46_62871860
 Bytes: 33
 Use bug numbers instead of ldap's
 
+157:5-159:74
+Thu Nov 03 20:23:32 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_0b274781
+Bytes: 270
+I highly recommend PasspointManager (similar to WifiConfigManager) keeping a master copy of the config and then passing out copies to external modules as needed.
+Otherwise, it becomes hard to keep track of where the configurations are getting modified in the wifi stack.
+
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
 
 102
