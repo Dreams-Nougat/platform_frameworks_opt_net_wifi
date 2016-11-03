@@ -1,0 +1,18 @@
+Revision: 46f8fcf4ad9e6c64c18f139778e08310f4f09e76
+Patch-set: 2
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+78:80-78:85
+Thu Nov 03 05:14:19 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_bca92636
+Bytes: 54
+Can we make this slightly more formal with "do not"  ?
+
+91:24-91:30
+Thu Nov 03 05:14:19 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_1caf9238
+Bytes: 8
+does not
+
