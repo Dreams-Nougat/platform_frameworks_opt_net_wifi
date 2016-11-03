@@ -28,6 +28,14 @@ UUID: 663c06f3_6595e286
 Bytes: 573
 the key reason for overriding this method is the msg.obj = this statement on line 113. If this is not overridden, then the response object cannot be typecasted as WifiAsyncChannel. Those that typecast it as AsyncChannel, will still be able to use it but they won't have the logging mechanism.For reference, in WifiP2pServiceImpl, search for HALF_CONNECTED and you will see that it can be type casted into WifiAsyncChannel  because of this code. The reason we had to copy the entire code of this method is because that msg.obj had to be updated and its right in the  middle.
 
+108
+Thu Nov 03 22:47:36 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_6595e286
+UUID: 86b57a46_3c27efcf
+Bytes: 170
+Discussed out-of-band. Because method calls are dispatched dynamically, it doesn't matter where |msg.obj| is assigned from |this| in the parent class, or the child class.
+
 133
 Fri Oct 28 20:36:16 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -42,4 +50,12 @@ Parent: 663c06f3_a52d2aae
 UUID: 663c06f3_c5894e76
 Bytes: 13
 Same as above
+
+133
+Thu Nov 03 22:47:36 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 663c06f3_c5894e76
+UUID: 86b57a46_7c317705
+Bytes: 15
+As at line 108.
 
