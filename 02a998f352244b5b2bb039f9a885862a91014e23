@@ -9,3 +9,19 @@ UUID: 86b57a46_7cc05ee5
 Bytes: 107
 Consider logging a message so we know the existing one is overwritten?How likely will this scenario happen?
 
+150:20-150:24
+Thu Nov 03 17:08:36 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_62871860
+Bytes: 33
+Use bug numbers instead of ldap's
+
+File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
+
+102
+Thu Nov 03 17:08:36 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_227b506a
+Bytes: 43
+Add javadoc (even though it's quite simple)
+
