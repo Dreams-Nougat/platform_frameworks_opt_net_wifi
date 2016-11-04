@@ -548,25 +548,28 @@ public class WifiStateMachineTest {
         mWsm.setOperationalMode(WifiStateMachine.SCAN_ONLY_MODE);
         mLooper.dispatchAll();
         assertEquals(WifiStateMachine.SCAN_ONLY_MODE, mWsm.getOperationalModeForTest());
-
-        // Start supplicant so we move to the next state
-        mWsm.setSupplicantRunning(true);
-        mLooper.dispatchAll();
-        assertEquals("SupplicantStartingState", getCurrentState().getName());
-        when(mWifiNative.setDeviceName(anyString())).thenReturn(true);
-        when(mWifiNative.setManufacturer(anyString())).thenReturn(true);
-        when(mWifiNative.setModelName(anyString())).thenReturn(true);
-        when(mWifiNative.setModelNumber(anyString())).thenReturn(true);
-        when(mWifiNative.setSerialNumber(anyString())).thenReturn(true);
-        when(mWifiNative.setConfigMethods(anyString())).thenReturn(true);
-        when(mWifiNative.setDeviceType(anyString())).thenReturn(true);
-        when(mWifiNative.setSerialNumber(anyString())).thenReturn(true);
-        when(mWifiNative.setScanningMacOui(any(byte[].class))).thenReturn(true);
-
-        mWsm.sendMessage(WifiMonitor.SUP_CONNECTION_EVENT);
-        mLooper.dispatchAll();
-
-        assertEquals("ScanModeState", getCurrentState().getName());
+        /*
+         * Control for switching states is migrating to WifiStateMachinePrime.  Comment out this
+         * section of the test.
+         * // Start supplicant so we move to the next state
+         * mWsm.setSupplicantRunning(true);
+         * mLooper.dispatchAll();
+         * assertEquals("SupplicantStartingState", getCurrentState().getName());
+         * when(mWifiNative.setDeviceName(anyString())).thenReturn(true);
+         * when(mWifiNative.setManufacturer(anyString())).thenReturn(true);
+         * when(mWifiNative.setModelName(anyString())).thenReturn(true);
+         * when(mWifiNative.setModelNumber(anyString())).thenReturn(true);
+         * when(mWifiNative.setSerialNumber(anyString())).thenReturn(true);
+         * when(mWifiNative.setConfigMethods(anyString())).thenReturn(true);
+         * when(mWifiNative.setDeviceType(anyString())).thenReturn(true);
+         * when(mWifiNative.setSerialNumber(anyString())).thenReturn(true);
+         * when(mWifiNative.setScanningMacOui(any(byte[].class))).thenReturn(true);
+         *
+         * mWsm.sendMessage(WifiMonitor.SUP_CONNECTION_EVENT);
+         * mLooper.dispatchAll();
+         *
+         * assertEquals("ScanModeState", getCurrentState().getName());
+         */
     }
 
     private void addNetworkAndVerifySuccess() throws Exception {
