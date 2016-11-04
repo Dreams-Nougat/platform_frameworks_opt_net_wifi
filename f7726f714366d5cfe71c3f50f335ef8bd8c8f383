@@ -1,0 +1,18 @@
+Revision: f7726f714366d5cfe71c3f50f335ef8bd8c8f383
+Patch-set: 4
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+428:27-428:49
+Fri Nov 04 03:54:15 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb47df8d_1bc39b29
+Bytes: 28
+Shall we flag an error here?
+
+443:27-443:50
+Fri Nov 04 03:54:15 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb47df8d_5bcd2350
+Bytes: 14
+Same as above.
+
