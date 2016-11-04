@@ -457,6 +457,7 @@ public class WifiController extends StateMachine {
             mDeferredEnableSerialNumber++;
             mHaveDeferredEnable = false;
             mWifiStateMachine.clearANQPCache();
+            mWifiStateMachinePrime.disableWifi();
         }
         @Override
         public boolean processMessage(Message msg) {
@@ -597,8 +598,9 @@ public class WifiController extends StateMachine {
 
         @Override
         public void enter() {
-            mWifiStateMachine.setSupplicantRunning(true);
+            //mWifiStateMachine.setSupplicantRunning(true);
             mWifiStateMachine.setOperationalMode(WifiStateMachine.SCAN_ONLY_WITH_WIFI_OFF_MODE);
+            mWifiStateMachinePrime.enterScanOnlyMode();
             // Supplicant can't restart right away, so not the time we switched off
             mDisabledTimestamp = SystemClock.elapsedRealtime();
             mDeferredEnableSerialNumber++;
@@ -841,6 +843,7 @@ public class WifiController extends StateMachine {
         public void enter() {
             mWifiStateMachine.setOperationalMode(WifiStateMachine.CONNECT_MODE);
             mWifiStateMachine.setHighPerfModeEnabled(false);
+            mWifiStateMachinePrime.enterClientMode();
         }
 
         @Override
@@ -890,6 +893,7 @@ public class WifiController extends StateMachine {
         @Override
         public void enter() {
             mWifiStateMachine.setOperationalMode(WifiStateMachine.SCAN_ONLY_MODE);
+            mWifiStateMachinePrime.enterScanOnlyMode();
         }
     }
 
@@ -899,6 +903,7 @@ public class WifiController extends StateMachine {
         public void enter() {
             mWifiStateMachine.setOperationalMode(WifiStateMachine.CONNECT_MODE);
             mWifiStateMachine.setHighPerfModeEnabled(false);
+            mWifiStateMachinePrime.enterClientMode();
         }
     }
 
@@ -908,6 +913,7 @@ public class WifiController extends StateMachine {
         public void enter() {
             mWifiStateMachine.setOperationalMode(WifiStateMachine.CONNECT_MODE);
             mWifiStateMachine.setHighPerfModeEnabled(true);
+            mWifiStateMachinePrime.enterClientMode();
         }
     }
 
@@ -916,6 +922,7 @@ public class WifiController extends StateMachine {
         @Override
         public void enter() {
             mWifiStateMachine.setOperationalMode(WifiStateMachine.DISABLED_MODE);
+            mWifiStateMachinePrime.disableWifi();
         }
     }
 
