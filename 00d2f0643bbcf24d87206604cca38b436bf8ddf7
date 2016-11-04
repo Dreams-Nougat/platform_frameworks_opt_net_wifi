@@ -1,0 +1,13 @@
+Revision: 00d2f0643bbcf24d87206604cca38b436bf8ddf7
+Patch-set: 6
+File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
+
+115:12-115:16
+Fri Nov 04 01:18:14 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 86b57a46_095aac0a
+Bytes: 182
+Why is this necessary? Are we ever calling a method of WifiAsyncChannel in this file? As long as you have "new WifiAsyncChannel" then you should be fine.
+
+And elsewhere in this file.
+
