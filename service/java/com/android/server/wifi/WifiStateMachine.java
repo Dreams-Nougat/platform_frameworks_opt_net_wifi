@@ -3970,6 +3970,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             logStateAndMessage(message, this);
             switch (message.what) {
                 case CMD_START_SUPPLICANT:
+                    if (mOperationalMode == SCAN_ONLY_MODE) {
+                        break;
+                    }
+
                     // Refresh our reference to wificond.  This allows us to tolerate restarts.
                     mWificond = mWifiInjector.makeWificond();
                     mClientInterface = setupDriverForClientMode(mWificond);
@@ -4030,7 +4034,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     break;
                 case CMD_SET_OPERATIONAL_MODE:
                     mOperationalMode = message.arg1;
-                    if (mOperationalMode != DISABLED_MODE) {
+                    //if (mOperationalMode != DISABLED_MODE) {
+                    if (mOperationalMode == CONNECT_MODE) {
                         sendMessage(CMD_START_SUPPLICANT);
                     }
                     break;
@@ -4078,6 +4083,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
             switch(message.what) {
                 case WifiMonitor.SUP_CONNECTION_EVENT:
+                    if (mOperationalMode == SCAN_ONLY_MODE) {
+                        break;
+                    }
                     if (mVerboseLoggingEnabled) log("Supplicant connection established");
                     setWifiState(WIFI_STATE_ENABLED);
                     mSupplicantRestartCount = 0;
@@ -4096,6 +4104,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     transitionTo(mSupplicantStartedState);
                     break;
                 case WifiMonitor.SUP_DISCONNECTION_EVENT:
+                    if (mOperationalMode == SCAN_ONLY_MODE) {
+                        break;
+                    }
                     if (++mSupplicantRestartCount <= SUPPLICANT_RESTART_TRIES) {
                         loge("Failed to setup control channel, restart supplicant");
                         mWifiMonitor.stopAllMonitoring();
