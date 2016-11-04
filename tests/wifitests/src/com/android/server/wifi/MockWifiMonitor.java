@@ -33,9 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Creates a WifiMonitor and installs it as the current WifiMonitor instance
+ * Creates a mock WifiMonitor and adds a method to trigger sending messages to the registered
+ * handler.
  * WARNING: This does not perfectly mock the behavior of WifiMonitor at the moment
- *          ex. startMoniroting does nothing and will not send a connection/disconnection event
+ *          ex. startMonitoring does nothing and will not send a connection/disconnection event
  */
 public class MockWifiMonitor {
     private final WifiMonitor mWifiMonitor;
@@ -49,10 +50,14 @@ public class MockWifiMonitor {
 
         doAnswer(new RegisterHandlerAnswer())
                 .when(mWifiMonitor).registerHandler(anyString(), anyInt(), any(Handler.class));
+    }
 
+    public WifiMonitor getWifiMonitor() {
+        return mWifiMonitor;
     }
 
     private final Map<String, SparseArray<Handler>> mHandlerMap = new HashMap<>();
+
     private class RegisterHandlerAnswer extends AnswerWithArguments {
         public void answer(String iface, int what, Handler handler) {
             SparseArray<Handler> ifaceHandlers = mHandlerMap.get(iface);
@@ -70,6 +75,7 @@ public class MockWifiMonitor {
     public void sendMessage(String iface, int what) {
         sendMessage(iface, Message.obtain(null, what));
     }
+
     public void sendMessage(String iface, Message message) {
         SparseArray<Handler> ifaceHandlers = mHandlerMap.get(iface);
         if (ifaceHandlers != null) {
@@ -86,6 +92,7 @@ public class MockWifiMonitor {
                     + ",what=" + message.what, sent);
         }
     }
+
     private boolean sendMessage(SparseArray<Handler> ifaceHandlers, Message message) {
         Handler handler = ifaceHandlers.get(message.what);
         if (handler != null) {
@@ -95,5 +102,4 @@ public class MockWifiMonitor {
         }
         return false;
     }
-
 }
