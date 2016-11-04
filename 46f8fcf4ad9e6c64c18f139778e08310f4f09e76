@@ -17,6 +17,14 @@ Rationale: the more verbose text can't fully capture the nuance of the permissio
 
 (The "pointer" is the text itself. We dereference that by grepping the source code. And, when grepping, shorter messages are easier to search for, since it's less likely that the string is broken across multiple lines of source.)
 
+0
+Fri Nov 04 00:13:34 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_5c33d355
+UUID: 86b57a46_57e9ecce
+Bytes: 31
+Agreed, have shortened the logs
+
 78:80-78:85
 Thu Nov 03 05:14:19 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
