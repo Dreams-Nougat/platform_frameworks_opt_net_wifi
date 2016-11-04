@@ -13,3 +13,11 @@ So I think we're better off adding cases for each of the values we want to ignor
 
 Whaddya think?
 
+140
+Fri Nov 04 00:01:30 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 86b57a46_9c81bb4b
+UUID: 86b57a46_57d72cd5
+Bytes: 225
+I understand your thinking.  You're saying that every time someone adds to the enum, you'd like someone to visit this switch state and explicitly decide whether or not this is a case that they care about.  I'm okay with that.
+
