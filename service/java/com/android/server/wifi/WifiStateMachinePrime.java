@@ -19,6 +19,7 @@ package com.android.server.wifi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.IApInterface;
+import android.net.wifi.IClientInterface;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -56,17 +57,27 @@ public class WifiStateMachinePrime {
 
     private Queue<WifiConfiguration> mApConfigQueue = new ConcurrentLinkedQueue<>();
 
-    /* The base for wifi message types */
+    // The base for wifi message types
     static final int BASE = Protocol.BASE_WIFI;
 
-    /* Start the soft access point */
+    // Start the soft access point
     static final int CMD_START_AP                                       = BASE + 21;
-    /* Indicates soft ap start failed */
+    // Indicates soft ap start failed
     static final int CMD_START_AP_FAILURE                               = BASE + 22;
-    /* Stop the soft access point */
+    // Stop the soft access point
     static final int CMD_STOP_AP                                        = BASE + 23;
-    /* Soft access point teardown is completed. */
+    // Soft access point teardown is complete
     static final int CMD_AP_STOPPED                                     = BASE + 24;
+    // Start wifi
+    static final int CMD_START_WIFI                                     = BASE + 25;
+    // Indicates wifi start failed
+    static final int CMD_START_WIFI_FAILURE                             = BASE + 26;
+    // Stop wifi
+    static final int CMD_STOP_WIFI                                      = BASE + 27;
+    // Wifi teardown is complete
+    static final int CMD_WIFI_STOPPED                                   = BASE + 28;
+
+
 
     WifiStateMachinePrime(WifiInjector wifiInjector,
                           Looper looper,
@@ -255,8 +266,37 @@ public class WifiStateMachinePrime {
         }
 
         class ScanOnlyModeState extends State {
+            IClientInterface mClientInterface = null;
+
             @Override
             public void enter() {
+                final Message message = mModeStateMachine.getCurrentMessage();
+                if (message.what != ModeStateMachine.CMD_START_SCAN_ONLY_MODE) {
+                    Log.d(TAG, "Entering ScanOnlyMode (idle): " + message);
+                    return;
+                }
+
+                // Continue with setup since we are changing modes
+                mClientInterface = null;
+                mWificond = mWifiInjector.makeWificond();
+                if (mWificond == null) {
+                    Log.e(TAG, "Failed to get reference to wificond");
+                    mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    return;
+                }
+
+                try {
+                    // When the other modes are activated - tearDownInterfaces can be removed.
+                    mWificond.tearDownInterfaces();
+                    mClientInterface = mWificond.createClientInterface();
+                } catch (RemoteException e1) { }
+
+                if (mClientInterface == null) {
+                    Log.e(TAG, "Count not get IClientInterface instance from wificond");
+                    mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    return;
+                }
+                mModeStateMachine.transitionTo(mScanOnlyModeActiveState);
             }
 
             @Override
@@ -264,13 +304,29 @@ public class WifiStateMachinePrime {
                 if (checkForAndHandleModeChange(message)) {
                     return HANDLED;
                 }
-                return NOT_HANDLED;
+
+                switch(message.what) {
+                    case CMD_START_WIFI:
+                        // This is no longer a valid message
+                        Log.d(TAG, "Received CMD_START_WIFI (now invalid message) - dropping");
+                        break;
+                    case CMD_START_WIFI_FAILURE:
+                        Log.e(TAG, "Failed to start ScanOnlyMode.  Wait for next mode command.");
+                        // do we need to broadcast that wifi is disabled?
+                        break;
+                    default:
+                        return NOT_HANDLED;
+                }
+                return HANDLED;
             }
 
             @Override
             public void exit() {
-                // Do not tear down interfaces yet since this mode is not actively controlled yet.
-                // tearDownInterfaces();
+                tearDownInterfaces();
+            }
+
+            protected IClientInterface getInterface() {
+                return mClientInterface;
             }
         }
 
@@ -411,11 +467,45 @@ public class WifiStateMachinePrime {
         }
 
         class ScanOnlyModeActiveState extends ModeActiveState {
+            private class WifiListener implements ScanOnlyModeManager.Listener {
+                @Override
+                public void onStateChanged(int state) {
+                    if (state == WifiManager.WIFI_STATE_UNKNOWN) {
+                        mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    } else if (state == WifiManager.WIFI_STATE_DISABLED) {
+                        mModeStateMachine.sendMessage(CMD_WIFI_STOPPED);
+                    }
+                }
+            }
+
             @Override
             public void enter() {
-                // This will be populated when we activate ScanOnlyMode.
-                //this.mActiveModeManager = new ScanOnlyModeManager();
+                this.mActiveModeManager =
+                        mWifiInjector.makeScanOnlyModeManager(mNMService, new WifiListener(),
+                                ((ScanOnlyModeState) mScanOnlyModeState).getInterface());
+                mActiveModeManager.start();
             }
+
+            @Override
+            public boolean processMessage(Message message) {
+                switch(message.what) {
+                    case CMD_START_WIFI:
+                        Log.d(TAG, "Received CMD_START_WIFI when active - invalid message - drop");
+                        break;
+                    case CMD_START_WIFI_FAILURE:
+                        Log.d(TAG, "ScanOnlyMode start failed.  Return to inactive ScanOnlyMode");
+                        mModeStateMachine.transitionTo(mScanOnlyModeState);
+                        break;
+                    case CMD_WIFI_STOPPED:
+                        Log.d(TAG, "ScanOnlyMode stopped.  Return to inactive ScanOnlyMode");
+                        mModeStateMachine.transitionTo(mScanOnlyModeState);
+                        break;
+                    default:
+                        return NOT_HANDLED;
+                }
+                return HANDLED;
+            }
+
         }
 
         class SoftAPModeActiveState extends ModeActiveState {
