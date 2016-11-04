@@ -390,7 +390,8 @@ public class WifiStateMachinePrime {
         class ScanOnlyModeActiveState extends ModeActiveState {
             @Override
             public void enter() {
-                this.mActiveModeManager = new ScanOnlyModeManager();
+                // This will be populated when we activate ScanOnlyMode.
+                //this.mActiveModeManager = new ScanOnlyModeManager();
             }
         }
 
