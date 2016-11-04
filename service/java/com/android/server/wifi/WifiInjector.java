@@ -18,6 +18,7 @@ package com.android.server.wifi;
 
 import android.content.Context;
 import android.net.wifi.IApInterface;
+import android.net.wifi.IClientInterface;
 import android.net.wifi.IWifiScanner;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
@@ -307,6 +308,22 @@ public class WifiInjector {
                                  mWifiNative, mCountryCode.getCountryCode(),
                                  listener, apInterface, nmService,
                                  mWifiApConfigStore, config);
+    }
+
+    /**
+     * Create a ScanOnlyManager.
+     * @param nmService NetworkManagementService allowing ScanOnlyManager to listen for interface
+     * changes
+     * @param listener listener for ScanOnlyManager
+     * @param clientInterface network interface for wifi
+     * @return an instand of ScanOnlyManager
+     */
+    public ScanOnlyModeManager makeScanOnlyModeManager(INetworkManagementService nmService,
+                                                   ScanOnlyModeManager.Listener listener,
+                                                   IClientInterface clientInterface) {
+        return new ScanOnlyModeManager(mContext, mWifiServiceHandlerThread.getLooper(),
+                                       mWifiNative, listener, clientInterface, nmService,
+                                       WifiMonitor.getInstance());
     }
 
     /**
