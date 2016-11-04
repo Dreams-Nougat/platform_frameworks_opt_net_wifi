@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.IApInterface;
+import android.net.wifi.IClientInterface;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -61,9 +62,12 @@ public class WifiStateMachinePrimeTest {
     @Mock Context mContext;
     @Mock IWificond mWificond;
     @Mock IApInterface mApInterface;
+    @Mock IClientInterface mClientInterface;
     @Mock INetworkManagementService mNMService;
     @Mock SoftApManager mSoftApManager;
+    @Mock ScanOnlyModeManager mScanOnlyModeManager;
     SoftApManager.Listener mSoftApListener;
+    ScanOnlyModeManager.Listener mWifiListener;
     WifiStateMachinePrime mWifiStateMachinePrime;
 
     /**
@@ -130,6 +134,36 @@ public class WifiStateMachinePrimeTest {
         mLooper.dispatchNext();
         assertEquals(SOFT_AP_MODE_ACTIVE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
         verify(mSoftApManager).start();
+    }
+
+    /**
+     * Helper method to enter the ScanOnlyActiveMode for WifiStateMachinePrime.
+     *
+     * This method puts the test object into the correct state and verifies steps along the way.
+     */
+    private void enterScanOnlyModeActiveState() throws Exception {
+        String fromState = mWifiStateMachinePrime.getCurrentMode();
+        when(mWifiInjector.makeWificond()).thenReturn(mWificond);
+        when(mWificond.createClientInterface()).thenReturn(mClientInterface);
+        doAnswer(
+                new Answer<Object>() {
+                    public ScanOnlyModeManager answer(InvocationOnMock invocation) {
+                        Object[] args = invocation.getArguments();
+                        assertEquals(mNMService, (INetworkManagementService) args[0]);
+                        mWifiListener = (ScanOnlyModeManager.Listener) args[1];
+                        assertEquals(mClientInterface, (IClientInterface) args[2]);
+                        return mScanOnlyModeManager;
+                    }
+                }).when(mWifiInjector).makeScanOnlyModeManager(any(INetworkManagementService.class),
+                        any(ScanOnlyModeManager.Listener.class), any(IClientInterface.class));
+        mWifiStateMachinePrime.enterScanOnlyMode();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        // we will clean up interfaces (just in case) when we enter ScanOnlyModeState
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_ACTIVE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mScanOnlyModeManager).start();
     }
 
     /**
@@ -380,6 +414,188 @@ public class WifiStateMachinePrimeTest {
         mLooper.dispatchNext();
         assertEquals(SOFT_AP_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
         verify(mWifiApConfigStore).setApConfiguration(eq(config));
+    }
+
+    /**
+     * Test that WifiStateMachinePrime properly enters the ScanOnlyModeActiveState from the
+     * WifiDisabled state.
+     */
+    @Test
+    public void testEnterScanOnlyModeFromDisabled() throws Exception {
+        enterScanOnlyModeActiveState();
+    }
+
+    /**
+     * Test that WifiStateMachinePrime properly enters the ScanOnlyModeActiveState from another
+     * state.
+     *
+     * Expectations: When going from one state to another, any interfaces that are still up are torn
+     * down.
+     */
+    @Test
+    public void testEnterScanOnlyModeFromDifferentState() throws Exception {
+        when(mWifiInjector.makeWificond()).thenReturn(mWificond);
+        mWifiStateMachinePrime.enterClientMode();
+        mLooper.dispatchNext();
+        assertEquals(CLIENT_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        enterScanOnlyModeActiveState();
+    }
+
+    /**
+     * Test that we can disable wifi fully from the ScanOnlyModeActiveState.
+     */
+    @Test
+    public void testDisableWifiFromScanOnlyModeActiveState() throws Exception {
+        enterScanOnlyModeActiveState();
+
+        mWifiStateMachinePrime.disableWifi();
+        mLooper.dispatchNext();
+        verify(mScanOnlyModeManager).stop();
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
+        assertEquals(WIFI_DISABLED_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+    }
+
+    /**
+     * Test that we can disable wifi fully from the ScanOnlyModeState.
+     */
+    @Test
+    public void testDisableWifiFromScanOnlyModeState() throws Exception {
+        // Use a failure getting wificond to stay in the ScanOnlyModeState
+        when(mWifiInjector.makeWificond()).thenReturn(null);
+        mWifiStateMachinePrime.enterScanOnlyMode();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+
+        mWifiStateMachinePrime.disableWifi();
+        mLooper.dispatchNext();
+        // mWificond will be null due to this test, no call to tearDownInterfaces here.
+        assertEquals(WIFI_DISABLED_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+    }
+
+    /**
+     * Test that we can switch from ScanOnlyModeActiveState to another mode.
+     * Expectation: When switching out of ScanOnlyModeActiveState we stop the ScanOnlyModeManager
+     * and tear down existing interfaces.
+     */
+    @Test
+    public void testSwitchModeWhenScanOnlyModeActiveState() throws Exception {
+        enterScanOnlyModeActiveState();
+
+        mWifiStateMachinePrime.enterClientMode();
+        mLooper.dispatchNext();
+        verify(mScanOnlyModeManager).stop();
+        verify(mWificond, atLeast(1)).tearDownInterfaces();
+        assertEquals(CLIENT_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+    }
+
+    /**
+     * Test that we do not attempt to enter ScanOnlyModeActiveState when we cannot get a reference
+     * to wificond.
+     *
+     * Expectations: After a failed attempt to get wificond from WifiInjector, we should remain in
+     * the ScanOnlyModeState.
+     */
+    @Test
+    public void testWificondNullWhenSwitchingToScanOnlyMode() throws Exception {
+        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
+
+        when(mWifiInjector.makeWificond()).thenReturn(null);
+        mWifiStateMachinePrime.enterScanOnlyMode();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+    }
+
+    /**
+     * Test that we do not attempt to enter ScanOnlyModeActiveState when we cannot get a
+     * ClientInterface from wificond.
+     *
+     * Expectations: After a failed attempt to get a ClientInterface from WifiInjector, we should
+     * remain in the ScanOnlyModeState.
+     */
+    @Test
+    public void testClientInterfaceFailedWhenSwitchingToScanOnlyMode() throws Exception {
+        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
+
+        when(mWifiInjector.makeWificond()).thenReturn(mWificond);
+        when(mWificond.createClientInterface()).thenReturn(null);
+        mWifiStateMachinePrime.enterScanOnlyMode();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+    }
+
+    /**
+     * Test that we do can enter the ScanOnlyModeActiveState if we are already in the
+     * ScanOnlyModeState.
+     *
+     * Expectations: We should exit the current ScanOnlyModeState and re-enter before successfully
+     * entering the ScanOnlyModeActiveState.
+     */
+    @Test
+    public void testEnterScanOnlyModeActiveWhenAlreadyInScanOnlyMode() throws Exception {
+        when(mWifiInjector.makeWificond()).thenReturn(mWificond);
+        when(mWificond.createClientInterface()).thenReturn(null);
+        mWifiStateMachinePrime.enterScanOnlyMode();
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+
+        enterScanOnlyModeActiveState();
+    }
+
+    /**
+     * Test that we return to the ScanOnlyModeState after a failure is reported when in the
+     * ScanOnlyModeActiveState.
+     *
+     * Expectations: We should exit the ScanOnlyModeActiveState and stop the
+     * ScanOnlyModeManager.
+     */
+    @Test
+    public void testScanOnlyModeFailureWhenActive() throws Exception {
+        enterScanOnlyModeActiveState();
+        // now inject failure through the ScanOnlyManager.Listener
+        mWifiListener.onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mScanOnlyModeManager).stop();
+    }
+
+    /**
+     * Test that we return to the ScanOnlyModeState after the ScanOnlyModeManager is stopped in
+     * the ScanOnlyModeActiveState.
+     *
+     * Expectations: We should exit the ScanOnlyModeActiveState and stop the ScanOnlyModeManager.
+     */
+    @Test
+    public void testScanOnlyModeDisabledWhenActive() throws Exception {
+        enterScanOnlyModeActiveState();
+        // now inject failure through the Wifi.Listener
+        mWifiListener.onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mScanOnlyModeManager).stop();
+    }
+
+    /**
+     * Test that we exit ScanOnlyModeActiveState when we receive notification that wifi was
+     * disabled.
+     *
+     * Expectations: We should exit the ScanOnlyModeActiveState and stop the ScanOnlyModeManager.
+     */
+    @Test
+    public void testScanOnlyModeManagerUpdatesWifiDisabled() throws Exception {
+        enterScanOnlyModeActiveState();
+        // now inject failure through the Wifi.Listener
+        mWifiListener.onStateChanged(WifiManager.WIFI_STATE_DISABLED);
+        mLooper.dispatchNext();
+        assertEquals(SCAN_ONLY_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        verify(mScanOnlyModeManager).stop();
     }
 
     /**
