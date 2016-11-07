@@ -9,6 +9,14 @@ UUID: 810004b4_0c6007bc
 Bytes: 59
 nit: looks like most of these could validly be marked final
 
+44
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_0c6007bc
+UUID: 8bb2e3c3_4f289eb4
+Bytes: 4
+Done
+
 69
 Tue Nov 01 17:26:59 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -17,6 +25,14 @@ Bytes: 121
 Maybe more accurately:
 
 This ensures that the framework and wificond are in a consistent state after a framework restart.
+
+69
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 06cc2aaa_8e904f67
+UUID: 8bb2e3c3_0f3aa6f9
+Bytes: 4
+Done
 
 76:0-77:70
 Tue Nov 01 17:26:59 2016 +0000
@@ -27,12 +43,28 @@ This probably indicates that wificond died between our obtaining that reference 
 
 "wificond died during framework startup"?
 
+76:0-77:70
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 06cc2aaa_ee2b434b
+UUID: 8bb2e3c3_af36fa13
+Bytes: 4
+Done
+
 125
 Tue Nov 01 17:26:59 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 810004b4_92beecb4
 Bytes: 137
 I think this conditional predates the disabled state.  Wouldn't it make more sense to always deliver these messages to the state machine?
+
+125
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_92beecb4
+UUID: 8bb2e3c3_ef05d231
+Bytes: 154
+I kept this here for the case where the system starts up with wifi disabled.  This way, if it is never enabled, we do not create the state machine at all.
 
 130:15-130:76
 Tue Nov 01 17:26:59 2016 +0000
@@ -41,6 +73,14 @@ UUID: 810004b4_0c2e4758
 Bytes: 215
 To the casual observer, it looks like you're lazily initializing the state machine for no obvious reason.  Could you call out why you're not just instantiating the state machine in the constructor with this comment?
 
+130:15-130:76
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_0c2e4758
+UUID: 8bb2e3c3_afe83a3a
+Bytes: 152
+As above, I am only creating the state machine when we get a mode command.  This allows us to avoid creating the state machine if we will never need it.
+
 156:25-156:40
 Tue Nov 01 17:26:59 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -48,12 +88,32 @@ UUID: 810004b4_d2a86478
 Bytes: 64
 Don't need this, you always deliver the intended mode afterward.
 
+156:25-156:40
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 810004b4_d2a86478
+UUID: 8bb2e3c3_6f6ec2e6
+Bytes: 410
+I use this to determine which mode we are going to start in - this is a result of not creating the state machine if we don't need to.  I pass in the first state and then use the switch below to set the startingState.
+
+I can certainly simplify this class to assume the disabled state first (and always create it).  The thought I had was to accommodate the users (apparently many) that always have wifi disabled.
+
 277:15-293:17
 Tue Nov 01 17:26:59 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 06cc2aaa_cea3e799
 Bytes: 237
 Should this not go into the active state as part of its enter()?  Presumably you'd like to do all the things that might increase your chances of entering the active state each time you enter it (like setting up the underlying interface).
+
+277:15-293:17
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 06cc2aaa_cea3e799
+UUID: 8bb2e3c3_8fbd360f
+Bytes: 653
+As we discussed offline, splitting the startup sequence allows different levels of "recovery."  My thought here was that we may need to restart a mode without tearing everything down underneath (like restarting the ap on a config change).  As this develops we may/will introduce watchdogs that will restart modes based on observed failures.  These may start as re-entering the active mode, but depending on the number and type of failure, may progress to a full restart of the mode.
+
+It is still possible that we will not need the active mode states at all and will continue to consider if these should just be collapsed into the single (4) mode states.
 
 294:16-294:60
 Tue Nov 01 17:26:59 2016 +0000
@@ -65,10 +125,26 @@ What's the point of having a state which exists to transition into a child state
   - do the startup logic on the combined enter() methods in a helper function on receiving CMD_START_*
   - write yourself a common helper object which retries sending a given command to a state (e.g. CMD_START_AP) with capped exponential backoff?
 
+294:16-294:60
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 06cc2aaa_c9c88145
+UUID: 8bb2e3c3_8fa696fb
+Bytes: 258
+As discussed offline - this is partly to allow for different types of restarting/recovering in the modes, but mainly to ease debugging.  When we shut down a mode it will transition from active to the idle mode - this (I believe) will make it easier to debug.
+
 396:71-396:74
 Tue Nov 01 17:26:59 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 06cc2aaa_8e9e0f4a
 Bytes: 89
 Maybe leave a comment that this field is probably null?  When will this ever be non-null?
+
+396:71-396:74
+Mon Nov 07 19:37:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 06cc2aaa_8e9e0f4a
+UUID: 8bb2e3c3_4f197e59
+Bytes: 4
+Done
 
