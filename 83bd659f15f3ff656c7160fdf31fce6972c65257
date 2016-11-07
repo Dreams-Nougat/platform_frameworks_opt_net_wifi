@@ -1,0 +1,28 @@
+Revision: 83bd659f15f3ff656c7160fdf31fce6972c65257
+Patch-set: 4
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+82
+Mon Nov 07 23:24:30 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6bb12ff1_60992803
+Bytes: 504
+1) Logging two messages suggests that two denials occurred, instead of just the one that actually occurred.
+2) The messages are still too verbose. (Log messages do not need to be full English phrases. Unlike proper English, every word in a log message should carry its own weight.)
+
+The reason I'm pressing the second point is that reading logs is very different from reading prose. In logs, extraneous words are noise, that we have to filter out. It's better to remove those words, and provide high SNR.
+
+87:51-87:60
+Mon Nov 07 23:24:30 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6bb12ff1_a09260dd
+Bytes: 109
+Would you interpret the log message any differently, if this word were not present? If not, please remove it.
+
+94
+Mon Nov 07 23:24:30 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6bb12ff1_008a2ca5
+Bytes: 14
+As at line 82.
+
