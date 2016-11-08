@@ -1,0 +1,18 @@
+Revision: 7c76fd556fc8a65aa62c3f0d73e3d46c598c5e38
+Patch-set: 7
+File: service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java
+
+390:57-390:60
+Tue Nov 08 18:34:59 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6bb12ff1_03379112
+Bytes: 87
+Should not be mentioning version 'O' in AOSP, either here, in comments, or method names
+
+3256:29-3256:51
+Tue Nov 08 18:34:59 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6bb12ff1_831c818d
+Bytes: 40
+Fix this, but otherwise the method is ok
+
