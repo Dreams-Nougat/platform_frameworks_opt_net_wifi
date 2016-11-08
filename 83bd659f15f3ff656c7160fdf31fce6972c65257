@@ -12,6 +12,14 @@ Bytes: 504
 
 The reason I'm pressing the second point is that reading logs is very different from reading prose. In logs, extraneous words are noise, that we have to filter out. It's better to remove those words, and provide high SNR.
 
+82
+Tue Nov 08 01:03:05 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6bb12ff1_60992803
+UUID: 6bb12ff1_661220cb
+Bytes: 40
+Will shorten further and combine the two
+
 87:51-87:60
 Mon Nov 07 23:24:30 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -19,10 +27,26 @@ UUID: 6bb12ff1_a09260dd
 Bytes: 109
 Would you interpret the log message any differently, if this word were not present? If not, please remove it.
 
+87:51-87:60
+Tue Nov 08 01:03:05 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6bb12ff1_a09260dd
+UUID: 6bb12ff1_a61b58e1
+Bytes: 17
+Will remove this.
+
 94
 Mon Nov 07 23:24:30 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6bb12ff1_008a2ca5
 Bytes: 14
 As at line 82.
+
+94
+Tue Nov 08 01:03:05 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6bb12ff1_008a2ca5
+UUID: 6bb12ff1_c6184ce7
+Bytes: 10
+Same as 82
 
