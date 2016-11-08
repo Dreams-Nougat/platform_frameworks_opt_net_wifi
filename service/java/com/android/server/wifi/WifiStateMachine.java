@@ -3472,6 +3472,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         if (clientInterface == null) {
             Log.e(TAG, "Could not get IClientInterface instance from wificond");
             return null;
+        } else {
+            Binder.allowBlocking(clientInterface.asBinder());
         }
 
         return clientInterface;
@@ -3491,6 +3493,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         if (apInterface == null) {
             Log.e(TAG, "Could not get IApInterface instance from wificond");
             return null;
+        } else {
+            Binder.allowBlocking(apInterface.asBinder());
         }
 
         if (!mWifiNative.startHal()) {
