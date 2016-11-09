@@ -1,0 +1,25 @@
+Revision: 968156d6b07c5a07de54a3739ace4a7ebde54479
+Patch-set: 5
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+81:29-81:77
+Wed Nov 09 19:46:05 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b676fa0_a79f8a96
+Bytes: 147
+Should this really be "No location permission" ?  (we are using the can_read_peer_mac_addr as a proxy for a type of location permission...  right?)
+
+86:29-86:50
+Wed Nov 09 19:46:05 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b676fa0_27acfad3
+Bytes: 40
+what about "app wifi scan not allowed" ?
+
+92:21-93:69
+Wed Nov 09 19:46:05 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b676fa0_c7b71e2e
+Bytes: 450
+can we shorten up this error message?  We have three categories of failure - location access, app scanning permission and then the profile related check.  If this is shortened to be something like "Profile denied" we not only get the benefit of a short (searchable) log message, but then also capture the type of failure.  That way we do not have to update the error message if the code is changed to check another permission type or profile setting.
+
