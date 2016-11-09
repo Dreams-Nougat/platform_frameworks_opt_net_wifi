@@ -2438,7 +2438,6 @@ public class WifiConfigManager {
         }
 
         WifiConfigStoreData storeData;
-        long readStartTime = mClock.getElapsedSinceBootMillis();
         try {
             storeData = mWifiConfigStore.read();
         } catch (IOException e) {
@@ -2448,9 +2447,6 @@ public class WifiConfigManager {
             Log.wtf(TAG, "XML deserialization of store failed. All saved networks are lost!", e);
             return false;
         }
-        long readTime = mClock.getElapsedSinceBootMillis() - readStartTime;
-        Log.d(TAG, "Reading from store completed in " + readTime + " ms.");
-
         loadInternalData(storeData.getConfigurations(), storeData.getDeletedEphemeralSSIDs());
         return true;
     }
@@ -2486,7 +2482,6 @@ public class WifiConfigManager {
                 new WifiConfigStoreData(
                         sharedConfigurations, userConfigurations, mDeletedEphemeralSSIDs);
 
-        long writeStartTime = mClock.getElapsedSinceBootMillis();
         try {
             mWifiConfigStore.write(forceWrite, storeData);
         } catch (IOException e) {
@@ -2496,8 +2491,6 @@ public class WifiConfigManager {
             Log.wtf(TAG, "XML serialization for store failed. Saved networks maybe lost!", e);
             return false;
         }
-        long writeTime = mClock.getElapsedSinceBootMillis() - writeStartTime;
-        Log.d(TAG, "Writing to store completed in " + writeTime + " ms.");
         return true;
     }
 
