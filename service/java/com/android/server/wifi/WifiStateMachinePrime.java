@@ -245,6 +245,8 @@ public class WifiStateMachinePrime {
         }
 
         class ClientModeState extends State {
+            IClientInterface mClientInterface = null;
+
             @Override
             public void enter() {
                 mWificond = mWifiInjector.makeWificond();
@@ -262,6 +264,10 @@ public class WifiStateMachinePrime {
             public void exit() {
                 // Do not tear down interfaces here since this mode is not actively controlled yet.
                 // tearDownInterfaces();
+            }
+
+            protected IClientInterface getInterface() {
+                return mClientInterface;
             }
         }
 
@@ -456,9 +462,22 @@ public class WifiStateMachinePrime {
         }
 
         class ClientModeActiveState extends ModeActiveState {
+            private class WifiListener implements ClientModeManager.Listener {
+                @Override
+                public void onStateChanged(int state) {
+                    if (state == WifiManager.WIFI_STATE_UNKNOWN) {
+                        mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    } else if (state == WifiManager.WIFI_STATE_DISABLED) {
+                        mModeStateMachine.sendMessage(CMD_WIFI_STOPPED);
+                    }
+                }
+            }
+
             @Override
             public void enter() {
-                this.mActiveModeManager = new ClientModeManager();
+                this.mActiveModeManager =
+                        mWifiInjector.makeClientModeManager(mNMService, new WifiListener(),
+                                ((ClientModeState) mClientModeState).getInterface());
             }
         }
 
