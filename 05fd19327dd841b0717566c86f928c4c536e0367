@@ -1,0 +1,15 @@
+Revision: 05fd19327dd841b0717566c86f928c4c536e0367
+Patch-set: 8
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+121:8-121:59
+Wed Nov 09 21:46:01 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b676fa0_cd42ddad
+Bytes: 193
+We discussed this offline - there is concern about what happens with two calls to switch in to softap mode in succession.  I am:
+1 - noting it here
+2 - writing a test for it.  :)
+
+More to come.
+
