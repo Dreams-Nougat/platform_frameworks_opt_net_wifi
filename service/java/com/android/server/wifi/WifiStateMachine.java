@@ -4745,10 +4745,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     || (!is24GHz && mWifiInfo.getRssi() >= mThresholdSaturatedRssi5);
             if (isBadRSSI) {
                 // Take note that we got disabled while RSSI was Bad
-                config.numUserTriggeredWifiDisableLowRSSI++;
+                config.numUserTriggeredWifiDisableBadRSSI++;
             } else if (isLowRSSI) {
                 // Take note that we got disabled while RSSI was Low
-                config.numUserTriggeredWifiDisableBadRSSI++;
+                config.numUserTriggeredWifiDisableLowRSSI++;
             } else if (!isHighRSSI) {
                 // Take note that we got disabled while RSSI was Not high
                 config.numUserTriggeredWifiDisableNotHighRSSI++;
