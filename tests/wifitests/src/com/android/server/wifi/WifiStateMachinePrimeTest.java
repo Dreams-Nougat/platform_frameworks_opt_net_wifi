@@ -508,7 +508,7 @@ public class WifiStateMachinePrimeTest {
         mLooper.dispatchAll();
         verify(mScanOnlyModeManager).stop();
         verify(mWificond, atLeast(1)).tearDownInterfaces();
-        assertEquals(CLIENT_MODE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
+        assertEquals(CLIENT_MODE_ACTIVE_STATE_STRING, mWifiStateMachinePrime.getCurrentMode());
     }
 
     /**
