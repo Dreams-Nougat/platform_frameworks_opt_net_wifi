@@ -255,7 +255,33 @@ public class WifiStateMachinePrime {
 
             @Override
             public void enter() {
+                final Message message = mModeStateMachine.getCurrentMessage();
+                if (message.what != ModeStateMachine.CMD_START_CLIENT_MODE) {
+                    Log.d(TAG, "Entering ClientMode (idle): " + message);
+                    return;
+                }
+
+                // Continue with setup since we are changing modes
+                mClientInterface = null;
                 mWificond = mWifiInjector.makeWificond();
+                if (mWificond == null) {
+                    Log.e(TAG, "Failed to get reference to wificond");
+                    mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    return;
+                }
+
+                try {
+                    // When the other modes are activated - tearDownInterfaces can be removed.
+                    mWificond.tearDownInterfaces();
+                    mClientInterface = mWificond.createClientInterface();
+                } catch (RemoteException e1) { }
+
+                if (mClientInterface == null) {
+                    Log.e(TAG, "Count not get IClientInterface instance from wificond");
+                    mModeStateMachine.sendMessage(CMD_START_WIFI_FAILURE);
+                    return;
+                }
+                mModeStateMachine.transitionTo(mClientModeActiveState);
             }
 
             @Override
@@ -263,13 +289,20 @@ public class WifiStateMachinePrime {
                 if (checkForAndHandleModeChange(message)) {
                     return HANDLED;
                 }
-                return NOT_HANDLED;
+
+                switch(message.what) {
+                    case CMD_START_WIFI_FAILURE:
+                        Log.e(TAG, "Failed to start ClientMode.  Wait for next mode command.");
+                        break;
+                    default:
+                        return NOT_HANDLED;
+                }
+                return HANDLED;
             }
 
             @Override
             public void exit() {
-                // Do not tear down interfaces here since this mode is not actively controlled yet.
-                // tearDownInterfaces();
+                tearDownInterfaces();
             }
 
             protected IClientInterface getInterface() {
@@ -492,6 +525,24 @@ public class WifiStateMachinePrime {
                 this.mActiveModeManager =
                         mWifiInjector.makeClientModeManager(mNMService, new WifiListener(),
                                 ((ClientModeState) mClientModeState).getInterface());
+                mActiveModeManager.start();
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                switch(message.what) {
+                    case CMD_START_WIFI_FAILURE:
+                        Log.d(TAG, "ClientMode start failed.  Return to inactive ClientMode");
+                        mModeStateMachine.transitionTo(mClientModeState);
+                        break;
+                    case CMD_WIFI_STOPPED:
+                        Log.d(TAG, "ClientMode stopped.  Return to inactive ClientMode");
+                        mModeStateMachine.transitionTo(mClientModeState);
+                        break;
+                    default:
+                        return NOT_HANDLED;
+                }
+                return HANDLED;
             }
         }
 
