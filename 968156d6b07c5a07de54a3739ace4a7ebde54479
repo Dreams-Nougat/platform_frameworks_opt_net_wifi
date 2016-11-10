@@ -9,6 +9,14 @@ UUID: 6b676fa0_a79f8a96
 Bytes: 147
 Should this really be "No location permission" ?  (we are using the can_read_peer_mac_addr as a proxy for a type of location permission...  right?)
 
+81:29-81:77
+Thu Nov 10 18:31:20 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b676fa0_a79f8a96
+UUID: 6b676fa0_33d513cd
+Bytes: 107
+yes. I meant to note the absence of that proxy too. But you are right, it is not necessary. I'll update it.
+
 86:29-86:50
 Wed Nov 09 19:46:05 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,10 +24,26 @@ UUID: 6b676fa0_27acfad3
 Bytes: 40
 what about "app wifi scan not allowed" ?
 
+86:29-86:50
+Thu Nov 10 18:31:20 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b676fa0_27acfad3
+UUID: 6b676fa0_53d207e6
+Bytes: 40
+sounds good too. I can use that instead.
+
 92:21-93:69
 Wed Nov 09 19:46:05 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6b676fa0_c7b71e2e
 Bytes: 450
 can we shorten up this error message?  We have three categories of failure - location access, app scanning permission and then the profile related check.  If this is shortened to be something like "Profile denied" we not only get the benefit of a short (searchable) log message, but then also capture the type of failure.  That way we do not have to update the error message if the code is changed to check another permission type or profile setting.
+
+92:21-93:69
+Thu Nov 10 18:31:20 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b676fa0_c7b71e2e
+UUID: 6b676fa0_d34117a7
+Bytes: 2
+ok
 
