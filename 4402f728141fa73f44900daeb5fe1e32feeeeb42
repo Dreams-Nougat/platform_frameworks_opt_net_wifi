@@ -9,6 +9,14 @@ UUID: 6b612fbb_97fa8405
 Bytes: 127
 Should this be updated to reflect that we are doing trace log statements?  (same with the mention of verbose logging in line 9)
 
+7:5-7:19
+Thu Nov 10 20:53:17 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_97fa8405
+UUID: 6b612fbb_baa3ed3b
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
 
 92:21-92:34
@@ -17,4 +25,12 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6b612fbb_d7f4fc1a
 Bytes: 98
 Switch to using the same format as above?  "Denied: profile not permitted" or something like that?
+
+92:21-92:34
+Thu Nov 10 20:53:17 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_d7f4fc1a
+UUID: 6b612fbb_17ed94db
+Bytes: 4
+Done
 
