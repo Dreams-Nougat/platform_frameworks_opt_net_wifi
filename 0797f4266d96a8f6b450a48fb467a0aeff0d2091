@@ -34,3 +34,13 @@ UUID: 6b612fbb_57e70cfb
 Bytes: 162
 Thanks for the explanation. In that case, shouldn't WifiStateMachine.mLastNetworkId be updated to that network's ID in WifiConfigManager's record of the new user?
 
+2351:37-2351:63
+Thu Nov 10 21:07:10 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_57e70cfb
+UUID: 6b612fbb_fa2005c8
+Bytes: 508
+In this case, there was no new user. This was just the currently logged-in user locking and then unlocking the device on an encrypted/multi-user device (can't reproduce this on my device though). So, we should not be loading from store in the first place. That's why we have this check now, we will only load if there was a user switch.
+
+If there is a user switch, then we will anyway disconnect the currently connected network, so we should not have any issues. This will be handled separately in b/32802464
+
