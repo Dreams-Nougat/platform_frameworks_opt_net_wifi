@@ -9,3 +9,11 @@ UUID: 6b676fa0_21d5c2cc
 Bytes: 187
 What kind of crash did we run into without the check against this flag? If this method is not thread safe, it won't completely address the issue. Unless we rely on callers to synchronize.
 
+2351:37-2351:63
+Thu Nov 10 16:38:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b676fa0_21d5c2cc
+UUID: 6b676fa0_d0f90d10
+Bytes: 622
+No. that's not the cause of crash. What happened was that we were connected to a network and WifiStatMachine had stored the |mLastNetworkId| for the connected network. But, then when we reloaded the networks from config store after unlock which changed the network ID of the connected network in WifiConfigManager's records. Then when WifiStateMachine tried to lookup the network, it got a null pointer. We can add null pointers everywhere in WifiStateMachine, but the root cause of these isssue is this. WifiStateMachine should be able to assume that the connected network's network ID will not change abruptly like this.
+
