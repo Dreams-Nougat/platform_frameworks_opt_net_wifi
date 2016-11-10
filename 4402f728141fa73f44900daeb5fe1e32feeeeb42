@@ -1,0 +1,20 @@
+Revision: 4402f728141fa73f44900daeb5fe1e32feeeeb42
+Patch-set: 6
+File: /COMMIT_MSG
+
+7:5-7:19
+Thu Nov 10 19:48:12 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_97fa8405
+Bytes: 127
+Should this be updated to reflect that we are doing trace log statements?  (same with the mention of verbose logging in line 9)
+
+File: service/java/com/android/server/wifi/util/WifiPermissionsUtil.java
+
+92:21-92:34
+Thu Nov 10 19:48:12 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_d7f4fc1a
+Bytes: 98
+Switch to using the same format as above?  "Denied: profile not permitted" or something like that?
+
