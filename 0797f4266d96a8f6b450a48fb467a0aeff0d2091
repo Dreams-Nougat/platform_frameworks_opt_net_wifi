@@ -26,3 +26,11 @@ Bytes: 56
 Typo above:
 "We can add null pointer checks everywhere "
 
+2351:37-2351:63
+Thu Nov 10 20:21:29 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b676fa0_90ecf54f
+UUID: 6b612fbb_57e70cfb
+Bytes: 162
+Thanks for the explanation. In that case, shouldn't WifiStateMachine.mLastNetworkId be updated to that network's ID in WifiConfigManager's record of the new user?
+
