@@ -1,0 +1,20 @@
+Revision: 7d1d9a21c72ba0bf385740f702bf45084e22f909
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+1043
+Fri Nov 11 16:44:43 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_71afb8ca
+Bytes: 125
+Is similar check needed here when removing an ephemeral network?  Or we don't actually use this to remove ephemeral networks.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
+
+252
+Fri Nov 11 16:44:43 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_31b5401b
+Bytes: 50
+Also verify |openNetwork| is in config store data?
+
