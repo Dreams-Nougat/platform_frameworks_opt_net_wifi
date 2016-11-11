@@ -2499,8 +2499,9 @@ public class WifiConfigManagerTest {
         assertTrue(result.hasProxyChanged());
 
         verifyNetworkAddBroadcast(configuration);
-        // Ephemeral networks should not be persisted.
-        verifyNetworkNotInConfigStoreData(configuration);
+        // Ensure that the write was not invoked for ephemeral network addition.
+        mContextConfigStoreMockOrder.verify(mWifiConfigStore, never())
+                .write(anyBoolean(), any(WifiConfigStoreData.class));
         return result;
     }
 
