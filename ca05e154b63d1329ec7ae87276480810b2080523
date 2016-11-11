@@ -17,3 +17,10 @@ UUID: 6b612fbb_43ed89da
 Bytes: 54
 That makes perfect sense. Patch set#2 has this change.
 
+2076:20-2076:35
+Fri Nov 11 23:01:52 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: eb935fd8_4e377643
+Bytes: 102
+connectedChannelFreq? |home| doesn't really convey that this is currently connected channel frequency.
+
