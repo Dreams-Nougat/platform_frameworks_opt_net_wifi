@@ -9,3 +9,11 @@ UUID: 6b612fbb_c39ef9ed
 Bytes: 245
 Can we move this to inside |fetchChannelSetForNetworkForPartialScan| itself? There is no need to pass this on to the |addToChannelSetForNetworkFromScanDetailCache| because this method says that it's adding the channel set from scan detail cache.
 
+2039:8-2039:40
+Fri Nov 11 22:24:35 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_c39ef9ed
+UUID: 6b612fbb_43ed89da
+Bytes: 54
+That makes perfect sense. Patch set#2 has this change.
+
