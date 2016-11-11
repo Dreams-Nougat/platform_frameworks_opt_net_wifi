@@ -1,0 +1,11 @@
+Revision: 6e60b6ab5f9bbd6401c7937921ce782a3d0f60d3
+Patch-set: 2
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
+
+1480:33-1480:44
+Fri Nov 11 23:01:52 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 0b97d3c5_f22d85c7
+Bytes: 74
+Can u update these docstrings as well. This will go out of sync otherwise.
+
