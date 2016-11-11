@@ -356,6 +356,23 @@ public class WifiInjector {
     }
 
     /**
+     * Create a ClientModeManager.
+     * @param nmService NetworkManagementService allowing ClientModeManager to listen for
+     * interface changes
+     * @param listener listener for ClientModeManager
+     * @param clientInterface network interface for wifi
+     * @return an instance of ClientModeManager
+     */
+    public ClientModeManager makeClientModeManager(INetworkManagementService nmService,
+                                                   ClientModeManager.Listener listener,
+                                                   IClientInterface clientInterface) {
+        return new ClientModeManager(mContext, mWifiServiceHandlerThread.getLooper(),
+                                     mWifiNative, listener, clientInterface, mCountryCode,
+                                     nmService, WifiMonitor.getInstance(), mSupplicantStateTracker,
+                                     mPropertyService, mWifiConfigManager);
+    }
+
+    /**
      * Create a WifiLog instance.
      * @param tag module name to include in all log messages
      */
