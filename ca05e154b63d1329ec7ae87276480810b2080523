@@ -1,0 +1,11 @@
+Revision: ca05e154b63d1329ec7ae87276480810b2080523
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2039:8-2039:40
+Fri Nov 11 21:29:49 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_c39ef9ed
+Bytes: 245
+Can we move this to inside |fetchChannelSetForNetworkForPartialScan| itself? There is no need to pass this on to the |addToChannelSetForNetworkFromScanDetailCache| because this method says that it's adding the channel set from scan detail cache.
+
