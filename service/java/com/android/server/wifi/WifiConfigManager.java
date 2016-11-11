@@ -2025,6 +2025,7 @@ public class WifiConfigManager {
      * |maxChannelSetSize|.
      *
      * @param channelSet        Channel set holding all the channels for the network.
+     * @param homeChannelFreq   Frequency of the currently connected network.
      * @param scanDetailCache   ScanDetailCache entry associated with the network.
      * @param nowInMillis       current timestamp to be used for age comparison.
      * @param ageInMillis       only consider scan details whose timestamps are earlier than this
@@ -2033,8 +2034,13 @@ public class WifiConfigManager {
      * @return false if the list is full, true otherwise.
      */
     private boolean addToChannelSetForNetworkFromScanDetailCache(
-            Set<Integer> channelSet, ScanDetailCache scanDetailCache,
+            Set<Integer> channelSet, int homeChannelFreq, ScanDetailCache scanDetailCache,
             long nowInMillis, long ageInMillis, int maxChannelSetSize) {
+        channelSet.add(homeChannelFreq);
+        if (channelSet.size() >= maxChannelSetSize) {
+            return false;
+        }
+
         if (scanDetailCache != null && scanDetailCache.size() > 0) {
             for (ScanDetail scanDetail : scanDetailCache.values()) {
                 ScanResult result = scanDetail.getScanResult();
@@ -2062,10 +2068,12 @@ public class WifiConfigManager {
      *
      * @param networkId   network ID corresponding to the network.
      * @param ageInMillis only consider scan details whose timestamps are earlier than this value.
+     * @param homeChannelFreq frequency of the currently connected network.
      * @return Set containing the frequencies on which this network was found, null if the network
      * was not found or there are no associated scan details in the cache.
      */
-    public Set<Integer> fetchChannelSetForNetworkForPartialScan(int networkId, long ageInMillis) {
+    public Set<Integer> fetchChannelSetForNetworkForPartialScan(int networkId, long ageInMillis,
+                int homeChannelFreq) {
         WifiConfiguration config = getInternalConfiguredNetwork(networkId);
         if (config == null) {
             return null;
@@ -2096,7 +2104,7 @@ public class WifiConfigManager {
 
         // First get channels for the network.
         if (!addToChannelSetForNetworkFromScanDetailCache(
-                channelSet, scanDetailCache, nowInMillis, ageInMillis,
+                channelSet, homeChannelFreq, scanDetailCache, nowInMillis, ageInMillis,
                 mMaxNumActiveChannelsForPartialScans)) {
             return channelSet;
         }
@@ -2111,8 +2119,8 @@ public class WifiConfigManager {
                 ScanDetailCache linkedScanDetailCache =
                         getScanDetailCacheForNetwork(linkedConfig.networkId);
                 if (!addToChannelSetForNetworkFromScanDetailCache(
-                        channelSet, linkedScanDetailCache, nowInMillis, ageInMillis,
-                        mMaxNumActiveChannelsForPartialScans)) {
+                        channelSet, homeChannelFreq, linkedScanDetailCache, nowInMillis,
+                        ageInMillis, mMaxNumActiveChannelsForPartialScans)) {
                     break;
                 }
             }
