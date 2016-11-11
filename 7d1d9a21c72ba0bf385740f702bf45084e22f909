@@ -9,6 +9,14 @@ UUID: 6b612fbb_71afb8ca
 Bytes: 125
 Is similar check needed here when removing an ephemeral network?  Or we don't actually use this to remove ephemeral networks.
 
+1043
+Fri Nov 11 17:03:08 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_71afb8ca
+UUID: 6b612fbb_718b383b
+Bytes: 103
+Yeah. probably. Although, we don't seem to be removing ephemeral networks currently in NetworkSelector.
+
 File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
 
 252
@@ -17,4 +25,14 @@ Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6b612fbb_31b5401b
 Bytes: 50
 Also verify |openNetwork| is in config store data?
+
+252
+Fri Nov 11 17:03:08 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_31b5401b
+UUID: 6b612fbb_f1eca813
+Bytes: 163
+Yeah. I did think about it. But, that's being tested in other tests and it needs some helper function refactoring. Was too lazy to do it :).
+
+But, anyway done now.
 
