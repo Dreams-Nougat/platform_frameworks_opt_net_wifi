@@ -16,6 +16,11 @@
 
 package com.android.server.wifi;
 
+import android.content.Context;
+import android.net.wifi.IClientInterface;
+import android.os.INetworkManagementService;
+import android.os.Looper;
+
 /**
  * Manager WiFi in Client Mode where we connect to configured networks.
  */
@@ -23,7 +28,26 @@ public class ClientModeManager implements ActiveModeManager {
 
     private static final String TAG = "ClientModeManager";
 
-    ClientModeManager() {
+    private final Context mContext;
+    private final WifiNative mWifiNative;
+    private final Listener mListener;
+    private final IClientInterface mClientInterface;
+    private final INetworkManagementService mNwService;
+    private final WifiMonitor mWifiMonitor;
+
+    ClientModeManager(Context context,
+                      Looper looper,
+                      WifiNative wifiNative,
+                      Listener listener,
+                      IClientInterface clientInterface,
+                      INetworkManagementService nms,
+                      WifiMonitor wifiMonitor) {
+        mContext = context;
+        mWifiNative = wifiNative;
+        mListener = listener;
+        mClientInterface = clientInterface;
+        mNwService = nms;
+        mWifiMonitor = wifiMonitor;
     }
 
     /**
@@ -38,5 +62,16 @@ public class ClientModeManager implements ActiveModeManager {
      */
     public void stop() {
 
+    }
+
+    /**
+     * Listener for ClientMode state changes.
+     */
+    public interface Listener {
+        /**
+         * Invoke when wifi state changes.
+         * @param state new wifi state
+         */
+        void onStateChanged(int state);
     }
 }
