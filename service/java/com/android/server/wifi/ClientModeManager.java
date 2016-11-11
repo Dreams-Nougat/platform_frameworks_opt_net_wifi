@@ -16,6 +16,11 @@
 
 package com.android.server.wifi;
 
+import android.content.Context;
+import android.net.wifi.IClientInterface;
+import android.os.INetworkManagementService;
+import android.os.Looper;
+
 /**
  * Manager WiFi in Client Mode where we connect to configured networks.
  */
@@ -23,7 +28,38 @@ public class ClientModeManager implements ActiveModeManager {
 
     private static final String TAG = "ClientModeManager";
 
-    ClientModeManager() {
+    private final Context mContext;
+    private final WifiNative mWifiNative;
+    private final Listener mListener;
+    private final IClientInterface mClientInterface;
+    private final WifiCountryCode mCountryCode;
+    private final INetworkManagementService mNwService;
+    private final WifiMonitor mWifiMonitor;
+    private final SupplicantStateTracker mSupplicantStateTracker;
+    private final PropertyService mPropertyService;
+    private final WifiConfigManager mWifiConfigManager;
+
+    ClientModeManager(Context context,
+                      Looper looper,
+                      WifiNative wifiNative,
+                      Listener listener,
+                      IClientInterface clientInterface,
+                      WifiCountryCode countryCode,
+                      INetworkManagementService nms,
+                      WifiMonitor wifiMonitor,
+                      SupplicantStateTracker supplicantStateTracker,
+                      PropertyService propertyService,
+                      WifiConfigManager wifiConfigManager) {
+        mContext = context;
+        mWifiNative = wifiNative;
+        mListener = listener;
+        mClientInterface = clientInterface;
+        mCountryCode = countryCode;
+        mNwService = nms;
+        mWifiMonitor = wifiMonitor;
+        mSupplicantStateTracker = supplicantStateTracker;
+        mPropertyService = propertyService;
+        mWifiConfigManager = wifiConfigManager;
     }
 
     /**
@@ -38,5 +74,16 @@ public class ClientModeManager implements ActiveModeManager {
      */
     public void stop() {
 
+    }
+
+    /**
+     * Listener for ClientMode state changes.
+     */
+    public interface Listener {
+        /**
+         * Invoke when wifi state changes.
+         * @param state new wifi state
+         */
+        void onStateChanged(int state);
     }
 }
