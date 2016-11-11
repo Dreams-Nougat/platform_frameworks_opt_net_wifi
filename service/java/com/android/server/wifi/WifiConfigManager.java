@@ -976,8 +976,10 @@ public class WifiConfigManager {
                 result.isNewNetwork()
                         ? WifiManager.CHANGE_REASON_ADDED
                         : WifiManager.CHANGE_REASON_CONFIG_CHANGE);
-        // External modification, persist it immediately.
-        saveToStore(true);
+        // Unless the added network is ephemeral, persist the network update/addition.
+        if (!config.ephemeral) {
+            saveToStore(true);
+        }
         return result;
     }
 
@@ -1038,7 +1040,6 @@ public class WifiConfigManager {
             clearLastSelectedNetwork();
         }
         sendConfiguredNetworkChangedBroadcast(config, WifiManager.CHANGE_REASON_REMOVED);
-        // External modification, persist it immediately.
         saveToStore(true);
         return true;
     }
