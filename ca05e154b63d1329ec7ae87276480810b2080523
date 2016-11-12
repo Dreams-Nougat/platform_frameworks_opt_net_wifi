@@ -24,3 +24,11 @@ UUID: eb935fd8_4e377643
 Bytes: 102
 connectedChannelFreq? |home| doesn't really convey that this is currently connected channel frequency.
 
+2076:20-2076:35
+Sat Nov 12 01:10:04 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb935fd8_4e377643
+UUID: 8b5ca306_f8cba65c
+Bytes: 150
+I am somehow under impression that "home channel" means the channel of the currently connected network. There is no such convention in the wifi world?
+
