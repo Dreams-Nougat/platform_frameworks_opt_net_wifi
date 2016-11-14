@@ -1,0 +1,21 @@
+Revision: 8e390095d5a37a75bd010c7f8e03fc94a26fea6b
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2039:3-2039:64
+Mon Nov 14 21:20:23 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_1c49d5d1
+Bytes: 64
+Nit: even you aren't touching this code, can you make it static?
+
+File: service/java/com/android/server/wifi/WifiConnectivityManager.java
+
+653:63-653:87
+Mon Nov 14 21:20:23 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_bc142109
+Bytes: 174
+What happens if getFrequency() does not return a valid value?
+This code path is reached from startSingleScan() which isn't always necessarily executed while we are connected.
+
