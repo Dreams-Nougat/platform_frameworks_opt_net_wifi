@@ -9,6 +9,14 @@ UUID: 6b612fbb_6c06f53e
 Bytes: 60
 I will delete this (the message printout was for debugging).
 
+278:62-278:71
+Mon Nov 14 22:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_6c06f53e
+UUID: f04a7097_62df92f7
+Bytes: 4
+Done
+
 319
 Mon Nov 14 18:04:50 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -30,4 +38,14 @@ Parent: 6b612fbb_ec1be584
 UUID: 6b612fbb_2cccfd74
 Bytes: 202
 We talked about this offline.  This actually related to error handling in the SoftAPModeState.enter().  I think we agreed that this should move closer to the actual errors (ie. it should be in enter()).
+
+319
+Mon Nov 14 22:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_2cccfd74
+UUID: f04a7097_c2d306ef
+Bytes: 30
+Done
+
+This is better!  Thanks!
 
