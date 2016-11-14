@@ -27,3 +27,13 @@ Bytes: 174
 What happens if getFrequency() does not return a valid value?
 This code path is reached from startSingleScan() which isn't always necessarily executed while we are connected.
 
+653:63-653:87
+Mon Nov 14 22:54:06 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_bc142109
+UUID: f04a7097_82da9e05
+Bytes: 360
+This method is invoked by startSingleScan() only if 'isFullBandScan' is evaluated to false, which happens only if the WiFi traffic is heavy. So the device should be connected.
+
+With that said, I think it's not a bad idea to add a sanity check against the input frequency value in WifiConfigManager.fetchChannelSetForNetworkForPartialScan(). Will update the CL.
+
