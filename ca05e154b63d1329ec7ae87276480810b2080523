@@ -40,3 +40,11 @@ UUID: 505b3c3f_873546ef
 Bytes: 50
 I don't think so. I have not heard of one atleast.
 
+2076:20-2076:35
+Mon Nov 14 18:19:52 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 505b3c3f_873546ef
+UUID: 6b612fbb_8c88a970
+Bytes: 128
+I heard of that from Paul and confirmed with him just now. Also Kumar uses that term as well. See his comment #38 in b/31707128.
+
