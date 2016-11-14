@@ -1,0 +1,18 @@
+Revision: 9c8d2fd80c3df4ca2bb7d46d14874c1501cd4dff
+Patch-set: 8
+File: service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+328:24-337:83
+Mon Nov 14 23:01:19 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_8219fef4
+Bytes: 170
+I can also move this to a private method...  would you also like this to be called directly from enter() or is it ok to do this here when the failure to start is handled?
+
+428:26-430:25
+Mon Nov 14 23:01:19 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_425d3698
+Bytes: 55
+now that we have a disabled state, this can be removed.
+
