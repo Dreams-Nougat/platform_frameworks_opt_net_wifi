@@ -23,3 +23,11 @@ I'm not sure I understand this logic:
 
 So it seems like if you wanted to persist that config (that potentially failed), you would store it in SoftAPModeActiveState.enter() right?  This is a different config.
 
+319
+Mon Nov 14 18:44:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6b612fbb_ec1be584
+UUID: 6b612fbb_2cccfd74
+Bytes: 202
+We talked about this offline.  This actually related to error handling in the SoftAPModeState.enter().  I think we agreed that this should move closer to the actual errors (ie. it should be in enter()).
+
