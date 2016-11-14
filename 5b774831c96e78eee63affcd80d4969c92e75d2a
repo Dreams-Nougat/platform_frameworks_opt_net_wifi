@@ -9,3 +9,17 @@ UUID: 6b612fbb_6c06f53e
 Bytes: 60
 I will delete this (the message printout was for debugging).
 
+319
+Mon Nov 14 18:04:50 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6b612fbb_ec1be584
+Bytes: 492
+I'm not sure I understand this logic:
+
+1) WSMP sent itself CMD_START_SOFT_AP_MODE and queued a config
+2) some state received that command, transitioned to SoftApModeState
+3) SoftApModeState.enter() *always* transitions to SoftAPModeActiveState
+4) SoftAPModeActiveState.enter() *always* polls the config queue exactly once.
+
+So it seems like if you wanted to persist that config (that potentially failed), you would store it in SoftAPModeActiveState.enter() right?  This is a different config.
+
