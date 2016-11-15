@@ -9,6 +9,14 @@ UUID: f04a7097_7742a75f
 Bytes: 177
 it looks like one of the issues is that this is returning null.  Would it be good to explicitly call that out instead of checking it inside the getCurrentWifiConfiguration call?
 
+5260:0-5260:76
+Tue Nov 15 23:04:53 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_7742a75f
+UUID: f04a7097_32366da3
+Bytes: 129
+This will not return "null". It might return -1, if the network Id does not match. But, that is anyway caught in the check below.
+
 6909:0-6909:71
 Tue Nov 15 21:22:13 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -22,4 +30,12 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: f04a7097_77bf4706
 Bytes: 243
 it seems like the behavior here is't change, but we are changing the code to avoid a log message.  Since this is used in other places, are we going to be masking an issue looking up an invalid ID to avoid logging in the case for the log above?
+
+6912:0-6912:100
+Tue Nov 15 23:04:53 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_77bf4706
+UUID: f04a7097_920661ce
+Bytes: 125
+Hmm. true. I'll put this back and check if we're using this when we are not connected. Will do it in a separate CL if needed.
 
