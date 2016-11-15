@@ -1,0 +1,18 @@
+Revision: ea8bdc19b27db7395bf0ee1184bc5bda28b1347f
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+5260:19-5261:33
+Tue Nov 15 23:52:36 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_cd596e49
+Bytes: 344
+In the case of sending CMD_DISCONNECT, do we still need to update this two variables? Anything bad could happen if we update them but then send out the disconnection command? Especially if something happen before CMD_DISCONNECT gets executed? I haven't gone through the logic of where these two variables get used. Just throw out this question.
+
+5275
+Tue Nov 15 23:52:36 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_0d62361b
+Bytes: 136
+Add some log to explain what's going on here? Otherwise a disconnection right after "Network connection established" can confuse people.
+
