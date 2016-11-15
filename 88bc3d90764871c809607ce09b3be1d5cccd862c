@@ -1,0 +1,20 @@
+Revision: 88bc3d90764871c809607ce09b3be1d5cccd862c
+Patch-set: 4
+File: service/java/com/android/server/wifi/ScanOnlyModeManager.java
+
+84
+Tue Nov 15 17:37:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_a67367c5
+Bytes: 336
+I'm not a huge fan of this, but I don't know if I have better suggestions.  You really want to write "transition to idle state in a blocking way" right?  After you call this, we have a state machine that seems to be in the active state, but with exit() called, or in the idle state.
+
+Do you only call this from the state machine thread?
+
+108
+Tue Nov 15 17:37:14 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_c6fdd3c1
+Bytes: 188
+I can't help but think that the presence of an idle state in here is another argument not having a scan mode idle state in the mode state machine.  It seems kind of redundant to have both.
+
