@@ -11,10 +11,28 @@ I'm not a huge fan of this, but I don't know if I have better suggestions.  You 
 
 Do you only call this from the state machine thread?
 
+84
+Tue Nov 15 17:51:33 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_a67367c5
+UUID: f04a7097_a62b6744
+Bytes: 239
+yeah, I haven't found a better way to do this yet.  Maybe I can clean it up in the future with a properly implemented halt on the state machine.
+
+yes, this is only called from the handler thread (The WifiStateMachine(Prime) handler thread.
+
 108
 Tue Nov 15 17:37:14 2016 +0000
 Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: f04a7097_c6fdd3c1
 Bytes: 188
 I can't help but think that the presence of an idle state in here is another argument not having a scan mode idle state in the mode state machine.  It seems kind of redundant to have both.
+
+108
+Tue Nov 15 17:51:33 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_c6fdd3c1
+UUID: f04a7097_46e383ed
+Bytes: 605
+The problem here is I need to wait on supplicant to come up.  Once I get the supplicant connected notification we move over to the active state and I let Scanning service know we are ready.  The two Idle states are different phases of the startup.  I think this will look much more clean when the error recovery stuff goes in, but remember..  I also plan on simplifying this to potentially not even be a state machine.  Nothing really even happens here, so it doesn't make a lot of sense.  (We had discussed this before and decided to move it to after the major refactor to keep things from slowing down.)
 
