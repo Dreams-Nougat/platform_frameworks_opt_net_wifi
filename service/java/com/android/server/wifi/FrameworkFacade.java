@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.TrafficStats;
 import android.net.ip.IpManager;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -61,11 +60,6 @@ public class FrameworkFacade {
 
     public PendingIntent getBroadcast(Context context, int requestCode, Intent intent, int flags) {
         return PendingIntent.getBroadcast(context, requestCode, intent, flags);
-    }
-
-    public SupplicantStateTracker makeSupplicantStateTracker(Context context,
-            WifiConfigManager configManager, Handler handler) {
-        return new SupplicantStateTracker(context, configManager, handler);
     }
 
     public boolean getConfigWiFiDisableInECBM(Context context) {

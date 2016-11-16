@@ -88,6 +88,7 @@ public class WifiInjector {
     private final IpConfigStore mIpConfigStore;
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
+    private final SupplicantStateTracker mSupplicantStateTracker;
     private final WifiNetworkSelector mWifiNetworkSelector;
     private WifiScanner mWifiScanner;
     private final WifiPermissionsWrapper mWifiPermissionsWrapper;
@@ -149,6 +150,8 @@ public class WifiInjector {
         mWifiConfigManager = new WifiConfigManager(mContext, mFrameworkFacade, mClock,
                 UserManager.get(mContext), TelephonyManager.from(mContext),
                 mWifiKeyStore, mWifiConfigStore, mWifiConfigStoreLegacy);
+        mSupplicantStateTracker = new SupplicantStateTracker(mContext, mWifiConfigManager,
+                mWifiStateMachineHandlerThread.getLooper());
         mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager, mClock);
 
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
@@ -284,6 +287,10 @@ public class WifiInjector {
 
     public WifiConfigManager getWifiConfigManager() {
         return mWifiConfigManager;
+    }
+
+    public SupplicantStateTracker getSupplicantStateTracker() {
+        return mSupplicantStateTracker;
     }
 
     public PasspointManager getPasspointManager() {

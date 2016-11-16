@@ -885,8 +885,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
         mWifiInfo = new WifiInfo();
         mWifiNetworkSelector = mWifiInjector.getWifiNetworkSelector();
-        mSupplicantStateTracker =
-                mFacade.makeSupplicantStateTracker(context, mWifiConfigManager, getHandler());
+        mSupplicantStateTracker = mWifiInjector.getSupplicantStateTracker();
 
         mLinkProperties = new LinkProperties();
 
