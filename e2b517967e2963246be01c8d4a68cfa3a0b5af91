@@ -1,0 +1,11 @@
+Revision: e2b517967e2963246be01c8d4a68cfa3a0b5af91
+Patch-set: 5
+File: service/java/com/android/server/wifi/util/InformationElementUtil.java
+
+388:46-388:58
+Wed Nov 16 00:15:36 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: f04a7097_2889e00c
+Bytes: 91
+Do u need to do this? You should be able to just do: keyManagement.add(ScanResult.AKM_EAP);
+
