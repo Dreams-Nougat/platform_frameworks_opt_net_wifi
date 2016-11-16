@@ -17,7 +17,9 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.NetworkInfo;
 import android.net.wifi.IClientInterface;
+import android.net.wifi.WifiInfo;
 import android.os.INetworkManagementService;
 import android.os.Looper;
 
@@ -38,6 +40,8 @@ public class ClientModeManager implements ActiveModeManager {
     private final SupplicantStateTracker mSupplicantStateTracker;
     private final PropertyService mPropertyService;
     private final WifiConfigManager mWifiConfigManager;
+    private final NetworkInfo mNetworkInfo;
+    private final WifiInfo mWifiInfo;
 
     ClientModeManager(Context context,
                       Looper looper,
@@ -49,7 +53,8 @@ public class ClientModeManager implements ActiveModeManager {
                       WifiMonitor wifiMonitor,
                       SupplicantStateTracker supplicantStateTracker,
                       PropertyService propertyService,
-                      WifiConfigManager wifiConfigManager) {
+                      WifiConfigManager wifiConfigManager,
+                      NetworkInfo networkInfo, WifiInfo wifiInfo) {
         mContext = context;
         mWifiNative = wifiNative;
         mListener = listener;
@@ -60,6 +65,8 @@ public class ClientModeManager implements ActiveModeManager {
         mSupplicantStateTracker = supplicantStateTracker;
         mPropertyService = propertyService;
         mWifiConfigManager = wifiConfigManager;
+        mNetworkInfo = networkInfo;
+        mWifiInfo = wifiInfo;
     }
 
     /**
