@@ -22,7 +22,7 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.BatteryStats;
-import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.RemoteException;
@@ -88,8 +88,8 @@ public class SupplicantStateTracker extends StateMachine {
         return getCurrentState().getName();
     }
 
-    public SupplicantStateTracker(Context c, WifiConfigManager wcs, Handler t) {
-        super(TAG, t.getLooper());
+    public SupplicantStateTracker(Context c, WifiConfigManager wcs, Looper looper) {
+        super(TAG, looper);
 
         mContext = c;
         mWifiConfigManager = wcs;

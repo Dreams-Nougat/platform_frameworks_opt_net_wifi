@@ -94,6 +94,7 @@ public class WifiInjector {
     private final IpConfigStore mIpConfigStore;
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
+    private final SupplicantStateTracker mSupplicantStateTracker;
     private final WifiNetworkSelector mWifiNetworkSelector;
     private final SavedNetworkEvaluator mSavedNetworkEvaluator;
     private final ExternalScoreEvaluator mExternalScoreEvaluator;
@@ -164,6 +165,8 @@ public class WifiInjector {
         mNetworkScoreManager = (NetworkScoreManager)
                 mContext.getSystemService(Context.NETWORK_SCORE_SERVICE);
         mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
+        mSupplicantStateTracker = new SupplicantStateTracker(mContext, mWifiConfigManager,
+                mWifiStateMachineHandlerThread.getLooper());
         mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager, mClock);
         LocalLog localLog = mWifiNetworkSelector.getLocalLog();
         mSavedNetworkEvaluator = new SavedNetworkEvaluator(mContext,
@@ -312,6 +315,10 @@ public class WifiInjector {
 
     public WifiConfigManager getWifiConfigManager() {
         return mWifiConfigManager;
+    }
+
+    public SupplicantStateTracker getSupplicantStateTracker() {
+        return mSupplicantStateTracker;
     }
 
     public PasspointManager getPasspointManager() {

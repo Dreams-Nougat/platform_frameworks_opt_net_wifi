@@ -372,9 +372,7 @@ public class WifiStateMachineTest {
         when(factory.makeApConfigStore(eq(context), eq(mBackupManagerProxy)))
                 .thenReturn(mApConfigStore);
 
-        when(factory.makeSupplicantStateTracker(
-                any(Context.class), any(WifiConfigManager.class),
-                any(Handler.class))).thenReturn(mSupplicantStateTracker);
+        when(mWifiInjector.getSupplicantStateTracker()).thenReturn(mSupplicantStateTracker);
 
         when(mUserManager.getProfileParent(11))
                 .thenReturn(new UserInfo(UserHandle.USER_SYSTEM, "owner", 0));
