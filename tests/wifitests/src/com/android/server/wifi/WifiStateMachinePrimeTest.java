@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IClientInterface;
 import android.net.wifi.IWificond;
@@ -66,6 +67,7 @@ public class WifiStateMachinePrimeTest {
     @Mock INetworkManagementService mNMService;
     @Mock SoftApManager mSoftApManager;
     @Mock ScanOnlyModeManager mScanOnlyModeManager;
+    @Mock NetworkInfo mNetworkInfo;
     SoftApManager.Listener mSoftApListener;
     ScanOnlyModeManager.Listener mWifiListener;
     WifiStateMachinePrime mWifiStateMachinePrime;
@@ -86,7 +88,8 @@ public class WifiStateMachinePrimeTest {
 
     private WifiStateMachinePrime createWifiStateMachinePrime() {
         when(mWifiInjector.makeWificond()).thenReturn(null);
-        return new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService, mContext);
+        return new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(),
+                mNMService, mContext, mNetworkInfo);
     }
 
     /**
@@ -173,7 +176,8 @@ public class WifiStateMachinePrimeTest {
     public void testWificondExistsOnStartup() throws Exception {
         when(mWifiInjector.makeWificond()).thenReturn(mWificond);
         WifiStateMachinePrime testWifiStateMachinePrime =
-                new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService, mContext);
+                new WifiStateMachinePrime(mWifiInjector, mLooper.getLooper(), mNMService,
+                        mContext, mNetworkInfo);
         verify(mWificond).tearDownInterfaces();
     }
 

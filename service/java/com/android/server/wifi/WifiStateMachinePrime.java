@@ -18,6 +18,7 @@ package com.android.server.wifi;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IClientInterface;
 import android.net.wifi.IWificond;
@@ -52,6 +53,7 @@ public class WifiStateMachinePrime {
     private final Looper mLooper;
     private final INetworkManagementService mNMService;
     private final Context mContext;
+    private final NetworkInfo mNetworkInfo;
 
     private IWificond mWificond;
 
@@ -82,11 +84,15 @@ public class WifiStateMachinePrime {
     WifiStateMachinePrime(WifiInjector wifiInjector,
                           Looper looper,
                           INetworkManagementService nmService,
-                          Context context) {
+                          Context context,
+                          NetworkInfo networkInfo) {
         mWifiInjector = wifiInjector;
         mLooper = looper;
         mNMService = nmService;
         mContext = context;
+        mNetworkInfo = networkInfo;
+
+        mNetworkInfo.setIsAvailable(false);
 
         // Clean up existing interfaces in wificond.
         // This ensures that the framework and wificond are in a consistent state after a framework
