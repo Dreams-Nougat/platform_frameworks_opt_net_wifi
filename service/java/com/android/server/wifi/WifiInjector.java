@@ -112,6 +112,7 @@ public class WifiInjector {
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
     private final PowerManager mPowerManager;
+    private WifiConnectivityManager mWifiConnectivityManager;
 
     private final boolean mUseRealLogger;
 
@@ -333,6 +334,10 @@ public class WifiInjector {
         return mPasspointManager;
     }
 
+    public PowerManager getPowerManager() {
+        return mPowerManager;
+    }
+
     public TelephonyManager makeTelephonyManager() {
         // may not be available when WiFi starts
         return (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
@@ -390,11 +395,18 @@ public class WifiInjector {
     public ClientModeManager makeClientModeManager(INetworkManagementService nmService,
                                                    ClientModeManager.Listener listener,
                                                    IClientInterface clientInterface) {
-        return new ClientModeManager(mContext, mWifiServiceHandlerThread.getLooper(),
+        WifiInfo wifiInfo = new WifiInfo();
+        return new ClientModeManager(mContext, mFrameworkFacade,
+                                     mWifiServiceHandlerThread.getLooper(),
                                      mWifiNative, listener, clientInterface, mCountryCode,
-                                     nmService, WifiMonitor.getInstance(), mSupplicantStateTracker,
+                                     nmService, WifiMonitor.getInstance(),
+                                     mWifiSupplicantControl, mSupplicantStateTracker,
                                      mPropertyService, mWifiConfigManager, mNetworkInfo,
-                                     new WifiInfo());
+                                     wifiInfo, getWifiScanner(),
+                                     makeWifiConnectivityManager(wifiInfo, false), mPowerManager,
+                                     mWifiMetrics, BatteryStatsService.getService(),
+                                     makeWifiDiagnostics(mWifiNative), mWifiLastResortWatchdog,
+                                     new WifiScoreReport(mContext, mWifiConfigManager));
     }
 
     /**
@@ -446,11 +458,15 @@ public class WifiInjector {
      */
     public WifiConnectivityManager makeWifiConnectivityManager(WifiInfo wifiInfo,
                                                                boolean hasConnectionRequests) {
-        return new WifiConnectivityManager(mContext, mWifiStateMachine, getWifiScanner(),
-                mWifiConfigManager, wifiInfo, mWifiNetworkSelector, mWifiLastResortWatchdog,
-                mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(), mClock,
-                hasConnectionRequests, mFrameworkFacade, mSavedNetworkEvaluator,
-                mExternalScoreEvaluator, mRecommendedNetworkEvaluator);
+        if (mWifiConnectivityManager == null) {
+            mWifiConnectivityManager = new WifiConnectivityManager(mContext, mWifiStateMachine,
+                    getWifiScanner(), mWifiConfigManager, wifiInfo, mWifiNetworkSelector,
+                    mWifiLastResortWatchdog, mWifiMetrics,
+                    mWifiStateMachineHandlerThread.getLooper(), mClock, hasConnectionRequests,
+                    mFrameworkFacade, mSavedNetworkEvaluator, mExternalScoreEvaluator,
+                    mRecommendedNetworkEvaluator);
+        }
+        return mWifiConnectivityManager;
     }
 
     public WifiPermissionsUtil getWifiPermissionsUtil() {
@@ -459,9 +475,5 @@ public class WifiInjector {
 
     public WifiPermissionsWrapper getWifiPermissionsWrapper() {
         return mWifiPermissionsWrapper;
-    }
-
-    public PowerManager getPowerManager() {
-        return mPowerManager;
     }
 }

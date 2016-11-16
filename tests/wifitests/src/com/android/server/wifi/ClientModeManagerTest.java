@@ -31,21 +31,31 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.InterfaceConfiguration;
 import android.net.NetworkInfo;
+import android.net.ip.IpManager;
 import android.net.wifi.IClientInterface;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WifiScanner;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.IBinder.DeathRecipient;
 import android.os.INetworkManagementService;
+import android.os.IPowerManager;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.test.TestLooper;
+import android.provider.Settings;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.android.internal.R;
+import com.android.internal.app.IBatteryStats;
 import com.android.server.net.BaseNetworkObserver;
 
 import org.junit.Before;
@@ -63,6 +73,7 @@ public class ClientModeManagerTest {
 
     private static final String TAG = "ClientModeManagerTest";
     private static final String TEST_INTERFACE_NAME = "testif0";
+    private static final int DEFAULT_SCAN_INTERVAL = 15000;
 
     @Mock Context mContext;
     TestLooper mLooper;
@@ -80,6 +91,21 @@ public class ClientModeManagerTest {
     @Mock WifiConfigManager mWifiConfigManager;
     @Mock NetworkInfo mNetworkInfo;
     @Mock WifiInfo mWifiInfo;
+    @Mock FrameworkFacade mFacade;
+    @Mock WifiSupplicantControl mWifiSupplicantControl;
+    @Mock WifiScanner mWifiScanner;
+    @Mock WifiConnectivityManager mWifiConnectivityManager;
+    @Mock IPowerManager mIPowerManager;
+    PowerManager mPowerManager;
+    @Mock WifiMetrics mWifiMetrics;
+    @Mock IBatteryStats mBatteryStats;
+    @Mock BaseWifiDiagnostics mWifiDiagnostics;
+    @Mock WifiLastResortWatchdog mWifiLastResortWatchdog;
+    @Mock WifiScoreReport mWifiScoreReport;
+    MockResources mResources;
+    @Mock PackageManager mPackageManager;
+    @Mock IpManager mIpManager;
+    @Mock ContentResolver mContentResolver;
 
     final ArgumentCaptor<DeathRecipient> mDeathListenerCaptor =
             ArgumentCaptor.forClass(DeathRecipient.class);
@@ -95,6 +121,8 @@ public class ClientModeManagerTest {
         mLooper = new TestLooper();
         mWifiMonitorMock = new MockWifiMonitor();
         mWifiMonitor = mWifiMonitorMock.getWifiMonitor();
+        mPowerManager = new PowerManager(mContext, mIPowerManager, new Handler());
+        mResources = new MockResources();
 
         when(mClientInterface.asBinder()).thenReturn(mClientInterfaceBinder);
         when(mClientInterface.getInterfaceName()).thenReturn(TEST_INTERFACE_NAME);
@@ -102,10 +130,21 @@ public class ClientModeManagerTest {
 
     private ClientModeManager createClientModeManager() throws Exception {
         when(mClientInterface.asBinder()).thenReturn(mClientInterfaceBinder);
-        ClientModeManager newClientModeManager = new ClientModeManager(mContext,
+        when(mContext.getResources()).thenReturn(mResources);
+        mResources.setInteger(R.integer.config_wifi_supplicant_scan_interval,
+                              DEFAULT_SCAN_INTERVAL);
+        when(mContext.getPackageManager()).thenReturn(mPackageManager);
+        when(mFacade.makeIpManager(any(), any(), any())).thenReturn(mIpManager);
+        when(mFacade.getLongSetting(mContext, Settings.Global.WIFI_SUPPLICANT_SCAN_INTERVAL_MS,
+                DEFAULT_SCAN_INTERVAL)).thenReturn((long) DEFAULT_SCAN_INTERVAL);
+        when(mContext.getContentResolver()).thenReturn(mContentResolver);
+        ClientModeManager newClientModeManager = new ClientModeManager(mContext, mFacade,
                 mLooper.getLooper(), mWifiNative, mListener, mClientInterface, mCountryCode,
-                mNmService, mWifiMonitorMock.getWifiMonitor(), mSupplicantStateTracker,
-                mPropertyService, mWifiConfigManager, mNetworkInfo, mWifiInfo);
+                mNmService, mWifiMonitorMock.getWifiMonitor(), mWifiSupplicantControl,
+                mSupplicantStateTracker,
+                mPropertyService, mWifiConfigManager, mNetworkInfo, mWifiInfo, mWifiScanner,
+                mWifiConnectivityManager, mPowerManager, mWifiMetrics, mBatteryStats,
+                mWifiDiagnostics, mWifiLastResortWatchdog, mWifiScoreReport);
         return newClientModeManager;
     }
 
