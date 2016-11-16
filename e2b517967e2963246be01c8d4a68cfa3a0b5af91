@@ -9,3 +9,11 @@ UUID: f04a7097_2889e00c
 Bytes: 91
 Do u need to do this? You should be able to just do: keyManagement.add(ScanResult.AKM_EAP);
 
+388:46-388:58
+Wed Nov 16 19:52:49 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_2889e00c
+UUID: f04a7097_e39c325a
+Bytes: 6
+Fixed.
+
