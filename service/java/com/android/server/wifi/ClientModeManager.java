@@ -27,8 +27,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.UserHandle;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.internal.R;
 import com.android.internal.util.State;
 import com.android.internal.util.StateMachine;
 import com.android.server.net.BaseNetworkObserver;
@@ -39,6 +42,8 @@ import com.android.server.net.BaseNetworkObserver;
 public class ClientModeManager implements ActiveModeManager {
 
     private static final String TAG = "ClientModeManager";
+
+    private static final String GOOGLE_OUI = "DA-A1-19";
 
     private final Context mContext;
     private final WifiNative mWifiNative;
@@ -134,6 +139,8 @@ public class ClientModeManager implements ActiveModeManager {
         private NetworkObserver mNetworkObserver;
         private boolean mIfaceIsUp = false;
 
+        private String mInterfaceName = null;
+
         private class NetworkObserver extends BaseNetworkObserver {
             private final String mIfaceName;
             NetworkObserver(String ifaceName) {
@@ -150,10 +157,10 @@ public class ClientModeManager implements ActiveModeManager {
         }
 
         private void registerWifiMonitorHandlers() throws RemoteException {
-            mWifiMonitor.registerHandler(mClientInterface.getInterfaceName(),
+            mWifiMonitor.registerHandler(mInterfaceName,
                                          WifiMonitor.SUP_CONNECTION_EVENT,
                                          getHandler());
-            mWifiMonitor.registerHandler(mClientInterface.getInterfaceName(),
+            mWifiMonitor.registerHandler(mInterfaceName,
                                          WifiMonitor.SUP_DISCONNECTION_EVENT,
                                          getHandler());
         }
@@ -180,11 +187,34 @@ public class ClientModeManager implements ActiveModeManager {
 
         private class IdleState extends State {
             private boolean mStartCalled = false;
+            private String mInterfaceName;
 
             @Override
             public void enter() {
                 mDeathRecipient.unlinkToDeath();
                 unregisterObserver();
+                // make sure we clean up any configured IP addresses.
+                try {
+                    mInterfaceName = mClientInterface.getInterfaceName();
+                    // A runtime crash or shutting down AP mode can leave
+                    // IP addresses configured, and this affects
+                    // connectivity when supplicant starts up.
+                    // Ensure we have no IP addresses before a supplicant start.
+                    mNwService.clearInterfaceAddresses(mInterfaceName);
+
+                    // Set privacy extensions
+                    mNwService.setInterfaceIpv6PrivacyExtensions(mInterfaceName, true);
+
+                    // IPv6 is enabled only as long as access point is connected since:
+                    // - IPv6 addresses and routes stick around after disconnection
+                    // - kernel is unaware when connected and fails to start IPv6 negotiation
+                    // - kernel can start autoconfiguration when 802.1x is not complete
+                    mNwService.disableIpv6(mInterfaceName);
+                } catch (RemoteException re) {
+                    loge("Unable to change interface settings: " + re);
+                } catch (IllegalStateException ie) {
+                    loge("Unable to change interface settings: " + ie);
+                }
             }
 
             @Override
@@ -200,7 +230,7 @@ public class ClientModeManager implements ActiveModeManager {
 
                         try {
                             mNetworkObserver =
-                                    new NetworkObserver(mClientInterface.getInterfaceName());
+                                    new NetworkObserver(mInterfaceName);
                             mNwService.registerObserver(mNetworkObserver);
                         } catch (RemoteException e) {
                             mDeathRecipient.unlinkToDeath();
@@ -224,7 +254,7 @@ public class ClientModeManager implements ActiveModeManager {
                                 break;
                             }
                             registerWifiMonitorHandlers();
-                            mWifiMonitor.startMonitoring(mClientInterface.getInterfaceName());
+                            mWifiMonitor.startMonitoring(mInterfaceName);
                         } catch (RemoteException e) {
                             Log.e(TAG, "RemoteException when starting supplicant");
                             mDeathRecipient.unlinkToDeath();
@@ -243,6 +273,7 @@ public class ClientModeManager implements ActiveModeManager {
                         mIfaceIsUp = message.arg1 == 1;
                         break;
                     case WifiMonitor.SUP_CONNECTION_EVENT:
+                        Log.d(TAG, "Supplicant connection established");
                         if (!mStartCalled) {
                             // TODO: remove the mStartCalled checks and variable when client mode is
                             // activated in WSMP - control split between WSM and WSMP causes issues
@@ -287,7 +318,33 @@ public class ClientModeManager implements ActiveModeManager {
             @Override
             public void enter() {
                 Log.d(TAG, "entering StartedState");
-                updateWifiState(WifiManager.WIFI_STATE_ENABLED);
+                // finish setting up supplicant
+                // initialize details for WPS
+                initializeWpsDetails();
+
+                // Reset supplicant state to indicate the supplicant state is not known at this
+                // time. TODO: this is done in WSM - is it really necessary?
+                //mSupplicantStateTracker.sendMessage(CMD_RESET_SUPPLICANT_STATE);
+                mWifiInfo.setMacAddress(mWifiNative.getMacAddress());
+                mWifiConfigManager.loadFromStore();
+
+                int defaultInterval = mContext.getResources().getInteger(
+                        R.integer.config_wifi_supplicant_scan_interval);
+                long supplicantScanIntervalMs =
+                        Settings.Global.getLong(mContext.getContentResolver(),
+                                                Settings.Global.WIFI_SUPPLICANT_SCAN_INTERVAL_MS,
+                                                defaultInterval);
+
+                mWifiNative.setScanInterval((int) supplicantScanIntervalMs / 1000);
+                mWifiNative.setExternalSim(true);
+
+                // turn on use of DFS channels
+                mWifiNative.setDfsFlag(true);
+
+                setRandomMacOui();
+                mWifiNative.enableAutoConnect(false);
+                mCountryCode.setReadyForChange(true);
+
                 sendSupplicantConnectionChangedBroadcast(true);
 
                 if (mIfaceIsUp) {
@@ -371,6 +428,52 @@ public class ClientModeManager implements ActiveModeManager {
             intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
             intent.putExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, connected);
             mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+        }
+
+        private void initializeWpsDetails() {
+            String detail;
+            detail = mPropertyService.get("ro.product.name", "");
+            if (!mWifiNative.setDeviceName(detail)) {
+                loge("Failed to set device name " +  detail);
+            }
+            detail = mPropertyService.get("ro.product.manufacturer", "");
+            if (!mWifiNative.setManufacturer(detail)) {
+                loge("Failed to set manufacturer " + detail);
+            }
+            detail = mPropertyService.get("ro.product.model", "");
+            if (!mWifiNative.setModelName(detail)) {
+                loge("Failed to set model name " + detail);
+            }
+            detail = mPropertyService.get("ro.product.model", "");
+            if (!mWifiNative.setModelNumber(detail)) {
+                loge("Failed to set model number " + detail);
+            }
+            detail = mPropertyService.get("ro.serialno", "");
+            if (!mWifiNative.setSerialNumber(detail)) {
+                loge("Failed to set serial number " + detail);
+            }
+            if (!mWifiNative.setConfigMethods("physical_display virtual_push_button")) {
+                loge("Failed to set WPS config methods");
+            }
+            detail = mContext.getResources().getString(R.string.config_wifi_p2p_device_type);
+            if (!mWifiNative.setDeviceType(detail)) {
+                loge("Failed to set primary device type " + detail);
+            }
+        }
+
+        private boolean setRandomMacOui() {
+            String oui = mContext.getResources().getString(R.string.config_wifi_random_mac_oui);
+            if (TextUtils.isEmpty(oui)) {
+                oui = GOOGLE_OUI;
+            }
+            String[] ouiParts = oui.split("-");
+            byte[] ouiBytes = new byte[3];
+            ouiBytes[0] = (byte) (Integer.parseInt(ouiParts[0], 16) & 0xFF);
+            ouiBytes[1] = (byte) (Integer.parseInt(ouiParts[1], 16) & 0xFF);
+            ouiBytes[2] = (byte) (Integer.parseInt(ouiParts[2], 16) & 0xFF);
+
+            logd("Setting OUI to " + oui);
+            return mWifiNative.setScanningMacOui(ouiBytes);
         }
     }
 }
