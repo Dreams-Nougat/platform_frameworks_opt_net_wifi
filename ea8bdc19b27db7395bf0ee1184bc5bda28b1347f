@@ -35,3 +35,11 @@ It's explained in the comment above.
 
 "Hence the old network Id lookups may not work, so disconnect the network and let network selector reselect a new network."
 
+5275
+Wed Nov 16 00:34:11 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: f04a7097_680f68a8
+UUID: f04a7097_4801cc1f
+Bytes: 83
+I was talking about log messages going to places like bugreport to help bug triage.
+
