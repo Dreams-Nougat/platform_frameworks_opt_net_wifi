@@ -17,11 +17,14 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IClientInterface;
 import android.net.wifi.IWifiScanner;
 import android.net.wifi.IWificond;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiScanner;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -54,6 +57,7 @@ import com.android.server.wifi.util.WifiPermissionsWrapper;
 public class WifiInjector {
     private static final String BOOT_DEFAULT_WIFI_COUNTRY_CODE = "ro.boot.wificountrycode";
     private static final String WIFICOND_SERVICE_NAME = "wificond";
+    private static final String NETWORKTYPE = "WIFI";
 
     static WifiInjector sWifiInjector = null;
 
@@ -68,6 +72,7 @@ public class WifiInjector {
     private final WifiNative mWifiNative;
     private final WifiStateMachine mWifiStateMachine;
     private final WifiStateMachinePrime mWifiStateMachinePrime;
+    private final NetworkInfo mNetworkInfo;
     private final WifiSettingsStore mSettingsStore;
     private final WifiCertManager mCertManager;
     private final WifiNotificationController mNotificationController;
@@ -159,8 +164,9 @@ public class WifiInjector {
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
         IBinder b = mFrameworkFacade.getService(Context.NETWORKMANAGEMENT_SERVICE);
         INetworkManagementService nmService = INetworkManagementService.Stub.asInterface(b);
+        mNetworkInfo = new NetworkInfo(ConnectivityManager.TYPE_WIFI, 0, NETWORKTYPE, "");
         mWifiStateMachinePrime = new WifiStateMachinePrime(this,
-                mWifiStateMachineHandlerThread.getLooper(), nmService, mContext);
+                mWifiStateMachineHandlerThread.getLooper(), nmService, mContext, mNetworkInfo);
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
@@ -357,7 +363,8 @@ public class WifiInjector {
         return new ClientModeManager(mContext, mWifiServiceHandlerThread.getLooper(),
                                      mWifiNative, listener, clientInterface, mCountryCode,
                                      nmService, WifiMonitor.getInstance(), mSupplicantStateTracker,
-                                     mPropertyService, mWifiConfigManager);
+                                     mPropertyService, mWifiConfigManager, mNetworkInfo,
+                                     new WifiInfo());
     }
 
     /**
