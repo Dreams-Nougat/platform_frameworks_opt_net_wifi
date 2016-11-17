@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -115,6 +116,19 @@ public class PasspointManagerTest {
     }
 
     /**
+     * Create a mock PasspointProvider with default expectations.
+     *
+     * @param config The configuration associated with the provider
+     * @return {@link com.android.server.wifi.hotspot2.PasspointProvider}
+     */
+    private PasspointProvider createMockProvider(PasspointConfiguration config) {
+        PasspointProvider provider = mock(PasspointProvider.class);
+        when(provider.installCertsAndKeys()).thenReturn(true);
+        when(provider.getConfig()).thenReturn(config);
+        return provider;
+    }
+
+    /**
      * Validate the broadcast intent when icon file retrieval succeeded.
      *
      * @throws Exception
@@ -200,11 +214,14 @@ public class PasspointManagerTest {
         config.credential.userCredential.password = "password";
         config.credential.userCredential.eapType = EAPConstants.EAP_TTLS;
         config.credential.userCredential.nonEapInnerMethod = "MS-CHAP";
+        PasspointProvider provider = createMockProvider(config);
+        when(mWifiInjector.makePasspointProvider(config)).thenReturn(provider);
         assertTrue(mManager.addProvider(config));
         verifyInstalledConfig(config);
 
         // Remove the provider.
         assertTrue(mManager.removeProvider(TEST_FQDN));
+        verify(provider).uninstallCertsAndKeys();
         assertEquals(null, mManager.getProviderConfigs());
     }
 
@@ -226,11 +243,14 @@ public class PasspointManagerTest {
         config.credential.simCredential.eapType = EAPConstants.EAP_SIM;
         when(mSimAccessor.getMatchingImsis(new IMSIParameter(TEST_IMSI)))
                 .thenReturn(new ArrayList<String>());
+        PasspointProvider provider = createMockProvider(config);
+        when(mWifiInjector.makePasspointProvider(config)).thenReturn(provider);
         assertTrue(mManager.addProvider(config));
         verifyInstalledConfig(config);
 
         // Remove the provider.
         assertTrue(mManager.removeProvider(TEST_FQDN));
+        verify(provider).uninstallCertsAndKeys();
         assertEquals(null, mManager.getProviderConfigs());
     }
 
@@ -276,6 +296,8 @@ public class PasspointManagerTest {
         origConfig.credential.simCredential.eapType = EAPConstants.EAP_SIM;
         when(mSimAccessor.getMatchingImsis(new IMSIParameter(TEST_IMSI)))
                 .thenReturn(new ArrayList<String>());
+        PasspointProvider origProvider = createMockProvider(origConfig);
+        when(mWifiInjector.makePasspointProvider(origConfig)).thenReturn(origProvider);
         assertTrue(mManager.addProvider(origConfig));
         verifyInstalledConfig(origConfig);
 
@@ -293,7 +315,45 @@ public class PasspointManagerTest {
         newConfig.credential.userCredential.password = "password";
         newConfig.credential.userCredential.eapType = EAPConstants.EAP_TTLS;
         newConfig.credential.userCredential.nonEapInnerMethod = "MS-CHAP";
+        PasspointProvider newProvider = createMockProvider(newConfig);
+        when(mWifiInjector.makePasspointProvider(newConfig)).thenReturn(newProvider);
         assertTrue(mManager.addProvider(newConfig));
         verifyInstalledConfig(newConfig);
+    }
+
+    /**
+     * Verify that adding a provider will fail when failing to install certificates and
+     * key to the keystore.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void addProviderOnKeyInstallationFailiure() throws Exception {
+        PasspointConfiguration config = new PasspointConfiguration();
+        config.homeSp = new HomeSP();
+        config.homeSp.fqdn = TEST_FQDN;
+        config.homeSp.friendlyName = TEST_FRIENDLY_NAME;
+        config.credential = new Credential();
+        config.credential.realm = TEST_REALM;
+        config.credential.caCertificate = FakeKeys.CA_CERT0;
+        config.credential.userCredential = new Credential.UserCredential();
+        config.credential.userCredential.username = "username";
+        config.credential.userCredential.password = "password";
+        config.credential.userCredential.eapType = EAPConstants.EAP_TTLS;
+        config.credential.userCredential.nonEapInnerMethod = "MS-CHAP";
+        PasspointProvider provider = mock(PasspointProvider.class);
+        when(provider.installCertsAndKeys()).thenReturn(false);
+        when(mWifiInjector.makePasspointProvider(config)).thenReturn(provider);
+        assertFalse(mManager.addProvider(config));
+    }
+
+    /**
+     * Verify that removing a non-existing provider will fail.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void removeNonExistingProvider() throws Exception {
+        assertFalse(mManager.removeProvider(TEST_FQDN));
     }
 }
