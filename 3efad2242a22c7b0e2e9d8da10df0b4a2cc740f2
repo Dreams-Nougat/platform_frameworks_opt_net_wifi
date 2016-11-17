@@ -1,0 +1,11 @@
+Revision: 3efad2242a22c7b0e2e9d8da10df0b4a2cc740f2
+Patch-set: 3
+File: libwifi_hal/include/wifi_hal/driver_tool.h
+
+43:25-43:30
+Thu Nov 17 21:53:18 2016 +0000
+Author: Christopher Wiley <1057759@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 108c6449_a1a5e687
+Bytes: 6
+invoke
+
