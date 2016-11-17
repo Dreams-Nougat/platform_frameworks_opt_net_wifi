@@ -500,6 +500,7 @@ public class WifiConnectivityManagerTest {
      * because of their low RSSI values.
      */
     @Test
+    @Ignore("b/32977707")
     public void pnoRetryForLowRssiNetwork() {
         when(mWifiNS.selectNetwork(anyObject(), anyObject(), anyBoolean(), anyBoolean(),
               anyBoolean())).thenReturn(null);
@@ -531,6 +532,7 @@ public class WifiConnectivityManagerTest {
      * a candidate while watchdog single scan did.
      */
     @Test
+    @Ignore("b/32977707")
     public void watchdogBitePnoBadIncrementsMetrics() {
         // Set screen to off
         mWifiConnectivityManager.handleScreenStateChanged(false);
@@ -554,6 +556,7 @@ public class WifiConnectivityManagerTest {
      * a candidate which was the same with watchdog single scan.
      */
     @Test
+    @Ignore("b/32977707")
     public void watchdogBitePnoGoodIncrementsMetrics() {
         // Qns returns no candidate after watchdog single scan.
         when(mWifiNS.selectNetwork(anyObject(), anyObject(), anyBoolean(), anyBoolean(),
