@@ -4690,38 +4690,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
     void noteWifiDisabledWhileAssociated() {
         // We got disabled by user while we were associated, make note of it
-        int rssi = mWifiInfo.getRssi();
-        WifiConfiguration config = getCurrentWifiConfiguration();
-        if (getCurrentState() == mConnectedState
-                && rssi != WifiInfo.INVALID_RSSI
-                && config != null) {
-            boolean is24GHz = mWifiInfo.is24GHz();
-            boolean isBadRSSI = (is24GHz && rssi < mThresholdMinimumRssi24)
-                    || (!is24GHz && rssi < mThresholdMinimumRssi5);
-            boolean isLowRSSI =
-                    (is24GHz && rssi < mThresholdQualifiedRssi24)
-                            || (!is24GHz && mWifiInfo.getRssi() < mThresholdQualifiedRssi5);
-            boolean isHighRSSI = (is24GHz && rssi >= mThresholdSaturatedRssi24)
-                    || (!is24GHz && mWifiInfo.getRssi() >= mThresholdSaturatedRssi5);
-            if (isBadRSSI) {
-                // Take note that we got disabled while RSSI was Bad
-                config.numUserTriggeredWifiDisableLowRSSI++;
-            } else if (isLowRSSI) {
-                // Take note that we got disabled while RSSI was Low
-                config.numUserTriggeredWifiDisableBadRSSI++;
-            } else if (!isHighRSSI) {
-                // Take note that we got disabled while RSSI was Not high
-                config.numUserTriggeredWifiDisableNotHighRSSI++;
-            }
-            mWifiConfigManager.setNetworkRSSIStats(
-                    config.networkId,
-                    config.numUserTriggeredWifiDisableLowRSSI,
-                    config.numUserTriggeredWifiDisableBadRSSI,
-                    config.numUserTriggeredWifiDisableNotHighRSSI,
-                    config.numTicksAtLowRSSI,
-                    config.numTicksAtBadRSSI,
-                    config.numTicksAtNotHighRSSI);
-        }
     }
 
     /**
