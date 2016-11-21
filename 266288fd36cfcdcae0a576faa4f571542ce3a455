@@ -1,0 +1,11 @@
+Revision: 266288fd36cfcdcae0a576faa4f571542ce3a455
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+3019:41-3019:63
+Mon Nov 21 21:26:12 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 903a1454_fecd18c4
+Bytes: 61
+Do we also need to clear this if we tear down the connection?
+
