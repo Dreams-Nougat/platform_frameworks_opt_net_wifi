@@ -1,0 +1,25 @@
+Revision: 768d224e1e8f156f1af50ef514b84da9c70e5eb6
+Patch-set: 1
+File: service/java/com/android/server/wifi/hotspot2/DomainMatcher.java
+
+35:4-35:48
+Wed Nov 23 19:15:35 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_7e43f163
+Bytes: 38
+Replace enum with static int constants
+
+144:33-144:34
+Wed Nov 23 19:15:35 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_7ef531d4
+Bytes: 10
+extra 'a'?
+
+145:48-145:50
+Wed Nov 23 19:15:35 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_3eefa902
+Bytes: 11
+repeated or
+
