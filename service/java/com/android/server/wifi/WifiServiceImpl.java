@@ -81,6 +81,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Slog;
 
+import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.TelephonyIntents;
@@ -273,7 +274,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     /**
      * Handles interaction with WifiStateMachine
      */
-    private class WifiStateMachineHandler extends Handler {
+    protected class WifiStateMachineHandler extends Handler {
         private AsyncChannel mWsmChannel;
 
         WifiStateMachineHandler(Looper looper) {
@@ -316,7 +317,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
 
     public WifiServiceImpl(Context context) {
         mContext = context;
-        mWifiInjector = new WifiInjector(context);
+        mWifiInjector = createWifiInjector(context);
 
         mFacade = mWifiInjector.getFrameworkFacade();
         mWifiMetrics = mWifiInjector.getWifiMetrics();
@@ -337,8 +338,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         mWifiMulticastLockManager = mWifiInjector.getWifiMulticastLockManager();
         HandlerThread wifiServiceHandlerThread = mWifiInjector.getWifiServiceHandlerThread();
         mClientHandler = new ClientHandler(wifiServiceHandlerThread.getLooper());
-        mWifiStateMachineHandler =
-                new WifiStateMachineHandler(wifiServiceHandlerThread.getLooper());
+        createWifiStateMachineHandler(wifiServiceHandlerThread.getLooper());
         mWifiController = mWifiInjector.getWifiController();
         mWifiBackupRestore = mWifiInjector.getWifiBackupRestore();
         mPermissionReviewRequired = Build.PERMISSIONS_REVIEW_REQUIRED
@@ -350,6 +350,15 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         enableVerboseLoggingInternal(getVerboseLoggingLevel());
     }
 
+    @VisibleForTesting
+    WifiInjector createWifiInjector(Context context) {
+        return new WifiInjector(context);
+    }
+
+    @VisibleForTesting
+    void createWifiStateMachineHandler(Looper looper) {
+        mWifiStateMachineHandler = new WifiStateMachineHandler(looper);
+    }
 
     /**
      * Check if Wi-Fi needs to be enabled and start
@@ -1553,7 +1562,8 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         enableVerboseLoggingInternal(verbose);
     }
 
-    private void enableVerboseLoggingInternal(int verbose) {
+    @VisibleForTesting
+    void enableVerboseLoggingInternal(int verbose) {
         mWifiStateMachine.enableVerboseLogging(verbose);
         mWifiLockManager.enableVerboseLogging(verbose);
         mWifiMulticastLockManager.enableVerboseLogging(verbose);
