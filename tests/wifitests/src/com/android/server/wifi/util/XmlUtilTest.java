@@ -199,6 +199,7 @@ public class XmlUtilTest {
         configuration.noInternetAccessExpected = true;
         configuration.userApproved = WifiConfiguration.USER_UNSPECIFIED;
         configuration.meteredHint = true;
+        configuration.meteredOverride = true;
         configuration.useExternalScores = true;
         configuration.numAssociation = 5;
         configuration.lastUpdateUid = configuration.lastConnectUid = configuration.creatorUid;

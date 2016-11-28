@@ -3196,6 +3196,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             }
         }
 
+        // handles metered capability update for meteredHint and meteredOverride
+        updateCapabilities(config);
         mSupplicantStateTracker.sendMessage(Message.obtain(message));
 
         return state;
@@ -4886,6 +4888,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     result = mWifiConfigManager.addOrUpdateNetwork(config, message.sendingUid);
                     if (!result.isSuccess()) {
                         messageHandlingStatus = MESSAGE_HANDLING_STATUS_FAIL;
+                    } else if (config != null && config.networkId == mLastNetworkId) {
+                        updateCapabilities(config);
                     }
                     replyToMessage(message, message.what, result.getNetworkId());
                     break;
@@ -5276,6 +5280,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     }
 
     private void updateCapabilities(WifiConfiguration config) {
+        if (mNetworkAgent == null) {
+            return;
+        }
         NetworkCapabilities networkCapabilities = new NetworkCapabilities(mDfltNetworkCapabilities);
         if (config != null) {
             if (config.ephemeral) {
@@ -5290,8 +5297,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     (mWifiInfo.getRssi() != WifiInfo.INVALID_RSSI)
                     ? mWifiInfo.getRssi()
                     : NetworkCapabilities.SIGNAL_STRENGTH_UNSPECIFIED);
-        }
 
+            if (config.meteredOverride) {
+                networkCapabilities.removeCapability(
+                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            } else if (!mWifiInfo.getMeteredHint()) {
+                // both meteredHint and meteredOverride not set.
+                networkCapabilities.addCapability(
+                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            }
+        }
         if (mWifiInfo.getMeteredHint()) {
             networkCapabilities.removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
