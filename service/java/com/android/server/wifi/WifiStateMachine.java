@@ -3189,6 +3189,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             mWifiInfo.setEphemeral(config.ephemeral);
             if (!mWifiInfo.getMeteredHint()) { // don't override the value if already set.
                 mWifiInfo.setMeteredHint(config.meteredHint);
+                updateCapabilities(config);
             }
         }
 
@@ -5300,10 +5301,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     (mWifiInfo.getRssi() != WifiInfo.INVALID_RSSI)
                     ? mWifiInfo.getRssi()
                     : NetworkCapabilities.SIGNAL_STRENGTH_UNSPECIFIED);
-        }
 
-        if (mWifiInfo.getMeteredHint()) {
-            networkCapabilities.removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            if (config.meteredHint || config.meteredOverride || mWifiInfo.getMeteredHint()) {
+                networkCapabilities.removeCapability(
+                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            }
         }
 
         mNetworkAgent.sendNetworkCapabilities(networkCapabilities);
