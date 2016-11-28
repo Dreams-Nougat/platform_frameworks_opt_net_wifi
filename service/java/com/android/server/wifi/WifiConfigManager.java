@@ -823,6 +823,7 @@ public class WifiConfigManager {
         newInternalConfig.noInternetAccessExpected = externalConfig.noInternetAccessExpected;
         newInternalConfig.ephemeral = externalConfig.ephemeral;
         newInternalConfig.meteredHint = externalConfig.meteredHint;
+        newInternalConfig.meteredOverride = externalConfig.meteredOverride;
         newInternalConfig.useExternalScores = externalConfig.useExternalScores;
         newInternalConfig.shared = externalConfig.shared;
 
@@ -851,6 +852,7 @@ public class WifiConfigManager {
 
         // Copy over all the public elements from the provided configuration.
         mergeWithInternalWifiConfiguration(newInternalConfig, externalConfig);
+        newInternalConfig.meteredOverride = externalConfig.meteredOverride;
 
         // Add debug information for network update.
         newInternalConfig.lastUpdateUid = uid;
