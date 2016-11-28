@@ -823,6 +823,7 @@ public class WifiConfigManager {
         newInternalConfig.noInternetAccessExpected = externalConfig.noInternetAccessExpected;
         newInternalConfig.ephemeral = externalConfig.ephemeral;
         newInternalConfig.meteredHint = externalConfig.meteredHint;
+        newInternalConfig.meteredOverride = externalConfig.meteredOverride;
         newInternalConfig.useExternalScores = externalConfig.useExternalScores;
         newInternalConfig.shared = externalConfig.shared;
 
@@ -856,6 +857,7 @@ public class WifiConfigManager {
         newInternalConfig.lastUpdateUid = uid;
         newInternalConfig.lastUpdateName = mContext.getPackageManager().getNameForUid(uid);
         newInternalConfig.updateTime = createDebugTimeStampString(mClock.getWallClockMillis());
+        newInternalConfig.meteredOverride = externalConfig.meteredOverride;
 
         return newInternalConfig;
     }

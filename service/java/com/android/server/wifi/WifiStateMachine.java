@@ -3196,6 +3196,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             }
         }
 
+        updateCapabilities(config);
         mSupplicantStateTracker.sendMessage(Message.obtain(message));
 
         return state;
@@ -5296,6 +5297,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
     private void updateCapabilities(WifiConfiguration config) {
         NetworkCapabilities networkCapabilities = new NetworkCapabilities(mDfltNetworkCapabilities);
+
         if (config != null) {
             if (config.ephemeral) {
                 networkCapabilities.removeCapability(
@@ -5309,8 +5311,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     (mWifiInfo.getRssi() != WifiInfo.INVALID_RSSI)
                     ? mWifiInfo.getRssi()
                     : NetworkCapabilities.SIGNAL_STRENGTH_UNSPECIFIED);
-        }
 
+            if (config.meteredOverride) {
+                networkCapabilities.removeCapability(
+                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            } else if (!mWifiInfo.getMeteredHint()) {
+                // both meteredHint and meteredOverride not set.
+                networkCapabilities.addCapability(
+                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+            }
+        }
         if (mWifiInfo.getMeteredHint()) {
             networkCapabilities.removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
         }
