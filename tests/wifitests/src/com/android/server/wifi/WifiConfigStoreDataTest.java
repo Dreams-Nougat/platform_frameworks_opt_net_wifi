@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiEnterpriseConfig;
 import android.net.wifi.WifiConfiguration.NetworkSelectionStatus;
+import android.net.wifi.WifiEnterpriseConfig;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import org.junit.Test;
@@ -77,6 +77,7 @@ public class WifiConfigStoreDataTest {
                     + "<boolean name=\"NoInternetAccessExpected\" value=\"false\" />\n"
                     + "<int name=\"UserApproved\" value=\"0\" />\n"
                     + "<boolean name=\"MeteredHint\" value=\"false\" />\n"
+                    + "<boolean name=\"MeteredOverride\" value=\"false\" />\n"
                     + "<boolean name=\"UseExternalScores\" value=\"false\" />\n"
                     + "<int name=\"NumAssociation\" value=\"0\" />\n"
                     + "<int name=\"CreatorUid\" value=\"%d\" />\n"
