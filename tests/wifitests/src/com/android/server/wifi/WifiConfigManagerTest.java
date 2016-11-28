@@ -1811,6 +1811,16 @@ public class WifiConfigManagerTest {
         when(mWifiConfigStore.read()).thenReturn(loadStoreData);
         assertTrue(mWifiConfigManager.loadFromStore());
 
+        // Fetch the network ID assigned to the user 1 network initially.
+        int user1NetworkId = WifiConfiguration.INVALID_NETWORK_ID;
+        List<WifiConfiguration> retrievedNetworks =
+                mWifiConfigManager.getConfiguredNetworksWithPasswords();
+        for (WifiConfiguration network : retrievedNetworks) {
+            if (network.configKey().equals(user1Network.configKey())) {
+                user1NetworkId = network.networkId;
+            }
+        }
+
         // Set up the user 2 store data that is loaded at user switch.
         List<WifiConfiguration> user2Networks = new ArrayList<WifiConfiguration>() {
             {
@@ -1824,7 +1834,8 @@ public class WifiConfigManagerTest {
                 .thenReturn(newUserStoreData);
         // Now switch the user to user 2 and ensure that user 1's private network has been removed.
         when(mUserManager.isUserUnlockingOrUnlocked(user2)).thenReturn(true);
-        mWifiConfigManager.handleUserSwitch(user2);
+        Set<Integer> removedNetworks = mWifiConfigManager.handleUserSwitch(user2);
+        assertTrue((removedNetworks.size() == 1) && (removedNetworks.contains(user1NetworkId)));
 
         // Set the expected networks to be |sharedNetwork| and |user2Network|.
         List<WifiConfiguration> expectedNetworks = new ArrayList<WifiConfiguration>() {
