@@ -823,6 +823,7 @@ public class WifiConfigManager {
         newInternalConfig.noInternetAccessExpected = externalConfig.noInternetAccessExpected;
         newInternalConfig.ephemeral = externalConfig.ephemeral;
         newInternalConfig.meteredHint = externalConfig.meteredHint;
+        newInternalConfig.meteredOverride = externalConfig.meteredOverride;
         newInternalConfig.useExternalScores = externalConfig.useExternalScores;
         newInternalConfig.shared = externalConfig.shared;
 
