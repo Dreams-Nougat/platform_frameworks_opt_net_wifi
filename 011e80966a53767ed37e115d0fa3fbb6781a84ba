@@ -9,6 +9,14 @@ UUID: eb47df8d_c4b14f2f
 Bytes: 90
 Move this to WifiConfigurationUtil since we already have a bunch of similar methods there.
 
+2527:0-2552:5
+Mon Nov 28 20:34:26 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb47df8d_c4b14f2f
+UUID: 6bb12ff1_d7a2bc82
+Bytes: 4
+Done
+
 2565:54-2565:57
 Sat Nov 05 00:00:54 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -17,6 +25,14 @@ Bytes: 270
 This is not the system UID. This is the UID of the quick settings menu. I don't think we can modify proxy settings via the "Quick settings menu".  So, this check maybe redundant.
 
 If u're looking for the settings app, then use the |checkConfigOverridePermission| method.
+
+2565:54-2565:57
+Mon Nov 28 20:34:26 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb47df8d_04acd7d3
+UUID: 6bb12ff1_f7226019
+Bytes: 4
+Done
 
 File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
 
@@ -27,10 +43,26 @@ UUID: eb47df8d_44f89fcc
 Bytes: 38
 space between methods. Here and below.
 
+2230:0-2231:7
+Mon Nov 28 20:34:26 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb47df8d_44f89fcc
+UUID: 6bb12ff1_9d04e37e
+Bytes: 4
+Done
+
 2365:0-2372:73
 Sat Nov 05 00:00:54 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: eb47df8d_e4e60b31
 Bytes: 60
 Move to the top along with the other contants in this class.
+
+2365:0-2372:73
+Mon Nov 28 20:34:26 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: eb47df8d_e4e60b31
+UUID: 6bb12ff1_ddfe5b44
+Bytes: 4
+Done
 
