@@ -19,3 +19,13 @@ If we're in disconnecting state, this message is ignored: https://cs.corp.google
 
 If we're roaming, we will trigger a disconnect to supplicant.
 
+3871:0-3871:52
+Tue Nov 29 22:22:47 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_fb3708f6
+UUID: 6def8770_5b6154ba
+Bytes: 257
+As discussed, if the network to be connected for the new user is the same as the old one, we probably want to stay connected to that network. Disconnection and re-connection can take a few seconds. 
+
+We don't have to address it in this CL. Filed b/33209440.
+
