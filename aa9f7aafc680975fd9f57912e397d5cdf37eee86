@@ -9,12 +9,28 @@ UUID: 6def8770_b485182a
 Bytes: 167
 This line is too long. (Gerrit should show a dashed red vertical line, indicating the right margin. If not, let's try to figure out why gerrit is misbehaving for you.)
 
+11:65-11:75
+Tue Nov 29 18:24:46 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_b485182a
+UUID: 6def8770_2a8f604c
+Bytes: 4
+Done
+
 14:20-14:31
 Tue Nov 29 01:37:27 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_148f244c
 Bytes: 112
 What does this mean? Is Sanity the name of a test suite, or is it some simple manual testing, or something else?
+
+14:20-14:31
+Tue Nov 29 18:24:46 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_148f244c
+UUID: 6def8770_ca859429
+Bytes: 20
+Updated description.
 
 File: service/java/com/android/server/wifi/scanner/WifiScanningServiceImpl.java
 
@@ -32,4 +48,12 @@ The reference to these changes (in the commit message) should explain the motiva
 I guess that "trace every public method" is what this CL is aiming for, because startService() is _not_ traced. And, on the other hand, replyFailed() is not a public method.
 
 But, without knowing the intent, I can't judge whether or not this CL hits the target.
+
+107
+Tue Nov 29 18:24:46 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_4f74f93e
+UUID: 6def8770_2a6640d4
+Bytes: 144
+I have updated the commit message on the new CL. The intention is log ScanningService API surface and to log outgoing messages from the service.
 
