@@ -17,6 +17,9 @@
 package com.android.server.wifi;
 
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -53,6 +56,8 @@ public class WifiServiceImplTest {
 
     @Test
     public void testRemoveNetworkUnknown() {
+        WifiConfigManager mWifiConfigManager = mWifiInjector.getWifiConfigManager();
+        when(mWifiConfigManager.removeNetwork(eq(-1), anyInt())).thenReturn(false);
         assertFalse(mWifiServiceImpl.removeNetwork(-1));
     }
 }

@@ -945,19 +945,15 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     /**
      * See {@link android.net.wifi.WifiManager#removeNetwork(int)}
      * @param netId the integer that identifies the network configuration
-     * to the supplicant
+     *
      * @return {@code true} if the operation succeeded
      */
     @Override
     public boolean removeNetwork(int netId) {
         enforceChangePermission();
 
-        if (mWifiStateMachineChannel != null) {
-            return mWifiStateMachine.syncRemoveNetwork(mWifiStateMachineChannel, netId);
-        } else {
-            Slog.e(TAG, "mWifiStateMachineChannel is not initialized");
-            return false;
-        }
+        Log.d("removeNetwork", " calling WifiConfigManager to remove network: " + netId);
+        return mWifiInjector.getWifiConfigManager().removeNetwork(netId, Binder.getCallingUid());
     }
 
     /**
