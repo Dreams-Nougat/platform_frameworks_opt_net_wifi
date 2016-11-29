@@ -1,0 +1,20 @@
+Revision: fb0113d3658efa2f874c4f1a0b56b883a9181f60
+Patch-set: 2
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+108:45-108:57
+Tue Nov 29 16:20:52 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_a79169a6
+Bytes: 208
+I'm sorry if i missed this in previous CL. We don't want to pass WifiInjector to classes directly. You should pass all ur dependencies directly to the class.
+
+In this class, u need the context, keystore, etc.
+
+150:40-150:53
+Tue Nov 29 16:20:52 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_678b6171
+Bytes: 132
+Don't use injector to create this instance. Use the keystore instance passed to the class |PasspointManager| to create the provider.
+
