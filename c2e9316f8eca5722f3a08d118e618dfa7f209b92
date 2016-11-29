@@ -1,0 +1,11 @@
+Revision: c2e9316f8eca5722f3a08d118e618dfa7f209b92
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+3871:0-3871:52
+Tue Nov 29 21:52:25 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_5b295499
+Bytes: 102
+What will happen if we are not in the connected state? For  example in roaming or disconnecting state.
+
