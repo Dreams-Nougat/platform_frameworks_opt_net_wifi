@@ -1,0 +1,23 @@
+Revision: 9063548cf08e7624f0a83befb099410dd4946b3f
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2338:15-2339:19
+Tue Nov 29 17:53:11 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_ea6df81c
+Bytes: 114
+can this be reworded a little?
+Cannot read data from new user store files before they log-in
+
+something like that?
+
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
+
+1837:8-1837:38
+Tue Nov 29 17:53:11 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_4a55043d
+Bytes: 69
+should you also test for an empty set and already the new user paths?
+
