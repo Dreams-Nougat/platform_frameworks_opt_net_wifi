@@ -11,10 +11,26 @@ I'm sorry if i missed this in previous CL. We don't want to pass WifiInjector to
 
 In this class, u need the context, keystore, etc.
 
+108:45-108:57
+Tue Nov 29 19:58:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_a79169a6
+UUID: 6def8770_a0f70f6d
+Bytes: 295
+I don't quiet understand the reason for not allowing WifiInjector to be passed into classes directly.  I think it is useful for mocking dynamic object creations (e.g. PasspointEventHandler, PasspointProvider) within the class.  It is not always possible or desired to create objects before hand.
+
 150:40-150:53
 Tue Nov 29 16:20:52 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_678b6171
 Bytes: 132
 Don't use injector to create this instance. Use the keystore instance passed to the class |PasspointManager| to create the provider.
+
+150:40-150:53
+Tue Nov 29 19:58:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_678b6171
+UUID: 6def8770_e004f77e
+Bytes: 87
+Refer to my comments above.  This allows mocking of objects that are created on-demand.
 
