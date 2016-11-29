@@ -1,0 +1,58 @@
+Revision: b7149f7c88cfee3c243e00f2b3bb2109fe40aad5
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2356:12-2356:36
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_6000e7b4
+Bytes: 89
+I don't think this call loads the user config from the legacy store, is that intentional?
+
+2495:12-2495:47
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_60d90741
+Bytes: 181
+So does the legacy store contain both shared and user configs? or only shared configs?  if it contains both, wouldn't the configs for users that didn't login be lost after a reboot?
+
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
+
+1746
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_f27ba28f
+Bytes: 139
+assertTrue(sharedNetwork1Id != WifiConfiguration.INVALID_NETWORK_ID);
+assertTrue(sharedNetwork2Id != WifiConfiguration.INVALID_NETWORK_ID);
+
+1764
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_f2d84282
+Bytes: 135
+int updatedSharedNetwork1Id = WifiConfiguration.INVALID_NETWORK_ID;
+int updatedSharedNetwork2Id = WifiConfiguration.INVALID_NETWORK_ID;
+
+1767:16-1767:66
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_72a672f6
+Bytes: 44
+updatedSharedNetwork1Id = network.networkId;
+
+1769:16-1769:66
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_d20c2624
+Bytes: 44
+updatedSharedNetwork2Id = network.networkId;
+
+1771
+Tue Nov 29 21:02:05 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 2dfd8f27_f20602fc
+Bytes: 113
+assertEquals(sharedNetwork1Id, updatedSharedNetwork1Id);
+assertEquals(sharedNetwork2Id, updatedSharedNetwork2Id);
+
