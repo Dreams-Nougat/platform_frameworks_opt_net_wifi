@@ -12,6 +12,14 @@ Cannot read data from new user store files before they log-in
 
 something like that?
 
+2338:15-2339:19
+Tue Nov 29 21:44:45 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_ea6df81c
+UUID: 6def8770_e01d172b
+Bytes: 4
+Done
+
 File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
 
 1837:8-1837:38
@@ -20,4 +28,12 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_4a55043d
 Bytes: 69
 should you also test for an empty set and already the new user paths?
+
+1837:8-1837:38
+Tue Nov 29 21:44:45 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_4a55043d
+UUID: 6def8770_7b1e588c
+Bytes: 105
+Added a new test for empty set and modified this test to check if we handle userswitch for the same user.
 
