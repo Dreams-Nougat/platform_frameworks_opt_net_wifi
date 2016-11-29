@@ -9,3 +9,13 @@ UUID: 6def8770_5b295499
 Bytes: 102
 What will happen if we are not in the connected state? For  example in roaming or disconnecting state.
 
+3871:0-3871:52
+Tue Nov 29 21:56:03 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_5b295499
+UUID: 6def8770_fb3708f6
+Bytes: 291
+If we're in disconnecting state, this message is ignored: https://cs.corp.google.com/android/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java?rcl=c4bc8322e0532413bb760f3fc396d16b6e89e624&l=6315.
+
+If we're roaming, we will trigger a disconnect to supplicant.
+
