@@ -1,0 +1,11 @@
+Revision: 04e60c403cfdb750fdaf8b418d63b4386d971fe6
+Base-for-patch-set: 4
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+1648:8-1648:49
+Wed Nov 30 04:21:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_d291c2a5
+Bytes: 65
+will a separate cl follow to remove them from the config as well?
+
