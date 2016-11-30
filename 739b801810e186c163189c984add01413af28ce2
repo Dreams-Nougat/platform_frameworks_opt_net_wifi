@@ -9,6 +9,14 @@ UUID: 6def8770_119e0b50
 Bytes: 32
 This should be an error message.
 
+2566:12-2566:13
+Wed Nov 30 17:50:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_119e0b50
+UUID: 6def8770_fb394101
+Bytes: 87
+addOrUpdateNetworkInternal gives an error when this fails. Making this verbose instead.
+
 File: service/java/com/android/server/wifi/WifiConfigurationUtil.java
 
 155:8-159:9
@@ -17,6 +25,14 @@ Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_cc9dac42
 Bytes: 55
 return !Objects.equals(existingHttpProxy, newHttpProxy)
+
+155:8-159:9
+Wed Nov 30 17:50:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_cc9dac42
+UUID: 6d64e70a_f8a37180
+Bytes: 5
+Done.
 
 File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
 
@@ -27,6 +43,14 @@ UUID: 6def8770_4cc75c35
 Bytes: 21
 Are these being used?
 
+86:0-93:74
+Wed Nov 30 17:50:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_4cc75c35
+UUID: 6def8770_9b16b532
+Bytes: 74
+testUpdateNetworkDifferentProxy, testUpdateRemoveProxy are both using them
+
 2342:39-2342:40
 Wed Nov 30 01:29:23 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -34,10 +58,26 @@ UUID: 6def8770_0ca95458
 Bytes: 10
 with->With
 
+2342:39-2342:40
+Wed Nov 30 17:50:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_0ca95458
+UUID: 6def8770_5b002de2
+Bytes: 4
+Done
+
 2672:32-2672:85
 Wed Nov 30 01:29:23 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_6c18e0ed
 Bytes: 237
 Can u rename to |createAddVerifyNetworkWithProxySettingsAndPermissions| to |verifyAddOrUpdateNetworkWithProxySettingsAndPermissions| or something like that because it's not clear that this method adds or updates the network as necessary.
+
+2672:32-2672:85
+Wed Nov 30 17:50:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_6c18e0ed
+UUID: 6def8770_fb06e1fb
+Bytes: 4
+Done
 
