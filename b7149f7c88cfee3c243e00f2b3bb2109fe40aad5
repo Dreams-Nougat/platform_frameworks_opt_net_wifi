@@ -17,6 +17,14 @@ UUID: 6def8770_9ba7dc5a
 Bytes: 172
 Yep. The migration should have happened at bootup. When the wifi service is up, we should have invoked |loadFromStore|. That should take care of all the migration required.
 
+2356:12-2356:36
+Wed Nov 30 17:43:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_9ba7dc5a
+UUID: 6d64e70a_38c7a936
+Bytes: 7
+Got it.
+
 2495:12-2495:47
 Tue Nov 29 21:02:05 2016 +0000
 Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -33,6 +41,14 @@ Bytes: 334
 The legacy store contains both private and shared configs. Once we load all the configs to memory, we invoke |saveToStore| which pushes all the private networks of other users on the device to the new shared store file until that user logs in to the device after upgrade (to get accesss to CE storage).
 
 The details are in b/29337176.
+
+2495:12-2495:47
+Wed Nov 30 17:43:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_3b39f033
+UUID: 6def8770_bb96199b
+Bytes: 27
+I see, thanks for the info.
 
 File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
 
