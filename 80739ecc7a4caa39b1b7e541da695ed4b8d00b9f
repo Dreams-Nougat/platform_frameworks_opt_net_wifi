@@ -1,0 +1,11 @@
+Revision: 80739ecc7a4caa39b1b7e541da695ed4b8d00b9f
+Patch-set: 4
+File: service/java/com/android/server/wifi/hotspot2/PasspointProvider.java
+
+46:23-46:27
+Wed Nov 30 23:58:34 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_dedf6150
+Bytes: 160
+Can we use a different name (maybe ProviderId?). The term "uid" is used to identify process id and used extensively. so, it's easy confuse what this is holding.
+
