@@ -27,3 +27,12 @@ This is a subtle point, and should be elaborated. If I understand the problem co
 
 To log replies sent on fully-connected messages, we add trace() calls to the (existing) replySucceeded() and replyFailed() methods."
 
+File: tests/wifitests/src/com/android/server/wifi/scanner/WifiScanningServiceTest.java
+
+92:4-92:26
+Wed Nov 30 18:15:41 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_26a9d058
+Bytes: 63
+Why is a spy being used, instead of a mock or real FakeWifiLog?
+
