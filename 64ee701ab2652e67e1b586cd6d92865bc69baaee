@@ -1,0 +1,29 @@
+Revision: 64ee701ab2652e67e1b586cd6d92865bc69baaee
+Patch-set: 3
+File: /COMMIT_MSG
+
+11
+Wed Nov 30 00:49:24 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_3108ef48
+Bytes: 177
+This list doesn't explain why we need a WifiHandler. (From this list, it seems like the trace calls in getMessenger(), getAvailableChannels(), WifiAsyncChannel would be enough.)
+
+14:0-14:10
+Wed Nov 30 00:49:24 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_36390534
+Bytes: 156
+Comma between these two words, please (to separate the clauses). Roughly speaking: if you'd pause between two words when speaking, use a comma when writing.
+
+15:9-16:69
+Wed Nov 30 00:49:24 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_31858f5b
+Bytes: 475
+This is a subtle point, and should be elaborated. If I understand the problem correctly, then something like the following could work:
+
+"Note that, for fully-connected AsyncChannels, replies do not (necessarily?) use replyToMessage(). Instead replies are (sometimes? always?) sent by calling the send() method of the client-provided Handler.
+
+To log replies sent on fully-connected messages, we add trace() calls to the (existing) replySucceeded() and replyFailed() methods."
+
