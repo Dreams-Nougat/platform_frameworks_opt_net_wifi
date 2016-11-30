@@ -21,6 +21,14 @@ Something like this?
 
 There isn't a bug yet.
 
+4692:8-4692:76
+Wed Nov 30 00:34:05 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 2dfd8f27_44c2a226
+UUID: 6def8770_96fa11c2
+Bytes: 74
+On further reflection, I'll just remove this method and its one call site.
+
 File: tests/wifitests/src/com/android/server/wifi/WifiScoreReportTest.java
 
 252:11-252:47
