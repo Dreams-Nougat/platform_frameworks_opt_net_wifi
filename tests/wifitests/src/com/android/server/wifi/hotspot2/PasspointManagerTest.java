@@ -75,12 +75,14 @@ public class PasspointManagerTest {
     @Mock SIMAccessor mSimAccessor;
     @Mock PasspointObjectFactory mObjectFactory;
     @Mock PasspointEventHandler.Callbacks mCallbacks;
+    @Mock AnqpCache mAnqpCache;
     PasspointManager mManager;
 
     /** Sets up test. */
     @Before
     public void setUp() throws Exception {
         initMocks(this);
+        when(mObjectFactory.makeAnqpCache(mClock)).thenReturn(mAnqpCache);
         mManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, mObjectFactory);
         ArgumentCaptor<PasspointEventHandler.Callbacks> callbacks =
