@@ -17,3 +17,11 @@ UUID: 6def8770_06e36c1a
 Bytes: 242
 I will probably deprecate these later. But, for the initial rollout I want to keep this. I don't see a reason for the file read to fail. So, if it is actually happening in real world, we may need to implement some kind of recovery mechanisms.
 
+2549:12-2549:19
+Wed Nov 30 19:19:17 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_06e36c1a
+UUID: 6def8770_466614d5
+Bytes: 78
+File operation failure happens. Can you file a bug to track the recovery work?
+
