@@ -1,0 +1,43 @@
+Revision: 739b801810e186c163189c984add01413af28ce2
+Patch-set: 7
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+2566:12-2566:13
+Wed Nov 30 01:29:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_119e0b50
+Bytes: 32
+This should be an error message.
+
+File: service/java/com/android/server/wifi/WifiConfigurationUtil.java
+
+155:8-159:9
+Wed Nov 30 01:29:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_cc9dac42
+Bytes: 55
+return !Objects.equals(existingHttpProxy, newHttpProxy)
+
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigManagerTest.java
+
+86:0-93:74
+Wed Nov 30 01:29:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_4cc75c35
+Bytes: 21
+Are these being used?
+
+2342:39-2342:40
+Wed Nov 30 01:29:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_0ca95458
+Bytes: 10
+with->With
+
+2672:32-2672:85
+Wed Nov 30 01:29:23 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 6def8770_6c18e0ed
+Bytes: 237
+Can u rename to |createAddVerifyNetworkWithProxySettingsAndPermissions| to |verifyAddOrUpdateNetworkWithProxySettingsAndPermissions| or something like that because it's not clear that this method adds or updates the network as necessary.
+
