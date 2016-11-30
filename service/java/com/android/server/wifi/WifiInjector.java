@@ -32,6 +32,7 @@ import android.net.wifi.WifiScanner;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
+import android.os.PowerManager;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
 import android.os.UserHandle;
@@ -110,6 +111,7 @@ public class WifiInjector {
     private final WifiPermissionsUtil mWifiPermissionsUtil;
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
+    private final PowerManager mPowerManager;
 
     private final boolean mUseRealLogger;
 
@@ -206,6 +208,7 @@ public class WifiInjector {
         mSimAccessor = new SIMAccessor(mContext);
         mPasspointManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, new PasspointObjectFactory());
+        mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
     }
 
     /**
@@ -456,5 +459,9 @@ public class WifiInjector {
 
     public WifiPermissionsWrapper getWifiPermissionsWrapper() {
         return mWifiPermissionsWrapper;
+    }
+
+    public PowerManager getPowerManager() {
+        return mPowerManager;
     }
 }
