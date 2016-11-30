@@ -1,0 +1,11 @@
+Revision: e64a8c7d97e376adfb9968f29cce4a5797ac03c2
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiNetworkHistory.java
+
+95:3-95:26
+Wed Nov 30 23:36:20 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_de600116
+Bytes: 149
+This store is deprecated. The change in XmlUtil (used by the new WifiConfigStore) is sufficient. This file is still here for migration purposes only.
+
