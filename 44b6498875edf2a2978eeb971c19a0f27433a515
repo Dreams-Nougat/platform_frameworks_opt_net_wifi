@@ -1,0 +1,20 @@
+Revision: 44b6498875edf2a2978eeb971c19a0f27433a515
+Patch-set: 6
+File: service/java/com/android/server/wifi/hotspot2/ANQPData.java
+
+80:34-80:35
+Thu Dec 01 01:04:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_84f74c1b
+Bytes: 23
+Remove the white space.
+
+File: service/java/com/android/server/wifi/hotspot2/AnqpCache.java
+
+46:7-46:49
+Thu Dec 01 01:04:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_642e80bd
+Bytes: 99
+Understand this is from the original code. But at this point of time we haven't done any sweep yet.
+
