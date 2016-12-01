@@ -198,7 +198,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     private WifiConfigManager mWifiConfigManager;
     private WifiSupplicantControl mWifiSupplicantControl;
     private WifiConnectivityManager mWifiConnectivityManager;
-    private WifiNetworkSelector mWifiNetworkSelector;
     private INetworkManagementService mNwService;
     private IWificond mWificond;
     private IClientInterface mClientInterface;
@@ -884,7 +883,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mWifiDiagnostics = mWifiInjector.makeWifiDiagnostics(mWifiNative);
 
         mWifiInfo = new WifiInfo();
-        mWifiNetworkSelector = mWifiInjector.getWifiNetworkSelector();
         mSupplicantStateTracker =
                 mFacade.makeSupplicantStateTracker(context, mWifiConfigManager, getHandler());
 
@@ -2131,7 +2129,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mWifiDiagnostics.captureBugReportData(WifiDiagnostics.REPORT_REASON_USER_ACTION);
         mWifiDiagnostics.dump(fd, pw, args);
         dumpIpManager(fd, pw, args);
-        mWifiNetworkSelector.dump(fd, pw, args);
+        mWifiConnectivityManager.dump(fd, pw, args);
     }
 
     public void handleUserSwitch(int userId) {
