@@ -1,0 +1,11 @@
+Revision: b9f326b3ef1be3bafae2f5cbb89a7831cccc24db
+Patch-set: 3
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+5305:23-5305:34
+Thu Dec 01 00:09:28 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_a1d19ae9
+Bytes: 114
+config.meteredHint is used to set in mWifiInfo.setMeteredHint at line 3191. Do we need to again check for it here?
+
