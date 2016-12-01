@@ -4797,6 +4797,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             String bssid;
             String ssid;
             NetworkUpdateResult result;
+            Set<Integer> removedNetworkIds;
             logStateAndMessage(message, this);
 
             switch (message.what) {
@@ -5102,10 +5103,22 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     }
                     break;
                 case CMD_REMOVE_APP_CONFIGURATIONS:
-                    mWifiConfigManager.removeNetworksForApp((ApplicationInfo) message.obj);
+                    removedNetworkIds =
+                            mWifiConfigManager.removeNetworksForApp((ApplicationInfo) message.obj);
+                    if (removedNetworkIds.contains(mTargetNetworkId) ||
+                            removedNetworkIds.contains(mLastNetworkId)) {
+                        // Disconnect and let autojoin reselect a new network.
+                        sendMessage(CMD_DISCONNECT);
+                    }
                     break;
                 case CMD_REMOVE_USER_CONFIGURATIONS:
-                    mWifiConfigManager.removeNetworksForUser(message.arg1);
+                    removedNetworkIds =
+                            mWifiConfigManager.removeNetworksForUser((Integer) message.arg1);
+                    if (removedNetworkIds.contains(mTargetNetworkId) ||
+                            removedNetworkIds.contains(mLastNetworkId)) {
+                        // Disconnect and let autojoin reselect a new network.
+                        sendMessage(CMD_DISCONNECT);
+                    }
                     break;
                 case WifiManager.CONNECT_NETWORK:
                     /**
