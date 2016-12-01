@@ -9,6 +9,14 @@ UUID: 2dfd8f27_7e43f163
 Bytes: 38
 Replace enum with static int constants
 
+35:4-35:48
+Thu Dec 01 17:50:25 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 2dfd8f27_7e43f163
+UUID: cd47938e_a7f1a578
+Bytes: 90
+Not sure what the advantage is for doing such. With enum, we know all the possible values.
+
 144:33-144:34
 Wed Nov 23 19:15:35 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,10 +24,26 @@ UUID: 2dfd8f27_7ef531d4
 Bytes: 10
 extra 'a'?
 
+144:33-144:34
+Thu Dec 01 17:50:25 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 2dfd8f27_7ef531d4
+UUID: cd47938e_07021970
+Bytes: 12
+Will update.
+
 145:48-145:50
 Wed Nov 23 19:15:35 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 2dfd8f27_3eefa902
 Bytes: 11
 repeated or
+
+145:48-145:50
+Thu Dec 01 17:50:25 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 2dfd8f27_3eefa902
+UUID: cd47938e_4761c14c
+Bytes: 12
+Will update.
 
