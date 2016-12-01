@@ -17,3 +17,11 @@ UUID: cd47938e_e4b290c5
 Bytes: 119
 Could config.meteredHint be set and potentially not trigger a supplicant state change? It seems safer to check it again
 
+5305:23-5305:34
+Thu Dec 01 17:11:36 2016 +0000
+Author: Lorenzo Colitti <1000835@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_e4b290c5
+UUID: cd47938e_8429079d
+Bytes: 239
+How does config.meteredHint change? Will the settings UI write it into the config store directly? If so, then it can race with the WifiStateMachine thread and we cannot guarantee that mWifiInfo.getMeteredHint() will be correct at any time.
+
