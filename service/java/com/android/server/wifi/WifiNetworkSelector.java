@@ -121,6 +121,7 @@ public class WifiNetworkSelector {
          * @param scanDetails    a list of scan details constructed from the scan results
          * @param currentNetwork configuration of the current connected network
          *                       or null if disconnected
+         * @param selectedNetwork the network selected by all higher priority NetworkEvaluators
          * @param currentBssid   BSSID of the current connected network or null if
          *                       disconnected
          * @param connected      a flag to indicate if WifiStateMachine is in connected
@@ -134,8 +135,8 @@ public class WifiNetworkSelector {
          */
         @Nullable
         WifiConfiguration evaluateNetworks(List<ScanDetail> scanDetails,
-                        WifiConfiguration currentNetwork, String currentBssid,
-                        boolean connected, boolean untrustedNetworkAllowed,
+                        WifiConfiguration currentNetwork, WifiConfiguration selectedNetwork,
+                        String currentBssid, boolean connected, boolean untrustedNetworkAllowed,
                         List<Pair<ScanDetail, WifiConfiguration>> connectableNetworks);
     }
 
@@ -503,11 +504,8 @@ public class WifiNetworkSelector {
         for (NetworkEvaluator registeredEvaluator : mEvaluators) {
             if (registeredEvaluator != null) {
                 selectedNetwork = registeredEvaluator.evaluateNetworks(filteredScanDetails,
-                            currentNetwork, currentBssid, connected,
+                            currentNetwork, selectedNetwork, currentBssid, connected,
                             untrustedNetworkAllowed, mConnectableNetworks);
-                if (selectedNetwork != null) {
-                    break;
-                }
             }
         }
 

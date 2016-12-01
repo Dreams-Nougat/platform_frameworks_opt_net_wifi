@@ -221,9 +221,12 @@ public class ExternalScoreEvaluator implements WifiNetworkSelector.NetworkEvalua
      *         null if no network in this category is available.
      */
     public WifiConfiguration evaluateNetworks(List<ScanDetail> scanDetails,
-                    WifiConfiguration currentNetwork, String currentBssid, boolean connected,
-                    boolean untrustedNetworkAllowed,
+                    WifiConfiguration currentNetwork, WifiConfiguration selectedNetwork,
+                    String currentBssid, boolean connected, boolean untrustedNetworkAllowed,
                     List<Pair<ScanDetail, WifiConfiguration>> connectableNetworks) {
+        if (selectedNetwork != null) {
+            return selectedNetwork;
+        }
         if (mScoreCache == null) {
             localLog("has no network score cache.");
             return null;

@@ -100,8 +100,8 @@ public class WifiNetworkSelectorTest {
          * Always return the first network in the scan results for connection.
          */
         public WifiConfiguration evaluateNetworks(List<ScanDetail> scanDetails,
-                    WifiConfiguration currentNetwork, String currentBssid, boolean connected,
-                    boolean untrustedNetworkAllowed,
+                    WifiConfiguration currentNetwork, WifiConfiguration selectedNetwork,
+                    String currentBssid, boolean connected, boolean untrustedNetworkAllowed,
                     List<Pair<ScanDetail, WifiConfiguration>> connectableNetworks) {
             ScanDetail scanDetail = scanDetails.get(0);
             mWifiConfigManager.setNetworkCandidateScanResult(0, scanDetail.getScanResult(), 100);

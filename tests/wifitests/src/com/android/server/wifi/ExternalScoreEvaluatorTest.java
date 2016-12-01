@@ -122,6 +122,15 @@ public class ExternalScoreEvaluatorTest {
         return wifiConfigManager;
     }
 
+    @Test
+    public void chooseSelectedNetworkIfSet() {
+        WifiConfiguration selectedNetwork = WifiConfigurationTestUtil.createWepNetwork();
+
+        WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(null,
+                null, selectedNetwork, null, false, true, null);
+
+        WifiConfigurationTestUtil.assertConfigurationEqual(candidate, selectedNetwork);
+    }
 
     /**
      * When no saved networks available, choose the available ephemeral networks
@@ -152,7 +161,7 @@ public class ExternalScoreEvaluatorTest {
 
         // Untrusted networks allowed.
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(ephemeralNetworkConfig, candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -192,7 +201,7 @@ public class ExternalScoreEvaluatorTest {
         }
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(ephemeralNetworkConfigs[1], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -229,7 +238,7 @@ public class ExternalScoreEvaluatorTest {
 
         // Untursted networks not allowed.
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, false, null);
+                null, null, null, false, false, null);
 
         assertEquals("Expect null configuration", null, candidate);
     }
@@ -261,7 +270,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, scores, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[0], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -293,7 +302,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, scores, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -326,7 +335,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, scores, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[0], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -379,7 +388,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, scores, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(ephemeralNetworkConfig, candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -412,7 +421,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, scores, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, null, false, true, null);
+                null, null, null, false, true, null);
 
         assertEquals("Expect null configuration", null, candidate);
     }
@@ -448,7 +457,7 @@ public class ExternalScoreEvaluatorTest {
         }
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                null, bssids[1], true, true, null);
+                null, null, bssids[1], true, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(ephemeralNetworkConfigs[1], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,
@@ -481,7 +490,7 @@ public class ExternalScoreEvaluatorTest {
                     scanDetails, null, meteredHints);
 
         WifiConfiguration candidate = mExternalScoreEvaluator.evaluateNetworks(scanDetails,
-                savedConfigs[1], bssids[1], true, true, null);
+                savedConfigs[1], null, bssids[1], true, true, null);
 
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
         WifiNetworkSelectorTestUtil.verifySelectedScanResult(mWifiConfigManager,

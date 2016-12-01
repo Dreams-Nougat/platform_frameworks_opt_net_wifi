@@ -19,7 +19,6 @@ package com.android.server.wifi;
 import static com.android.server.wifi.WifiConfigurationTestUtil.SECURITY_NONE;
 import static com.android.server.wifi.WifiConfigurationTestUtil.SECURITY_PSK;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import android.content.Context;
@@ -168,7 +167,7 @@ public class SavedNetworkEvaluatorTest {
         WifiConfiguration[] savedConfigs = scanDetailsAndConfigs.getWifiConfigs();
 
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                null, null, true, false, null);
+                null, null, null, true, false, null);
 
         ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
@@ -196,7 +195,7 @@ public class SavedNetworkEvaluatorTest {
         WifiConfiguration[] savedConfigs = scanDetailsAndConfigs.getWifiConfigs();
 
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                null, null, true, false, null);
+                null, null, null, true, false, null);
 
         ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
@@ -223,7 +222,7 @@ public class SavedNetworkEvaluatorTest {
         WifiConfiguration[] savedConfigs = scanDetailsAndConfigs.getWifiConfigs();
 
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                null, null, true, false, null);
+                null, null, null, true, false, null);
 
         ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
@@ -250,7 +249,7 @@ public class SavedNetworkEvaluatorTest {
         WifiConfiguration[] savedConfigs = scanDetailsAndConfigs.getWifiConfigs();
 
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                null, null, true, false, null);
+                null, null, null, true, false, null);
 
         ScanResult chosenScanResult = scanDetails.get(1).getScanResult();
         WifiConfigurationTestUtil.assertConfigurationEqual(savedConfigs[1], candidate);
@@ -280,7 +279,7 @@ public class SavedNetworkEvaluatorTest {
 
         // Simuluate we are connected to SSID test1 already.
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                savedConfigs[0], null, true, false, null);
+                savedConfigs[0], null, null, true, false, null);
 
         // Even though test2 has higher RSSI value, test1 is chosen because of the
         // currently connected network bonus.
@@ -313,7 +312,7 @@ public class SavedNetworkEvaluatorTest {
 
         // Simuluate we are connected to BSSID "6c:f3:7f:ae:8c:f3" already
         WifiConfiguration candidate = mSavedNetworkEvaluator.evaluateNetworks(scanDetails,
-                null, bssids[0], true, false, null);
+                null, null, bssids[0], true, false, null);
 
         // Even though test2 has higher RSSI value, test1 is chosen because of the
         // currently connected BSSID bonus.

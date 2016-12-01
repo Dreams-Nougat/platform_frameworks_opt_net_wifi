@@ -231,7 +231,6 @@ public class SavedNetworkEvaluator implements WifiNetworkSelector.NetworkEvaluat
                 + scanResultCandidate.BSSID);
         return candidate;
     }
-
     /**
      * Evaluate all the networks from the scan results and return
      * the WifiConfiguration of the network chosen for connection.
@@ -240,8 +239,8 @@ public class SavedNetworkEvaluator implements WifiNetworkSelector.NetworkEvaluat
      *         null if no network in this category is available.
      */
     public WifiConfiguration evaluateNetworks(List<ScanDetail> scanDetails,
-                    WifiConfiguration currentNetwork, String currentBssid, boolean connected,
-                    boolean untrustedNetworkAllowed,
+                    WifiConfiguration currentNetwork, WifiConfiguration selectedNetwork,
+                    String currentBssid, boolean connected, boolean untrustedNetworkAllowed,
                     List<Pair<ScanDetail, WifiConfiguration>> connectableNetworks) {
         int highestScore = Integer.MIN_VALUE;
         ScanResult scanResultCandidate = null;
