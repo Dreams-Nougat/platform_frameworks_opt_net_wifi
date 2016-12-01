@@ -17,6 +17,15 @@ UUID: cd47938e_a7f1a578
 Bytes: 90
 Not sure what the advantage is for doing such. With enum, we know all the possible values.
 
+35:4-35:48
+Thu Dec 01 21:20:18 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_a7f1a578
+UUID: cd47938e_fd105a03
+Bytes: 170
+Enum's define a bunch of extra methods by extending the Enum class, which is unnecessary for your usage.
+Best practice in framework code is to avoid creating/using these.
+
 144:33-144:34
 Wed Nov 23 19:15:35 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
