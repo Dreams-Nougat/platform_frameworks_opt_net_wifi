@@ -9,3 +9,11 @@ UUID: cd47938e_a1d19ae9
 Bytes: 114
 config.meteredHint is used to set in mWifiInfo.setMeteredHint at line 3191. Do we need to again check for it here?
 
+5305:23-5305:34
+Thu Dec 01 01:12:24 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_a1d19ae9
+UUID: cd47938e_e4b290c5
+Bytes: 119
+Could config.meteredHint be set and potentially not trigger a supplicant state change? It seems safer to check it again
+
