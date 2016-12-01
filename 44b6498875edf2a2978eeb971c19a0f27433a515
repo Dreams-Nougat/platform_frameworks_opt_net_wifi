@@ -9,6 +9,14 @@ UUID: cd47938e_84f74c1b
 Bytes: 23
 Remove the white space.
 
+80:34-80:35
+Thu Dec 01 17:26:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_84f74c1b
+UUID: cd47938e_647b1b69
+Bytes: 8
+Will do.
+
 File: service/java/com/android/server/wifi/hotspot2/AnqpCache.java
 
 46:7-46:49
@@ -18,10 +26,26 @@ UUID: cd47938e_642e80bd
 Bytes: 99
 Understand this is from the original code. But at this point of time we haven't done any sweep yet.
 
+46:7-46:49
+Thu Dec 01 17:26:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_642e80bd
+UUID: cd47938e_c462efbd
+Bytes: 113
+I think this is fine, it is just an initialization of the timestamp.  The cache is empty at the time of creation.
+
 77
 Thu Dec 01 04:55:11 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: cd47938e_551a0c89
 Bytes: 59
 Will it make sense to have the caller do the time checking?
+
+77
+Thu Dec 01 17:26:30 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_551a0c89
+UUID: cd47938e_24e3d31a
+Bytes: 75
+I think it make more sense and cleaner to have it maintained by this class.
 
