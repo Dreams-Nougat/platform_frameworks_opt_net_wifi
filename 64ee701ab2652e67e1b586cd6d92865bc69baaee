@@ -9,6 +9,14 @@ UUID: 6def8770_3108ef48
 Bytes: 177
 This list doesn't explain why we need a WifiHandler. (From this list, it seems like the trace calls in getMessenger(), getAvailableChannels(), WifiAsyncChannel would be enough.)
 
+11
+Thu Dec 01 01:29:37 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_3108ef48
+UUID: 6def8770_f1c1673d
+Bytes: 106
+Async Channel messages are received by Handler. It's implied but not explicitly mentioned, I can add that.
+
 14:0-14:10
 Wed Nov 30 00:49:24 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -35,4 +43,12 @@ Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_26a9d058
 Bytes: 63
 Why is a spy being used, instead of a mock or real FakeWifiLog?
+
+92:4-92:26
+Thu Dec 01 01:29:37 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_26a9d058
+UUID: cd47938e_cfd4cddb
+Bytes: 210
+I need the real object in this case because I'm not mocking the methods called on this object. I need the real object to be defined. If I use a mock, I get a null pointer exception when the methods are invoked.
 
