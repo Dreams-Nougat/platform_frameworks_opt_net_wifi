@@ -9,3 +9,11 @@ UUID: cd47938e_69a76cf4
 Bytes: 332
 I thought we are moving this LocalLog dump to WifiService. If the goal is just to remove mWifiNetworkSelector from WSM constructor, we can do something like "mWifiInjector.getWifiNetworkSelector().dump()" here. This way we don't need to make that change to WifiConnectivityManager which simply calls into WifiNetworkSelector.dump().
 
+2132
+Thu Dec 01 23:27:30 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_69a76cf4
+UUID: cd47938e_ed10a715
+Bytes: 892
+I put this in the bug already, but I did try this initially.  WifiServiceImpl doesn't have an instance of NetworkSelector either, so it seems odd to put it there.  Additionally, I also noticed that NetworkSelector in the main holder of the LocalLog instance and ConnectivityManager is using the same LocalLog.  This doesn't make a lot of sense.  If ConnectivityManager is the one holding on to and directly calling NetworkSelector, then it should probably be the owner of the log and do the dump call.  Having another class reach around ConnectivityManager to get to NetworkSelector (via WifiInjector) is a bit convoluted.  I am hoping this will be more clear after I get more of the WSM refactor done and then hopefully ConnectivityManager will be a better cut of a subset of code.  For now, I am just trying to get another variable out of WSM and don't want to just stick it in ServiceImpl.
+
