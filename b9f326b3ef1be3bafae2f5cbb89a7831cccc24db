@@ -1,5 +1,14 @@
 Revision: b9f326b3ef1be3bafae2f5cbb89a7831cccc24db
 Patch-set: 3
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+826
+Thu Dec 01 23:50:36 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: cd47938e_905c989d
+Bytes: 341
+Similar to lorenzo@ question, when does settings app set this parameter? Is it during network addition or will it come as an update later. The change here will only work if it only comes as a part of addition. If u want to modify these in updates, u should add that in (updateExistingInternalWifiConfigurationFromExternal) in line 855 below.
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 5305:23-5305:34
