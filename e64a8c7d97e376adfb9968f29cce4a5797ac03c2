@@ -9,3 +9,11 @@ UUID: cd47938e_de600116
 Bytes: 149
 This store is deprecated. The change in XmlUtil (used by the new WifiConfigStore) is sufficient. This file is still here for migration purposes only.
 
+95:3-95:26
+Thu Dec 01 00:05:01 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_de600116
+UUID: cd47938e_2198ea55
+Bytes: 8
+Removed.
+
