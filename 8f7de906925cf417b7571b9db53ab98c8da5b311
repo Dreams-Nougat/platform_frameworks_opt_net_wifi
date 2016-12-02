@@ -25,3 +25,11 @@ UUID: cd47938e_f0b23c97
 Bytes: 310
 Sorry, I missed your comment in the bug. WifiConnectivityManager and WifiNetworkSelector share a local buffer. However WifiConnectivityManager depends on WifiNetworkSelector, which is initialized then passed to WifiConnectivityManager constructor. That's why the local buffer is created in WifiNetworkSelector.
 
+2132
+Fri Dec 02 01:29:43 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_f0b23c97
+UUID: cd47938e_96e130b9
+Bytes: 312
+NetworkSelector is created in WifiInjector, but the only class that directly interacts with it is ConnectivityManager.  No one else holds the NetworkSelector and it is pretty unnatural for another class to reach around ConnectivityManager to get to it.  (It is possible thanks to WifiInjector, but it is awkward.
+
