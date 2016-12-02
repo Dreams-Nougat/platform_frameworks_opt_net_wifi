@@ -21,3 +21,17 @@ UUID: 8decbb0b_911cdce1
 Bytes: 704
 Yes. WifiHandler can be used any Wifi service that wishes to log incoming messages. P2p Service is also one of them, which is started before the Wifi service is started. The Wifi service is the one that first instantiates the WifiInjector. So, when WifiHandler is instantiated , the singleton instance of WifiInjector is not available in all cases. This is the reason, WifiAsyncChannel and WifiHandler do a lazy initialization of mLog and get their own instances of WifiInjector using WifiInjector.getInstance(). WifiScanningService is started after WifiService is started and so for this particular service WifiInjector is available and can be passed in. But WifiHandler is to be used by other services.
 
+32
+Fri Dec 02 22:57:12 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_911cdce1
+UUID: 8decbb0b_cb7989e7
+Bytes: 496
+Makes sense. Please do three things:
+
+1. @VisibleForTesting annotation for this field.
+2. Include this explanation (or an excerpt of it), in the commit message. (This explanation is the "why this is the best approach" part of t he commit message. https://engdoc.corp.google.com/eng/doc/devguide/coding/review/developer/cl-descriptions.md)
+3. Add a TODO(b/<new-bug-number>) comment for cleaning this up, once the ordering issue is resolved. (b/<new-bug-number) should block on b/31651755)
+
+Thanks.
+
