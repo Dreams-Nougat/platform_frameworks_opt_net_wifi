@@ -67,3 +67,11 @@ UUID: 8decbb0b_11634cf2
 Bytes: 372
 The CL makes sense now after I understand what you are doing to clean up WSM. Since WSM is no longer calling into WifiInjector#getWifiNetworkSelector, we can remove "when(mWifiInjector.getWifiNetworkSelector()).thenReturn(mock(WifiNetworkSelector.class));" from WifiStateMachineTest.java. Also it would be good if we just remove getWifiNetworkSelector() from WifiInjector.
 
+2132
+Fri Dec 02 18:53:35 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_11634cf2
+UUID: 8decbb0b_513af488
+Bytes: 352
+We can do the cleanup for WifiInjector after I switch over.  I am not actually changing WSM in its current state, I am incrementally building the new code in parallel and will switch over at a later date.  This allows me to continue with my development of ClientMode without losing the logs held in the shared LocalLog (or forgetting to call it later).
+
