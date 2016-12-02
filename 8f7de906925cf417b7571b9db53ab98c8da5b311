@@ -59,3 +59,11 @@ One additional question about an alternate place to call NetworkSelector from, i
 
 In the end, won't they move to the alternate logging service and make this decision obsolete?
 
+2132
+Fri Dec 02 18:39:44 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_3c38fbe4
+UUID: 8decbb0b_11634cf2
+Bytes: 372
+The CL makes sense now after I understand what you are doing to clean up WSM. Since WSM is no longer calling into WifiInjector#getWifiNetworkSelector, we can remove "when(mWifiInjector.getWifiNetworkSelector()).thenReturn(mock(WifiNetworkSelector.class));" from WifiStateMachineTest.java. Also it would be good if we just remove getWifiNetworkSelector() from WifiInjector.
+
