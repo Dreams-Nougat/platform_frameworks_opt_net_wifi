@@ -49,3 +49,13 @@ UUID: cd47938e_fcf05322
 Bytes: 133
 I am missing another path then, can you point out where it is being called or design docs for where it is planning to be called from?
 
+2132
+Fri Dec 02 07:28:20 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_fcf05322
+UUID: cd47938e_3c38fbe4
+Bytes: 456
+One additional question about an alternate place to call NetworkSelector from, if that does happen, then won't the logs from ConnectivityManager be mixed in?  If there is to be a separate call path, then we potentially should have CM share with WSM and NS have an independent call.  Mixing the two and then arguing they should be separate seems a bit confusing.
+
+In the end, won't they move to the alternate logging service and make this decision obsolete?
+
