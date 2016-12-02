@@ -13,3 +13,11 @@ Could you elaborate, though, on what problems we'd run into, if we _did_ pass Wi
 
 (I'm not necessarily opposed to this approach. But I'd like to understand why we need to diverge from the pattern used in other Wifi code.)
 
+32
+Fri Dec 02 18:22:17 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_16b6c08d
+UUID: 8decbb0b_911cdce1
+Bytes: 704
+Yes. WifiHandler can be used any Wifi service that wishes to log incoming messages. P2p Service is also one of them, which is started before the Wifi service is started. The Wifi service is the one that first instantiates the WifiInjector. So, when WifiHandler is instantiated , the singleton instance of WifiInjector is not available in all cases. This is the reason, WifiAsyncChannel and WifiHandler do a lazy initialization of mLog and get their own instances of WifiInjector using WifiInjector.getInstance(). WifiScanningService is started after WifiService is started and so for this particular service WifiInjector is available and can be passed in. But WifiHandler is to be used by other services.
+
