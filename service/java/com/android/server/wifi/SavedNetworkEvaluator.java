@@ -173,7 +173,8 @@ public class SavedNetworkEvaluator implements WifiNetworkSelector.NetworkEvaluat
 
         // Same network award.
         if (currentNetwork != null
-                && (network == currentNetwork || network.isLinked(currentNetwork))) {
+                && (network.networkId == currentNetwork.networkId
+                || network.isLinked(currentNetwork))) {
             score += mSameNetworkAward;
             sbuf.append(" Same network bonus as the current one bonus: ")
                     .append(mSameNetworkAward).append(",");
