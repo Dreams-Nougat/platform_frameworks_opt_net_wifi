@@ -33,3 +33,11 @@ UUID: cd47938e_96e130b9
 Bytes: 312
 NetworkSelector is created in WifiInjector, but the only class that directly interacts with it is ConnectivityManager.  No one else holds the NetworkSelector and it is pretty unnatural for another class to reach around ConnectivityManager to get to it.  (It is possible thanks to WifiInjector, but it is awkward.
 
+2132
+Fri Dec 02 04:43:27 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_96e130b9
+UUID: cd47938e_bcdb6b09
+Bytes: 543
+Depending on how you look at it, WifiNetworkSelector(WNS) and WifiConnectivityManager(WCM) are literally two entities. The job of WNS is to evaluate scan results, regardless of whether they come from WCM or other modules (for example in WNS unit tests the scan results are all mocked and WCM is not there at all). The job of WCM is mainly to schedule connectivity scans. Each class used to have its own LocalLog buffer. We consolidate them into one recently just to make better use of the memory. WNS doesn't have to be always reached via WCM.
+
