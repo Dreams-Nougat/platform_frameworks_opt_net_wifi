@@ -41,3 +41,11 @@ UUID: cd47938e_bcdb6b09
 Bytes: 543
 Depending on how you look at it, WifiNetworkSelector(WNS) and WifiConnectivityManager(WCM) are literally two entities. The job of WNS is to evaluate scan results, regardless of whether they come from WCM or other modules (for example in WNS unit tests the scan results are all mocked and WCM is not there at all). The job of WCM is mainly to schedule connectivity scans. Each class used to have its own LocalLog buffer. We consolidate them into one recently just to make better use of the memory. WNS doesn't have to be always reached via WCM.
 
+2132
+Fri Dec 02 06:26:51 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_bcdb6b09
+UUID: cd47938e_fcf05322
+Bytes: 133
+I am missing another path then, can you point out where it is being called or design docs for where it is planning to be called from?
+
