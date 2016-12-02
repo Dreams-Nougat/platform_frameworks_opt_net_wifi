@@ -1,0 +1,11 @@
+Revision: 219a1c84f2a20cea201ca9490121da5f6251624e
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+164
+Fri Dec 02 23:40:36 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_e6fb6456
+Bytes: 75
+silberst@ to verify whether this is the right place for this instantiation.
+
