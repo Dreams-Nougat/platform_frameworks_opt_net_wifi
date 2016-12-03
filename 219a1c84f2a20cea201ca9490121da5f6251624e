@@ -9,3 +9,21 @@ UUID: 8decbb0b_e6fb6456
 Bytes: 75
 silberst@ to verify whether this is the right place for this instantiation.
 
+164:73-164:77
+Sat Dec 03 00:26:34 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_4670f086
+Bytes: 235
+I don't think the injector needs to be passed (though there are bad examples, we should not be passing the injector itself around to classes).
+
+I do see hints that you might be wanted to get to WifiScanner...  is that why this is here?
+
+File: service/java/com/android/server/wifi/WifiWakeupController.java
+
+42:0-42:45
+Sat Dec 03 00:26:34 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_26e04c0b
+Bytes: 15
+Is this needed?
+
