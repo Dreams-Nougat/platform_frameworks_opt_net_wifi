@@ -35,3 +35,13 @@ Makes sense. Please do three things:
 
 Thanks.
 
+32
+Sat Dec 03 03:06:55 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_cb7989e7
+UUID: 8decbb0b_bdfb2a05
+Bytes: 124
+#1 Just adding that field didn't make it visible in WifiHandlerTest. I have added a hidden API instead.
+2. Done
+3. Also done
+
