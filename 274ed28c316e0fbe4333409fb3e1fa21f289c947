@@ -19,6 +19,14 @@ Empty result, which is still a List thou, that's why I didn't say anything about
 
 I can be more explicit if you prefer.
 
+242
+Mon Dec 05 22:21:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_3f0cc920
+UUID: 8decbb0b_c8d2a165
+Bytes: 9
+Please do
+
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
 
 172:8-172:66
@@ -75,4 +83,12 @@ public WifiConfiguration evaulateNetworks(..) {
     ...
   ..
 }
+
+527:7-527:46
+Mon Dec 05 22:21:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_1ffb45a1
+UUID: 8decbb0b_28112d3c
+Bytes: 23
+Ok, I'm cool with that.
 
