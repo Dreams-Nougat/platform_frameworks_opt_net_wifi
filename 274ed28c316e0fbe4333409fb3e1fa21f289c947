@@ -1,0 +1,39 @@
+Revision: 274ed28c316e0fbe4333409fb3e1fa21f289c947
+Patch-set: 6
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+242
+Mon Dec 05 19:24:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_6663f4c3
+Bytes: 96
+Please call out the return behaviour when there are no matches in javadoc (null vs empty result)
+
+File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
+
+172:8-172:66
+Mon Dec 05 19:24:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_64e3e71a
+Bytes: 232
+Why is the time function returning a PROVIDER_ID?
+Just spoke with Peter. Using time as a provider ID is pretty weird (bad), but none of this works yet, and this will be changed to use FQDN instead of time to alias keys/certificates.
+
+437:7-437:81
+Mon Dec 05 19:24:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_ffdac105
+Bytes: 89
+Be more explicit about what you expect for matchProvider. (Here and in other tests below)
+
+527:7-527:46
+Mon Dec 05 19:24:28 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_3f45e9b6
+Bytes: 327
+This test is kind of pointless, it calls a wrapper method on the ANQPcache, which is mocked, and checks it got called.
+
+Ideally this test would create the conditions which cause PasspointManager to trigger an AnqpCache sweep. What does trigger this behaviour?
+
+Is there an AnqpTest.java that tests the functionality of sweep()?
+
