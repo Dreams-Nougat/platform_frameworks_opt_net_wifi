@@ -1,0 +1,29 @@
+Revision: d6eb267d94bf1195052f27ce215c5ef1c3865dc8
+Patch-set: 4
+File: service/java/com/android/server/wifi/hotspot2/anqp/DomainNameElement.java
+
+19:12-19:36
+Mon Dec 05 22:47:50 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_2825ad71
+Bytes: 105
+I don't think this throws a ProtocolException anymore, it potentially throws a bunch of other exceptions.
+
+File: tests/wifitests/src/com/android/server/wifi/ByteBufferReaderTest.java
+
+36:7-36:30
+Mon Dec 05 22:47:50 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_33b882ab
+Bytes: 173
+You've actually already stated 'the expectations' but you have stated the conditions.
+
+'Verify that reading an integer from a too short buffer results in a buffer underflow'
+
+48:7-48:93
+Mon Dec 05 22:47:50 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_5330a645
+Bytes: 113
+Reword all these. Explicityly state the expectation. Make sure you state what the test does, and what it expects.
+
