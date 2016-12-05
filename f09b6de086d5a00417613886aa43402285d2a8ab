@@ -1,0 +1,11 @@
+Revision: f09b6de086d5a00417613886aa43402285d2a8ab
+Patch-set: 4
+File: tests/wifitests/src/com/android/server/wifi/WifiWakeupControllerTest.java
+
+62:8-62:18
+Mon Dec 05 22:52:11 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_f3ab1a23
+Bytes: 124
+You will probably want to move this to a class variable so you can call the dispatch methods later when you have real tests.
+
