@@ -1,0 +1,29 @@
+Revision: 6ca5d733ab054874b4addfb148be77aefd2df3e9
+Patch-set: 8
+File: service/java/com/android/server/wifi/hotspot2/ANQPData.java
+
+33:7-33:21
+Mon Dec 05 20:13:48 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_bf143909
+Bytes: 23
+Maximum entry lifetime?
+
+File: service/java/com/android/server/wifi/hotspot2/ANQPNetworkKey.java
+
+88
+Mon Dec 05 20:13:48 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_5feaedbc
+Bytes: 31
+whitespace here, run checkStyle
+
+File: tests/wifitests/src/com/android/server/wifi/hotspot2/ANQPDataTest.java
+
+81:7-81:29
+Mon Dec 05 20:13:48 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 8decbb0b_c2a7228e
+Bytes: 6
+unused
+
