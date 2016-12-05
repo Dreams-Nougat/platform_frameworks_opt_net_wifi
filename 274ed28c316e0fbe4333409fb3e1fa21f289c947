@@ -9,6 +9,16 @@ UUID: 8decbb0b_6663f4c3
 Bytes: 96
 Please call out the return behaviour when there are no matches in javadoc (null vs empty result)
 
+242
+Mon Dec 05 19:51:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_6663f4c3
+UUID: 8decbb0b_3f0cc920
+Bytes: 135
+Empty result, which is still a List thou, that's why I didn't say anything about returning null.
+
+I can be more explicit if you prefer.
+
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/PasspointManagerTest.java
 
 172:8-172:66
@@ -36,4 +46,25 @@ This test is kind of pointless, it calls a wrapper method on the ANQPcache, whic
 Ideally this test would create the conditions which cause PasspointManager to trigger an AnqpCache sweep. What does trigger this behaviour?
 
 Is there an AnqpTest.java that tests the functionality of sweep()?
+
+527:7-527:46
+Mon Dec 05 19:51:54 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_3f45e9b6
+UUID: 8decbb0b_1ffb45a1
+Bytes: 663
+Yes, AnqpCacheTest does test sweep().
+
+This is just to make sure we are actually invoking mAnqpCache.sweep when PasspointManager.sweepCache is called.
+
+PasspointManager.sweepCache will be invoke by PasspointNetworkEvaluator to sweep the cache before performing providers matching.  We could've put the cache sweep in the matchProvider function, but that's a bit inefficient since it would be invoked when matching each ScanDetail.  Instead, we can have PasspointNetworkEvaluator do something like:
+
+public WifiConfiguration evaulateNetworks(..) {
+  ...
+  mPasspointManager.sweepCache();
+  for each scanDetail
+    mPasspointManager.matchProvider(..)
+    ...
+  ..
+}
 
