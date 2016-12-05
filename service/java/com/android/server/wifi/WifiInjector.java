@@ -17,6 +17,7 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.NetworkScoreManager;
 import android.net.NetworkScorerAppManager;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IWifiScanner;
@@ -34,6 +35,7 @@ import android.os.UserManager;
 import android.provider.Settings;
 import android.security.KeyStore;
 import android.telephony.TelephonyManager;
+import android.util.LocalLog;
 
 import com.android.internal.R;
 import com.android.server.am.BatteryStatsService;
@@ -91,6 +93,7 @@ public class WifiInjector {
     private final WifiConfigManager mWifiConfigManager;
     private final WifiNetworkSelector mWifiNetworkSelector;
     private final WifiNetworkScoreCache mWifiNetworkScoreCache;
+    private final NetworkScoreManager mNetworkScoreManager;
     private WifiScanner mWifiScanner;
     private final WifiPermissionsWrapper mWifiPermissionsWrapper;
     private final WifiPermissionsUtil mWifiPermissionsUtil;
@@ -175,6 +178,8 @@ public class WifiInjector {
         mSimAccessor = new SIMAccessor(mContext);
         mPasspointManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, new PasspointObjectFactory());
+        mNetworkScoreManager = (NetworkScoreManager)
+                mContext.getSystemService(Context.NETWORK_SCORE_SERVICE);
         mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
     }
 
@@ -371,11 +376,18 @@ public class WifiInjector {
      */
     public WifiConnectivityManager makeWifiConnectivityManager(WifiInfo wifiInfo,
                                                                boolean hasConnectionRequests) {
+        LocalLog localLog = mWifiNetworkSelector.getLocalLog();
+        SavedNetworkEvaluator savedNetworkEvaluator = new SavedNetworkEvaluator(mContext,
+                mWifiConfigManager, mClock, localLog);
+        ExternalScoreEvaluator externalScoreEvaluator = new ExternalScoreEvaluator(
+                mContext, mWifiConfigManager, mWifiNetworkScoreCache, mClock, localLog);
+        RecommendedNetworkEvaluator recommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
+                mWifiNetworkScoreCache, mNetworkScoreManager, mWifiConfigManager, localLog);
         return new WifiConnectivityManager(mContext, mWifiStateMachine, getWifiScanner(),
-                                           mWifiConfigManager, wifiInfo, mWifiNetworkSelector,
-                                           mWifiNetworkScoreCache, mWifiLastResortWatchdog,
-                                           mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(),
-                                           mClock, hasConnectionRequests);
+                mWifiConfigManager, wifiInfo, mWifiNetworkSelector, mWifiLastResortWatchdog,
+                mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(), mClock,
+                hasConnectionRequests, mFrameworkFacade, savedNetworkEvaluator,
+                externalScoreEvaluator, recommendedNetworkEvaluator);
     }
 
     public WifiPermissionsUtil getWifiPermissionsUtil() {
