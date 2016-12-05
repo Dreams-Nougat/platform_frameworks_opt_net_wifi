@@ -18,6 +18,14 @@ I don't think the injector needs to be passed (though there are bad examples, we
 
 I do see hints that you might be wanted to get to WifiScanner...  is that why this is here?
 
+164:73-164:77
+Mon Dec 05 18:43:06 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_4670f086
+UUID: 8decbb0b_84b5abd1
+Bytes: 154
+Yes, the intention is to use WifiScanner's scan results for logic to wake up Wi-Fi. I'll remove this injector pass for now until the logic is implemented.
+
 File: service/java/com/android/server/wifi/WifiWakeupController.java
 
 42:0-42:45
