@@ -17,6 +17,7 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.NetworkScoreManager;
 import android.net.NetworkScorerAppManager;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IWifiScanner;
@@ -91,6 +92,7 @@ public class WifiInjector {
     private final WifiConfigManager mWifiConfigManager;
     private final WifiNetworkSelector mWifiNetworkSelector;
     private final WifiNetworkScoreCache mWifiNetworkScoreCache;
+    private final NetworkScoreManager mNetworkScoreManager;
     private WifiScanner mWifiScanner;
     private final WifiPermissionsWrapper mWifiPermissionsWrapper;
     private final WifiPermissionsUtil mWifiPermissionsUtil;
@@ -176,6 +178,8 @@ public class WifiInjector {
         mSimAccessor = new SIMAccessor(mContext);
         mPasspointManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, new PasspointObjectFactory());
+        mNetworkScoreManager = (NetworkScoreManager)
+                mContext.getSystemService(Context.NETWORK_SCORE_SERVICE);
         mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
     }
 
@@ -374,9 +378,10 @@ public class WifiInjector {
                                                                boolean hasConnectionRequests) {
         return new WifiConnectivityManager(mContext, mWifiStateMachine, getWifiScanner(),
                                            mWifiConfigManager, wifiInfo, mWifiNetworkSelector,
+                                           mNetworkScoreManager,
                                            mWifiNetworkScoreCache, mWifiLastResortWatchdog,
                                            mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(),
-                                           mClock, hasConnectionRequests);
+                                           mClock, hasConnectionRequests, mFrameworkFacade);
     }
 
     public WifiPermissionsUtil getWifiPermissionsUtil() {
