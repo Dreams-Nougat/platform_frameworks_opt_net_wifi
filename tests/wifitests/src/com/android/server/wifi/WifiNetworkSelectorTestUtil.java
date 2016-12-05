@@ -26,6 +26,7 @@ import android.net.NetworkKey;
 import android.net.RssiCurve;
 import android.net.ScoredNetwork;
 import android.net.WifiKey;
+import android.net.WifiNetworkScoreCache;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiConfiguration.NetworkSelectionStatus;

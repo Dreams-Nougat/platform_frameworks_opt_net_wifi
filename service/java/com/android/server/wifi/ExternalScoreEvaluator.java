@@ -21,6 +21,7 @@ import android.content.Context;
 import android.net.NetworkKey;
 import android.net.NetworkScoreManager;
 import android.net.WifiKey;
+import android.net.WifiNetworkScoreCache;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.os.Process;
