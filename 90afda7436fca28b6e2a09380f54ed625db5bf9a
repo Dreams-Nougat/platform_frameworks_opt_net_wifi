@@ -1,0 +1,27 @@
+Revision: 90afda7436fca28b6e2a09380f54ed625db5bf9a
+Patch-set: 2
+File: service/java/com/android/server/wifi/hotspot2/anqp/ANQPFactory.java
+
+105:0-106:36
+Tue Dec 06 19:47:12 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_03faf4c3
+Bytes: 43
+Add a log to indicate what's going on here?
+
+File: service/java/com/android/server/wifi/hotspot2/anqp/IPAddressTypeAvailabilityElement.java
+
+101:39-101:42
+Tue Dec 06 19:47:12 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_2ea11f79
+Bytes: 36
+Can we define macro for these masks?
+
+106:46-106:50
+Tue Dec 06 19:47:12 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_eeb7a7bb
+Bytes: 36
+Can we define macro for these masks?
+
