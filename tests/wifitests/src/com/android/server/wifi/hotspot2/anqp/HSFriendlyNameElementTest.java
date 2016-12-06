@@ -35,29 +35,30 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Unit tests for {@link com.android.server.wifi.hotspot2.anqp.VenueNameElement}.
+ * Unit tests for {@link com.android.server.wifi.hotspot2.anqp.HSFriendlyNameElement}.
  */
 @SmallTest
-public class VenueNameElementTest {
+public class HSFriendlyNameElementTest {
     private static final String TEST_LANGUAGE = "en";
     private static final Locale TEST_LOCALE = Locale.forLanguageTag(TEST_LANGUAGE);
-    private static final String TEST_VENUE_NAME1 = "Venue1";
-    private static final String TEST_VENUE_NAME2 = "Venue2";
+    private static final String TEST_OPERATOR_NAME1 = "Operator1";
+    private static final String TEST_OPERATOR_NAME2 = "Operator2";
 
     /**
-     * Helper function for appending a Venue Name to an output stream.
+     * Helper function for appending a Operator Name to an output stream.
      *
      * @param stream Stream to write to
-     * @param venue The venue name string
+     * @param operator The name of the operator
      * @throws IOException
      */
-    private void appendVenue(ByteArrayOutputStream stream, String venue) throws IOException {
-        byte[] venueBytes = venue.getBytes(StandardCharsets.UTF_8);
-        int length = I18Name.LANGUAGE_CODE_LENGTH + venue.length();
+    private void appendOperatorName(ByteArrayOutputStream stream, String operator)
+            throws IOException {
+        byte[] nameBytes = operator.getBytes(StandardCharsets.UTF_8);
+        int length = I18Name.LANGUAGE_CODE_LENGTH + operator.length();
         stream.write((byte) length);
         stream.write(TEST_LANGUAGE.getBytes(StandardCharsets.US_ASCII));
         stream.write(new byte[]{(byte) 0x0});  // Padding for language code.
-        stream.write(venueBytes);
+        stream.write(nameBytes);
     }
 
     /**
@@ -68,22 +69,21 @@ public class VenueNameElementTest {
      */
     private byte[] getTestData(String[] names) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        // Venue info data not currently used.
-        stream.write(new byte[VenueNameElement.VENUE_INFO_LENGTH]);
         for (String name : names) {
-            appendVenue(stream, name);
+            appendOperatorName(stream, name);
         }
         return stream.toByteArray();
     }
 
     /**
-     * Verify that BufferUnderflowException will be thrown when parsing an empty buffer.
+     * Verify that HSFriendlyNameElement with a empty operator name list will be returned when
+     * parsing an empty buffer.
      *
      * @throws Exception
      */
-    @Test(expected = BufferUnderflowException.class)
+    @Test
     public void parseBufferWithEmptyBuffer() throws Exception {
-        VenueNameElement.parse(ByteBuffer.allocate(0));
+        assertTrue(HSFriendlyNameElement.parse(ByteBuffer.allocate(0)).getNames().isEmpty());
     }
 
     /**
@@ -94,60 +94,46 @@ public class VenueNameElementTest {
      */
     @Test(expected = BufferUnderflowException.class)
     public void parseBufferWithTruncatedByte() throws Exception {
-        byte[] testData = getTestData(new String[] {TEST_VENUE_NAME1});
+        byte[] testData = getTestData(new String[] {TEST_OPERATOR_NAME1});
         // Truncate a byte at the end.
         ByteBuffer buffer = ByteBuffer.allocate(testData.length - 1);
         buffer.put(testData, 0, testData.length - 1);
         buffer.position(0);
-        VenueNameElement.parse(buffer);
+        HSFriendlyNameElement.parse(buffer);
     }
 
     /**
-     * Verify that VenueNameElement will contained an empty name list when parsing a buffer
-     * contained no venue name (only contained the venue info data).
+     * Verify that an expected HSFriendlyNameElement will be returned when parsing a buffer
+     * containing the default test data.
      *
      * @throws Exception
      */
     @Test
-    public void parseBufferWithEmptyVenueName() throws Exception {
-        byte[] testData = getTestData(new String[0]);
-        ByteBuffer buffer = ByteBuffer.allocate(testData.length);
-        buffer.put(testData);
-        buffer.position(0);
-        assertTrue(VenueNameElement.parse(buffer).getNames().isEmpty());
-    }
-    /**
-     * Verify that an expected VenueNameElement will be returned when parsing a buffer containing
-     * valid Venue Name data.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void parseBufferWithValidVenueNames() throws Exception {
-        byte[] testData = getTestData(new String[] {TEST_VENUE_NAME1, TEST_VENUE_NAME2});
+    public void parseBufferWithDefaultTestData() throws Exception {
+        byte[] testData = getTestData(new String[] {TEST_OPERATOR_NAME1, TEST_OPERATOR_NAME2});
         ByteBuffer buffer = ByteBuffer.allocate(testData.length);
         buffer.put(testData);
         buffer.position(0);
 
         // Setup expected element.
         List<I18Name> nameList = new ArrayList<>();
-        nameList.add(new I18Name(TEST_LANGUAGE, TEST_LOCALE, TEST_VENUE_NAME1));
-        nameList.add(new I18Name(TEST_LANGUAGE, TEST_LOCALE, TEST_VENUE_NAME2));
-        VenueNameElement expectedElement = new VenueNameElement(nameList);
+        nameList.add(new I18Name(TEST_LANGUAGE, TEST_LOCALE, TEST_OPERATOR_NAME1));
+        nameList.add(new I18Name(TEST_LANGUAGE, TEST_LOCALE, TEST_OPERATOR_NAME2));
+        HSFriendlyNameElement expectedElement = new HSFriendlyNameElement(nameList);
 
-        assertEquals(expectedElement, VenueNameElement.parse(buffer));
+        assertEquals(expectedElement, HSFriendlyNameElement.parse(buffer));
     }
 
     /**
-     * Verify that an expected VenueNameElement will be returned when parsing a buffer
-     * containing a venue name with the maximum length.
+     * Verify that an expected HSFriendlyNameElement will be returned when parsing a buffer
+     * containing a operator name with the maximum length.
      *
      * @throws Exception
      */
     @Test
-    public void parseBufferWithMaxLengthVenueName() throws Exception {
-        // Venue name with maximum length.
-        byte[] textData = new byte[VenueNameElement.MAXIMUM_VENUE_NAME_LENGTH];
+    public void parseBufferWithMaxLengthOperatoreName() throws Exception {
+        // Operator name with the maximum length.
+        byte[] textData = new byte[HSFriendlyNameElement.MAXIMUM_OPERATOR_NAME_LENGTH];
         Arrays.fill(textData, (byte) 'a');
         String text = new String(textData);
         byte[] testData = getTestData(new String[] {text});
@@ -158,27 +144,27 @@ public class VenueNameElementTest {
         // Setup expected element.
         List<I18Name> nameList = new ArrayList<>();
         nameList.add(new I18Name(TEST_LANGUAGE, TEST_LOCALE, text));
-        VenueNameElement expectedElement = new VenueNameElement(nameList);
+        HSFriendlyNameElement expectedElement = new HSFriendlyNameElement(nameList);
 
-        assertEquals(expectedElement, VenueNameElement.parse(buffer));
+        assertEquals(expectedElement, HSFriendlyNameElement.parse(buffer));
     }
 
     /**
      * Verify that ProtocolException will be thrown when parsing a buffer containing a
-     * venue name that exceeds the maximum length.
+     * operator name that exceeds the maximum length.
      *
      * @throws Exception
      */
     @Test(expected = ProtocolException.class)
-    public void parseBufferWithVenueNameLengthExceedMax() throws Exception {
-        byte[] textData = new byte[VenueNameElement.MAXIMUM_VENUE_NAME_LENGTH + 1];
+    public void parseBufferWithOperatorNameLengthExceedMax() throws Exception {
+        byte[] textData = new byte[HSFriendlyNameElement.MAXIMUM_OPERATOR_NAME_LENGTH + 1];
         Arrays.fill(textData, (byte) 'a');
         String text = new String(textData);
         byte[] testData = getTestData(new String[] {text});
         ByteBuffer buffer = ByteBuffer.allocate(testData.length);
         buffer.put(testData);
         buffer.position(0);
-        VenueNameElement.parse(buffer);
+        HSFriendlyNameElement.parse(buffer);
     }
 
 }
