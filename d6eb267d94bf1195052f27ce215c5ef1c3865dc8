@@ -9,6 +9,14 @@ UUID: 8decbb0b_2825ad71
 Bytes: 105
 I don't think this throws a ProtocolException anymore, it potentially throws a bunch of other exceptions.
 
+19:12-19:36
+Tue Dec 06 16:59:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_2825ad71
+UUID: ad1edff1_9df0a774
+Bytes: 78
+This will be cleanup in the upcoming CLs as part of the ANQP element cleanups.
+
 File: tests/wifitests/src/com/android/server/wifi/ByteBufferReaderTest.java
 
 36:7-36:30
@@ -20,10 +28,26 @@ You've actually already stated 'the expectations' but you have stated the condit
 
 'Verify that reading an integer from a too short buffer results in a buffer underflow'
 
+36:7-36:30
+Tue Dec 06 16:59:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_33b882ab
+UUID: ad1edff1_7d083391
+Bytes: 12
+Will update.
+
 48:7-48:93
 Mon Dec 05 22:47:50 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 8decbb0b_5330a645
 Bytes: 113
 Reword all these. Explicityly state the expectation. Make sure you state what the test does, and what it expects.
+
+48:7-48:93
+Tue Dec 06 16:59:27 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_5330a645
+UUID: ad1edff1_1d057778
+Bytes: 12
+Will update.
 
