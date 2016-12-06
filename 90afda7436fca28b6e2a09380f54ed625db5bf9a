@@ -9,6 +9,14 @@ UUID: ad1edff1_03faf4c3
 Bytes: 43
 Add a log to indicate what's going on here?
 
+105:0-106:36
+Tue Dec 06 21:22:08 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_03faf4c3
+UUID: ad1edff1_e9a6c1f6
+Bytes: 69
+I haven't get to this part yet.  Will be cleanup in the upcoming CLs.
+
 File: service/java/com/android/server/wifi/hotspot2/anqp/IPAddressTypeAvailabilityElement.java
 
 101:39-101:42
@@ -18,10 +26,26 @@ UUID: ad1edff1_2ea11f79
 Bytes: 36
 Can we define macro for these masks?
 
+101:39-101:42
+Tue Dec 06 21:22:08 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_2ea11f79
+UUID: ad1edff1_09ac55d3
+Bytes: 8
+Will do.
+
 106:46-106:50
 Tue Dec 06 19:47:12 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_eeb7a7bb
 Bytes: 36
 Can we define macro for these masks?
+
+106:46-106:50
+Tue Dec 06 21:22:08 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_eeb7a7bb
+UUID: ad1edff1_a9a0c9d9
+Bytes: 8
+Will do.
 
