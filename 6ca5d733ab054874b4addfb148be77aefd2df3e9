@@ -9,6 +9,14 @@ UUID: 8decbb0b_bf143909
 Bytes: 23
 Maximum entry lifetime?
 
+33:7-33:21
+Tue Dec 06 00:26:22 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_bf143909
+UUID: 8decbb0b_590fa54f
+Bytes: 112
+Hmm, prefer to leave it as is, since this is the allowed lifetime for an entry (there is no maximum or minimum).
+
 File: service/java/com/android/server/wifi/hotspot2/ANQPNetworkKey.java
 
 88
@@ -18,6 +26,14 @@ UUID: 8decbb0b_5feaedbc
 Bytes: 31
 whitespace here, run checkStyle
 
+88
+Tue Dec 06 00:26:22 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_5feaedbc
+UUID: 8decbb0b_99406d73
+Bytes: 78
+will update. checkStyle have been crashing, not sure it has been fixed or not.
+
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/ANQPDataTest.java
 
 81:7-81:29
@@ -26,4 +42,12 @@ Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 8decbb0b_c2a7228e
 Bytes: 6
 unused
+
+81:7-81:29
+Tue Dec 06 00:26:22 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 8decbb0b_c2a7228e
+UUID: 8decbb0b_b95a116b
+Bytes: 12
+Will remove.
 
