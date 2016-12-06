@@ -19,6 +19,10 @@ package com.android.server.wifi;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.Context;
+import android.hardware.wifi.V1_0.IWifi;
+import android.hardware.wifi.V1_0.IWifiChip;
+import android.hardware.wifi.V1_0.WifiStatus;
+import android.hardware.wifi.V1_0.WifiStatusCode;
 import android.net.apf.ApfCapabilities;
 import android.net.wifi.RttManager;
 import android.net.wifi.RttManager.ResponderConfig;
@@ -1490,6 +1494,11 @@ public class WifiNative {
     private static MonitorThread sThread;
     private static final int STOP_HAL_TIMEOUT_MS = 1000;
 
+    // Vendor HAL HIDL interface objects.
+    private static final String HAL_HIDL_SERVICE_NAME = "wifi";
+    private IWifi mHidlWifi;
+    private IWifiChip mHidlWifiChip;
+
     private static native boolean startHalNative();
     private static native void stopHalNative();
     private static native void waitForHalEventNative();
@@ -1502,6 +1511,55 @@ public class WifiNative {
         }
     }
 
+    private boolean startHidlHal() {
+        mHidlWifi = IWifi.getService(HAL_HIDL_SERVICE_NAME);
+        if (mHidlWifi == null) {
+            Log.e(TAG, "Failed to get Wifi HIDL interface objects.");
+            return false;
+        }
+        WifiStatus status = mHidlWifi.start();
+        if (status.code != WifiStatusCode.SUCCESS) {
+            Log.e(TAG, "Starting wifi hal failed. Error code: " + status.code);
+            return false;
+        }
+
+        final ArrayList<Integer> chipIdsInternal = new ArrayList<>();
+        // Use lamda's here.
+        IWifi.getChipIdsCallback chipIdsCb = new IWifi.getChipIdsCallback() {
+            public void onValues(WifiStatus status, java.util.ArrayList<Integer> chipIds) {
+                if (status.code != WifiStatusCode.SUCCESS) {
+                    Log.e(TAG, "Getting chip ids failed. Error code: " + status.code);
+                    return;
+                }
+                chipIdsInternal.addAll(chipIds);
+            }
+        };
+        mHidlWifi.getChipIds(chipIdsCb);
+        if (chipIdsInternal.size() != 1) {
+            Log.e(TAG, "Expected 1 chip to be present.");
+            return false;
+        }
+
+        // Use lamda's here.
+        IWifi.getChipCallback chipCb = new IWifi.getChipCallback() {
+            public void onValues(WifiStatus status, IWifiChip chip) {
+                if (status.code != WifiStatusCode.SUCCESS) {
+                    Log.e(TAG, "Getting chip failed. Error code: " + status.code);
+                    return;
+                }
+                mHidlWifiChip = chip;
+            }
+        };
+        mHidlWifi.getChip(chipIdsInternal.get(0).intValue(), chipCb);
+        if (mHidlWifiChip == null) {
+            Log.e(TAG, "Failed to get WifiChip HIDL interface objects.");
+            return false;
+        }
+
+        Log.i(TAG, "Retrieved the HIDL interface objects.");
+        return true;
+    }
+
     public boolean startHal() {
         String debugLog = "startHal stack: ";
         java.lang.StackTraceElement[] elements = Thread.currentThread().getStackTrace();
@@ -1510,6 +1568,8 @@ public class WifiNative {
         }
 
         sLocalLog.log(debugLog);
+
+        startHidlHal();
 
         synchronized (sLock) {
             if (startHalNative()) {
