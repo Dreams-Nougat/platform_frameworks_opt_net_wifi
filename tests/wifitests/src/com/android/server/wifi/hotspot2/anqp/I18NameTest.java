@@ -16,110 +16,156 @@
 
 package com.android.server.wifi.hotspot2.anqp;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.ProtocolException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
- * Unit tests for {@link com.android.server.wifi.anqp.I18Name}.
+ * Unit tests for {@link com.android.server.wifi.hotspot2.anqp.I18Name}.
  */
 @SmallTest
 public class I18NameTest {
-    private static class I18NameTestMapping {
-        byte[] mBytes;
-        String mExpectedLanguage;
-        Locale mExpectedLocale;
-        String mExpectedText;
-        I18NameTestMapping(byte[] bytes, String language, Locale locale, String text) {
-            this.mBytes = bytes;
-            this.mExpectedLanguage = language;
-            this.mExpectedLocale = locale;
-            this.mExpectedText = text;
-        }
-    }
-
-    private static final byte[][] MALFORMED_I18_NAME_BYTES =
-            new byte[][] {
-                    // Too short.
-                    new byte[0],
-                    new byte[] {(byte) 0x01},
-                    new byte[] {(byte) 0x01, (byte) 0x02},
-                    // Length value of 0x02 shorter than the length of the language code field
-                    // (i.e. 3).
-                    new byte[] {
-                        (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0xb0, (byte) 0xb1},
-                    // Length value of 0xff longer than payload size.
-                    new byte[] {
-                        (byte) 0xff, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                        (byte) 0xb0, (byte) 0xb1}
-            };
-
-    private static final I18NameTestMapping[] I18_NAME_MAPPINGS =
-            new I18NameTestMapping[] {
-                new I18NameTestMapping(
-                        new byte[] {
-                            (byte) 0x09, (byte) 0x65, (byte) 0x6e, (byte) 0x00,
-                            (byte) 0x74, (byte) 0x65, (byte) 0x73, (byte) 0x74,
-                            (byte) 0x41, (byte) 0x70},
-                        "en", Locale.ENGLISH, "testAp"),
-                // TODO: Make sure the ISO-639 alpha-3 code is properly parsed (b/30311144).
-                /*
-                new I18NameTestMapping(
-                        new byte[] {
-                            (byte) 0x09, (byte) 0x65, (byte) 0x6e, (byte) 0x67,
-                            (byte) 0x74, (byte) 0x65, (byte) 0x73, (byte) 0x74,
-                            (byte) 0x41, (byte) 0x70},
-                        "eng", Locale.ENGLISH, "testAp"),
-                */
-                new I18NameTestMapping(
-                        new byte[] {
-                            (byte) 0x0b, (byte) 0x66, (byte) 0x72, (byte) 0x00,
-                            (byte) 0x62, (byte) 0x6c, (byte) 0x61, (byte) 0x68,
-                            (byte) 0x62, (byte) 0x6c, (byte) 0x61, (byte) 0x68},
-                        "fr", Locale.FRENCH, "blahblah")
-            };
+    private static final String TEST_LANGUAGE = "en";
+    private static final Locale TEST_LOCALE = Locale.forLanguageTag(TEST_LANGUAGE);
+    private static final String TEST_TEXT = "Hello World";
 
     /**
-     * Verifies that parsing malformed I18Name bytes results in a ProtocolException.
+     * Helper function for generating test data. The test data include the language code and
+     * text field.
+     *
+     * @return byte[] of data
+     * @throws IOException
      */
-    @Test
-    public void testMalformedI18NameBytes() {
-        for (byte[] malformedBytes : MALFORMED_I18_NAME_BYTES) {
-            try {
-                I18Name i18Name = new I18Name(ByteBuffer.wrap(
-                        malformedBytes).order(ByteOrder.LITTLE_ENDIAN));
-            } catch (ProtocolException e) {
-                continue;
-            }
-            fail("Expected exception while parsing malformed I18 Name bytes: " + malformedBytes);
-        }
+    private byte[] getTestData() throws IOException {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        stream.write(TEST_LANGUAGE.getBytes(StandardCharsets.US_ASCII));
+        stream.write(new byte[]{(byte) 0x0});  // Padding for language code.
+        stream.write(TEST_TEXT.getBytes(StandardCharsets.UTF_8));
+        return stream.toByteArray();
     }
 
     /**
-     * Verifies that a sampling of valid I18Name bytes are properly parsed.
+     * Verify that BufferUnderflowException will be thrown when parsing from an empty buffer.
+     *
+     * @throws Exception
+     */
+    @Test(expected = BufferUnderflowException.class)
+    public void parseEmptyBuffer() throws Exception {
+        I18Name.parse(ByteBuffer.allocate(0));
+    }
+
+    /**
+     * Verify that BufferUnderflowException will be thrown when the length field is set to more
+     * than the actual buffer size.
+     *
+     * @throws Exception
+     */
+    @Test(expected = BufferUnderflowException.class)
+    public void parseBufferWithLengthMoreThanBufferSize() throws Exception {
+        byte[] testData = getTestData();
+        // Allocate extra byte for storing the length field.
+        ByteBuffer buffer = ByteBuffer.allocate(testData.length + 1);
+        // Adding one extra byte to the length field to cause buffer underflow.
+        buffer.put((byte) (testData.length + 1));
+        buffer.put(testData);
+        // Rewind buffer for reading.
+        buffer.position(0);
+        I18Name.parse(buffer);
+    }
+
+    /**
+     * Verify that ProtocolException will be thrown when the length field is set to less than
+     * the minimum.
+     *
+     * @throws Exception
+     */
+    @Test(expected = ProtocolException.class)
+    public void parseBufferWithLengthLessThanMinimum() throws Exception {
+        byte[] testData = getTestData();
+        ByteBuffer buffer = ByteBuffer.allocate(testData.length + 1);
+        buffer.put((byte) (I18Name.MINIMUM_LENGTH - 1));
+        buffer.put(testData);
+        // Rewind buffer for reading.
+        buffer.position(0);
+        I18Name.parse(buffer);
+    }
+
+    /**
+     * Verify that the expected I18Name will be returned when parsing a buffer contained the
+     * predefined test data.
+     *
+     * @throws Exception
      */
     @Test
-    public void testI18NameParsing() {
+    public void parseBufferWithTestData() throws Exception {
+        byte[] testData = getTestData();
+        ByteBuffer buffer = ByteBuffer.allocate(testData.length + 1);
+        buffer.put((byte) (testData.length));
+        buffer.put(testData);
+        // Rewind buffer for reading.
+        buffer.position(0);
+        I18Name actualName = I18Name.parse(buffer);
+        I18Name expectedName = new I18Name(TEST_LANGUAGE, TEST_LOCALE, TEST_TEXT);
+        assertEquals(expectedName, actualName);
+    }
 
-        for (I18NameTestMapping testMapping : I18_NAME_MAPPINGS) {
-            try {
+    /**
+     * Verify that the expected I18Name will be returned when parsing a buffer contained
+     * a non-English (French) language.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void parseBufferWithFrenchData() throws Exception {
+        // Test data for French.
+        String language = "fr";
+        String text = "Hello World";
 
-                I18Name i18Name = new I18Name(ByteBuffer.wrap(
-                        testMapping.mBytes).order(ByteOrder.LITTLE_ENDIAN));
-                assertEquals(testMapping.mExpectedLanguage, i18Name.getLanguage());
-                assertEquals(testMapping.mExpectedLocale, i18Name.getLocale());
-                assertEquals(testMapping.mExpectedText, i18Name.getText());
-            } catch (ProtocolException e) {
-                fail("Exception encountered during parsing: " + e);
-            }
-        }
+        byte[] languageBytes = language.getBytes(StandardCharsets.US_ASCII);
+        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        int dataLength = I18Name.LANGUAGE_CODE_LENGTH + textBytes.length;
+        ByteBuffer buffer = ByteBuffer.allocate(dataLength + 1);
+        buffer.put((byte) dataLength);
+        buffer.put(languageBytes);
+        buffer.put((byte) 0);    // Padding for language code.
+        buffer.put(textBytes);
+
+        // Rewind buffer for reading.
+        buffer.position(0);
+        I18Name actualName = I18Name.parse(buffer);
+        I18Name expectedName = new I18Name(language, Locale.forLanguageTag(language), text);
+        assertEquals(expectedName, actualName);
+    }
+
+    /**
+     * Verify that an I18Name with an empty text will be returned when parsing a buffer contained
+     * an empty text field.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void parseBufferWithEmptyText() throws Exception {
+        byte[] language = TEST_LANGUAGE.getBytes(StandardCharsets.US_ASCII);
+        int dataLength = I18Name.LANGUAGE_CODE_LENGTH;
+        ByteBuffer buffer = ByteBuffer.allocate(dataLength + 1);
+        buffer.put((byte) dataLength);
+        buffer.put(language);
+        buffer.put((byte) 0);    // Padding for language code.
+
+        // Rewind buffer for reading.
+        buffer.position(0);
+        I18Name actualName = I18Name.parse(buffer);
+        I18Name expectedName = new I18Name(TEST_LANGUAGE, TEST_LOCALE, "");
+        assertEquals(expectedName, actualName);
     }
 }
