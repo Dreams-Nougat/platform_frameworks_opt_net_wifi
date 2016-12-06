@@ -68,7 +68,14 @@ LOCAL_SRC_FILES := $(filter-out $(call all-java-files-under, \
           java/com/android/server/wifi/aware),$(LOCAL_SRC_FILES))
 endif
 
-LOCAL_JAVA_LIBRARIES := bouncycastle conscrypt jsr305 services
+LOCAL_JAVA_LIBRARIES := \
+	bouncycastle \
+	conscrypt \
+	jsr305 \
+	services
+LOCAL_STATIC_JAVA_LIBRARIES := \
+	android.hardware.wifi@1.0-java-static \
+	android.hardware.wifi.supplicant@1.0-java-static
 LOCAL_REQUIRED_MODULES := services
 LOCAL_MODULE_TAGS :=
 LOCAL_MODULE := wifi-service
