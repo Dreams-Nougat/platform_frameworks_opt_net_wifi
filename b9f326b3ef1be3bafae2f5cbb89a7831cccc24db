@@ -9,6 +9,14 @@ UUID: cd47938e_905c989d
 Bytes: 341
 Similar to lorenzo@ question, when does settings app set this parameter? Is it during network addition or will it come as an update later. The change here will only work if it only comes as a part of addition. If u want to modify these in updates, u should add that in (updateExistingInternalWifiConfigurationFromExternal) in line 855 below.
 
+826
+Wed Dec 07 20:54:02 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_905c989d
+UUID: ad1edff1_d72348bc
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 5305:23-5305:34
@@ -33,4 +41,14 @@ Parent: cd47938e_e4b290c5
 UUID: cd47938e_8429079d
 Bytes: 239
 How does config.meteredHint change? Will the settings UI write it into the config store directly? If so, then it can race with the WifiStateMachine thread and we cannot guarantee that mWifiInfo.getMeteredHint() will be correct at any time.
+
+5305:23-5305:34
+Wed Dec 07 20:54:02 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: cd47938e_8429079d
+UUID: ad1edff1_f129bc4c
+Bytes: 510
+config.meteredHint changes via ExternalScoreEvaluator, which calls WifiConfigManager#addOrUpdateNetwork. handleSupplicantStateChange will in turn update the capabilities to match when a connection is made. The Settings UI will also call the same method to update config.meteredOverride.
+
+It is worth noting that this means when user toggles a network as metered within Settings UI, the capability change will only happen on the next connection. That seems acceptable because the UI is not used often, thoughts?
 
