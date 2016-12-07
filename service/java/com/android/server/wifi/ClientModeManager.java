@@ -127,6 +127,13 @@ public class ClientModeManager implements ActiveModeManager {
 
         private final State mIdleState = new IdleState();
         private final State mStartedState = new StartedState();
+        private final State mL2ConnectedState = new L2ConnectedState();
+        private final State mObtainingIpState = new ObtainingIpState();
+        private final State mConnectedState = new ConnectedState();
+        private final State mRoamingState = new RoamingState();
+        private final State mDisconnectingState = new DisconnectingState();
+        private final State mDisconnectedState = new DisconnectedState();
+        private final State mWpsRunningState = new WpsRunningState();
 
         private final StateMachineDeathRecipient mDeathRecipient =
                 new StateMachineDeathRecipient(this, CMD_CLIENT_INTERFACE_BINDER_DEATH);
@@ -171,8 +178,17 @@ public class ClientModeManager implements ActiveModeManager {
         ClientModeStateMachine(Looper looper) {
             super(TAG, looper);
 
+            // CHECKSTYLE:OFF IndentationCheck
             addState(mIdleState);
             addState(mStartedState);
+                addState(mL2ConnectedState, mStartedState);
+                    addState(mObtainingIpState, mL2ConnectedState);
+                    addState(mConnectedState, mL2ConnectedState);
+                    addState(mRoamingState, mL2ConnectedState);
+                addState(mDisconnectingState, mStartedState);
+                addState(mDisconnectedState, mStartedState);
+                addState(mWpsRunningState, mStartedState);
+            // CHECKSTYLE:ON IndentationCheck
 
             setInitialState(mIdleState);
             start();
@@ -353,6 +369,117 @@ public class ClientModeManager implements ActiveModeManager {
             }
         }
 
+        private class L2ConnectedState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class ObtainingIpState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class ConnectedState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class RoamingState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+            }
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class DisconnectingState extends State {
+            @Override
+            public void enter() {
+            }
+            @Override
+            public void exit() {
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class DisconnectedState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
+        private class WpsRunningState extends State {
+            @Override
+            public void enter() {
+            }
+
+            @Override
+            public void exit() {
+            }
+
+            @Override
+            public boolean processMessage(Message message) {
+                logStateAndMessage(message, this);
+                return NOT_HANDLED;
+            }
+        }
+
         private void sendScanAvailableBroadcast(boolean available) {
             Log.d(TAG, "sending scan available broadcast: " + available);
             final Intent intent = new Intent(WifiManager.WIFI_SCAN_AVAILABLE);
@@ -371,6 +498,10 @@ public class ClientModeManager implements ActiveModeManager {
             intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
             intent.putExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, connected);
             mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+        }
+
+        private void logStateAndMessage(Message message, State state) {
+            Log.d(TAG, state.getClass().getSimpleName() + " " + getLogRecString(message));
         }
     }
 }
