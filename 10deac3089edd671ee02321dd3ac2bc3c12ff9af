@@ -1,0 +1,25 @@
+Revision: 10deac3089edd671ee02321dd3ac2bc3c12ff9af
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConfigManager.java
+
+1055:7-1055:13
+Wed Dec 07 18:13:47 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_2ba7c3f4
+Bytes: 26
+Can u update the javadocs?
+
+1072:48-1072:60
+Wed Dec 07 18:13:47 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_6b0a9b02
+Bytes: 98
+Why was this needed? The uid of the app should have enough permission to remove it's own networks.
+
+1083:6-1083:14
+Wed Dec 07 18:13:47 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_eba0ebda
+Bytes: 5
+Same.
+
