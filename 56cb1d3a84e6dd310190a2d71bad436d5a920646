@@ -1,0 +1,11 @@
+Revision: 56cb1d3a84e6dd310190a2d71bad436d5a920646
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiNetworkSelector.java
+
+412:19-412:49
+Wed Dec 07 05:15:56 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_416ea119
+Bytes: 133
+A suggestion that's out of the scope of this CL: maybe separate this function into two functions, one for disable and one for enable.
+
