@@ -17,12 +17,28 @@ UUID: 6def8770_f1c1673d
 Bytes: 106
 Async Channel messages are received by Handler. It's implied but not explicitly mentioned, I can add that.
 
+11
+Wed Dec 07 02:14:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_f1c1673d
+UUID: ad1edff1_351f2779
+Bytes: 4
+Done
+
 14:0-14:10
 Wed Nov 30 00:49:24 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 6def8770_36390534
 Bytes: 156
 Comma between these two words, please (to separate the clauses). Roughly speaking: if you'd pause between two words when speaking, use a comma when writing.
+
+14:0-14:10
+Wed Dec 07 02:14:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_36390534
+UUID: ad1edff1_f528cf98
+Bytes: 4
+Done
 
 15:9-16:69
 Wed Nov 30 00:49:24 2016 +0000
@@ -34,6 +50,14 @@ This is a subtle point, and should be elaborated. If I understand the problem co
 "Note that, for fully-connected AsyncChannels, replies do not (necessarily?) use replyToMessage(). Instead replies are (sometimes? always?) sent by calling the send() method of the client-provided Handler.
 
 To log replies sent on fully-connected messages, we add trace() calls to the (existing) replySucceeded() and replyFailed() methods."
+
+15:9-16:69
+Wed Dec 07 02:14:24 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 6def8770_31858f5b
+UUID: ad1edff1_952e33a1
+Bytes: 4
+Done
 
 File: tests/wifitests/src/com/android/server/wifi/scanner/WifiScanningServiceTest.java
 
