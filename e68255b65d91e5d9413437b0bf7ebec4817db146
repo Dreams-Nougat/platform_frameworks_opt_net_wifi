@@ -9,6 +9,14 @@ UUID: ad1edff1_5c2c3f07
 Bytes: 65
 nit. Can u move this above the block of debug fields to line 855?
 
+860:44-860:58
+Wed Dec 07 20:54:02 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_5c2c3f07
+UUID: ad1edff1_dca60fa5
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
 4922:0-4923:51
@@ -18,10 +26,26 @@ UUID: ad1edff1_fcdf53f3
 Bytes: 170
 This is not needed. We should only be updating the config if we're connected to the network. This should already be handled in handleSupplicantStateChange() change above.
 
+4922:0-4923:51
+Wed Dec 07 20:54:02 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_fcdf53f3
+UUID: ad1edff1_7cbfc3ad
+Bytes: 4
+Done
+
 5302
 Wed Dec 07 19:53:59 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_bcd23beb
 Bytes: 16
 nit. Extra line.
+
+5302
+Wed Dec 07 20:54:02 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_bcd23beb
+UUID: ad1edff1_37a7245c
+Bytes: 4
+Done
 
