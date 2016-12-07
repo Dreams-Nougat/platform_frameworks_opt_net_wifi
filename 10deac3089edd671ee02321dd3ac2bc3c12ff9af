@@ -9,6 +9,14 @@ UUID: ad1edff1_2ba7c3f4
 Bytes: 26
 Can u update the javadocs?
 
+1055:7-1055:13
+Wed Dec 07 18:18:01 2016 +0000
+Author: Robin Lee <1045544@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_2ba7c3f4
+UUID: 0d5d2bd4_453d6a7e
+Bytes: 73
+After some intensive experimentation, I'm happy to report that yes I can.
+
 1072:48-1072:60
 Wed Dec 07 18:13:47 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,10 +24,26 @@ UUID: ad1edff1_6b0a9b02
 Bytes: 98
 Why was this needed? The uid of the app should have enough permission to remove it's own networks.
 
+1072:48-1072:60
+Wed Dec 07 18:18:01 2016 +0000
+Author: Robin Lee <1045544@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_6b0a9b02
+UUID: 0d5d2bd4_8542820c
+Bytes: 44
+The uid of the app might not exist any more.
+
 1083:6-1083:14
 Wed Dec 07 18:13:47 2016 +0000
 Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_eba0ebda
+Bytes: 5
+Same.
+
+1083:6-1083:14
+Wed Dec 07 18:18:01 2016 +0000
+Author: Robin Lee <1045544@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_eba0ebda
+UUID: 0d5d2bd4_653ae689
 Bytes: 5
 Same.
 
