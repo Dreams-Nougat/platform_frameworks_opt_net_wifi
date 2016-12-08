@@ -1,0 +1,43 @@
+Revision: 752370f46376cbabd1137f0e5b535cc73def44ca
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+76:12-76:24
+Thu Dec 08 22:18:14 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_cbdcf177
+Bytes: 5
+final
+
+98:29-98:59
+Thu Dec 08 22:18:14 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_0bf2e929
+Bytes: 314
+I just realized this is not the final approach. We should be using the badges that are derived from the quality of the network to qualify them. Sundeep filed b/33457699 to add the badge curve to ScoredNetwork.
+
+This is fine for now, add a TODO(b/33457699): qualify networks based on the badge, not hardcoded scores
+
+221:32-221:43
+Thu Dec 08 22:18:14 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_ab1f3d76
+Bytes: 72
+Add a ! since we only want to request scores that are not yet available.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
+
+151:54-151:57
+Thu Dec 08 22:18:14 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_8b0cb922
+Bytes: 3
+for
+
+167
+Thu Dec 08 22:18:14 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_6b1b655a
+Bytes: 109
+add another test that verifies that networks scores are requested for ones that do not currently have a score
+
