@@ -50,7 +50,11 @@ public class WifiNativeNew {
     private ISupplicant mHidlSupplicant;
     private     ISupplicantStaIface mHidlSupplicantStaIface;
 
-    private boolean startHidlHal() {
+    /**
+     * Bring up the HIDL Vendor HAL and configure for STA mode
+     * (CHIP CONFIGURATION CODE NOT YET COMPLETE)
+     */
+    public boolean startHidlHal() {
         /** Get the Wifi Service */
         mHidlWifi = IWifi.getService(HAL_HIDL_SERVICE_NAME);
         if (mHidlWifi == null) {
@@ -98,6 +102,8 @@ public class WifiNativeNew {
             Log.e(TAG, "Failed to get WifiChip HIDL interface objects.");
             return false;
         }
+        /** Configure Chip Mode for STA**/
+            // see https://android-review.googlesource.com/#/c/310925/8/wifi/1.0/vts/functional/wifi_hidl_test_utils.cpp@224
 
         /** Get Wifi STA Interface names */
         final ArrayList<String> staIfNames = new ArrayList<>();
