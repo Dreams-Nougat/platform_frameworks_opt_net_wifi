@@ -52,3 +52,17 @@ config.meteredHint changes via ExternalScoreEvaluator, which calls WifiConfigMan
 
 It is worth noting that this means when user toggles a network as metered within Settings UI, the capability change will only happen on the next connection. That seems acceptable because the UI is not used often, thoughts?
 
+5305:23-5305:34
+Thu Dec 08 23:49:22 2016 +0000
+Author: Lorenzo Colitti <1000835@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_f129bc4c
+UUID: 2d3f4f99_6eb36fcb
+Bytes: 584
+Actually, if I'm reading the code correctly, it doesn't seem hard to have this take effect dynamically.
+
+If you make the settings UI call WifiManager#updateNetwork, then it will result in WifiStateMachine getting CMD_ADD_OR_UPDATE_NETWORK and calling WifiConfigManager#addOrUpdateNetwork for you, on the right thread.
+
+Then all you need to do is make sure that the handling code for CMD_ADD_OR_UPDATE_NETWORK calls updateCapabilities() if the update succeeded and the network is the current network. Then the metered bit will be updated properly.
+
+Roshan, I assume this is safe to do?
+
