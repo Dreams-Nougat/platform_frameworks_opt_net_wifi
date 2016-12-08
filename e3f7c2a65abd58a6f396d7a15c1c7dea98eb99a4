@@ -1,0 +1,76 @@
+Revision: e3f7c2a65abd58a6f396d7a15c1c7dea98eb99a4
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+165:58-165:62
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_5ec3cc9a
+Bytes: 39
+why are we passing in a null parameter?
+
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+118:8-118:21
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_fea0a0da
+Bytes: 241
+I believe this is always available before WifiService is created. NetworkScoreSErvice is started on line 811 in SystemServer and WifiService is started on line 844. If this is true, we can pass in NetworkScoreManager in the constructor here.
+
+203:69-203:87
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_5e4e6c3a
+Bytes: 307
+It's unlikely that these arrays will be the same size as the scan results. Also, if there are no open networks, then we've just wasted 2 allocations (the backing Object[] is set to a static ArrayList#EMPTY_ELEMENTDATA if nothing is added to the list). The default constructor is likely the best choice here.
+
+214:55-214:65
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_de635cc1
+Bytes: 31
+ScanResultUtil.createQuotedSSID
+
+216:28-216:43
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_de8cbc56
+Bytes: 71
+Only add to openNetworkKeys if mScoreCache.isScoredNetwork return false
+
+218:33-218:57
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_3e0cd820
+Bytes: 40
+This will never happen. Remove try catch
+
+224:20-224:32
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_1e48f429
+Bytes: 28
+nit: !openNetworks.isEmpty()
+
+228:29-228:46
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_7e0a5002
+Bytes: 94
+The system has the permissions to request scores, so this will never happen. Remove try catch.
+
+240
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_bee9c8fb
+Bytes: 100
+No need to have this if statement - a score of Byte.MIN_VALUE will be returned if there is no score.
+
+243:36-243:58
+Thu Dec 08 03:21:20 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_de07dcc8
+Bytes: 244
+Early return here after setting the notification visible. Or move this out of the loop and create a variable to contain the highest scoring network beyond the threshold and pass that in to setNotificationVisible to prepare for your next change.
+
