@@ -132,6 +132,7 @@ public class WifiInjector {
                         .getBoolean(R.bool.config_wifi_revert_country_code_on_cellular_loss));
         mWifiApConfigStore = new WifiApConfigStore(mContext, mBackupManagerProxy);
         mWifiNative = WifiNative.getWlanNativeInterface();
+        mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
 
         // WifiConfigManager/Store objects and their dependencies.
         // New config store
@@ -161,7 +162,7 @@ public class WifiInjector {
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mWifiStateMachine,
-                mFrameworkFacade, null, this);
+                mWifiNetworkScoreCache, mFrameworkFacade, null, this);
         mWifiWakeupController = new WifiWakeupController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
@@ -176,7 +177,6 @@ public class WifiInjector {
         mSimAccessor = new SIMAccessor(mContext);
         mPasspointManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, new PasspointObjectFactory());
-        mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
     }
 
     /**

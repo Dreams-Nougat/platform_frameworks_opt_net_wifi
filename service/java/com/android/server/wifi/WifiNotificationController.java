@@ -26,6 +26,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.net.NetworkInfo;
+import android.net.NetworkKey;
+import android.net.NetworkScoreManager;
+import android.net.WifiKey;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiScanner;
@@ -37,10 +40,11 @@ import android.provider.Settings;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /* Takes care of handling the "open wi-fi network available" notification @hide */
-final class WifiNotificationController {
+class WifiNotificationController {
     /**
      * The icon to show in the 'available networks' notification. This will also
      * be the ID of the Notification given to the NotificationManager.
@@ -89,8 +93,12 @@ final class WifiNotificationController {
      */
     private int mNumScansSinceNetworkStateChange;
 
+    private static final int MIN_SCORE_TO_SHOW_NOTIFICATION = 20;
+
     private final Context mContext;
     private final WifiStateMachine mWifiStateMachine;
+    private final NetworkScoreManager mScoreManager;
+    private final WifiNetworkScoreCache mScoreCache;
     private NetworkInfo mNetworkInfo;
     private NetworkInfo.DetailedState mDetailedState;
     private volatile int mWifiState;
@@ -99,12 +107,19 @@ final class WifiNotificationController {
     private WifiScanner mWifiScanner;
 
     WifiNotificationController(Context context, Looper looper, WifiStateMachine wsm,
-            FrameworkFacade framework, Notification.Builder builder, WifiInjector wifiInjector) {
+            WifiNetworkScoreCache wifiNetworkScoreCache, FrameworkFacade framework,
+            Notification.Builder builder, WifiInjector wifiInjector) {
         mContext = context;
         mWifiStateMachine = wsm;
         mFrameworkFacade = framework;
         mNotificationBuilder = builder;
         mWifiInjector = wifiInjector;
+        mScoreCache = wifiNetworkScoreCache;
+        mScoreManager =
+                (NetworkScoreManager) context.getSystemService(Context.NETWORK_SCORE_SERVICE);
+        if (mScoreManager != null) {
+            mScoreManager.registerNetworkScoreCache(NetworkKey.TYPE_WIFI, mScoreCache);
+        }
         mWifiState = WifiManager.WIFI_STATE_UNKNOWN;
         mDetailedState = NetworkInfo.DetailedState.IDLE;
 
@@ -185,7 +200,8 @@ final class WifiNotificationController {
         if ((state == NetworkInfo.State.DISCONNECTED)
                 || (state == NetworkInfo.State.UNKNOWN)) {
             if (scanResults != null) {
-                int numOpenNetworks = 0;
+                ArrayList<ScanResult> openNetworks = new ArrayList<>(scanResults.size());
+                ArrayList<NetworkKey> openNetworkKeys = new ArrayList<>(scanResults.size());
                 for (int i = scanResults.size() - 1; i >= 0; i--) {
                     ScanResult scanResult = scanResults.get(i);
 
@@ -193,11 +209,24 @@ final class WifiNotificationController {
                     //that is available for an STA to connect
                     if (scanResult.capabilities != null &&
                             scanResult.capabilities.equals("[ESS]")) {
-                        numOpenNetworks++;
+                        try {
+                            WifiKey wifiKey =
+                                    new WifiKey("\"" + scanResult.SSID + "\"", scanResult.BSSID);
+                            NetworkKey networkKey = new NetworkKey(wifiKey);
+                            openNetworkKeys.add(networkKey);
+                            openNetworks.add(scanResult);
+                        } catch (IllegalArgumentException e) {
+                            // invalid SSID, skip scan result.
+                        }
                     }
                 }
 
-                if (numOpenNetworks > 0) {
+                if (openNetworks.size() > 0) {
+                    try {
+                        mScoreManager.requestScores(openNetworkKeys.toArray(
+                                new NetworkKey[openNetworkKeys.size()]));
+                    } catch (SecurityException e) {
+                    }
                     if (++mNumScansSinceNetworkStateChange >= NUM_SCANS_BEFORE_ACTUALLY_SCANNING) {
                         /*
                          * We've scanned continuously at least
@@ -206,7 +235,15 @@ final class WifiNotificationController {
                          * since otherwise supplicant would have tried to
                          * associate and thus resetting this counter.
                          */
-                        setNotificationVisible(true, numOpenNetworks, false, 0);
+                        for (int i = openNetworks.size() - 1; i >= 0; i--) {
+                            ScanResult scanResult = openNetworks.get(i);
+                            if (mScoreCache.isScoredNetwork(scanResult)) {
+                                int score = mScoreCache.getNetworkScore(scanResult);
+                                if (score >= MIN_SCORE_TO_SHOW_NOTIFICATION) {
+                                    setNotificationVisible(true, openNetworks.size(), false, 0);
+                                }
+                            }
+                        }
                     }
                     return;
                 }
