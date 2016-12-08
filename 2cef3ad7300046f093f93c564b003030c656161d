@@ -1,0 +1,11 @@
+Revision: 2cef3ad7300046f093f93c564b003030c656161d
+Patch-set: 3
+File: service/java/com/android/server/wifi/wificond/SingleScanSettings.java
+
+38:10-40:5
+Thu Dec 08 22:55:20 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_7d4ecc3a
+Bytes: 74
+Don't u want to copy over the |channelSettings| and |hiddenNetworks| also?
+
