@@ -9,3 +9,14 @@ UUID: ad1edff1_7d4ecc3a
 Bytes: 74
 Don't u want to copy over the |channelSettings| and |hiddenNetworks| also?
 
+38:10-40:5
+Thu Dec 08 23:09:10 2016 +0000
+Author: Ningyuan Wang <1081508@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_7d4ecc3a
+UUID: ad1edff1_00a5e384
+Bytes: 121
+oops my bad.
+I add them here.
+I am not very sure what kind of copy do we need here.
+I think either deep/shallow are fine.
+
