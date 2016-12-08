@@ -17,6 +17,7 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.NetworkScoreManager;
 import android.net.NetworkScorerAppManager;
 import android.net.wifi.IApInterface;
 import android.net.wifi.IWifiScanner;
@@ -96,6 +97,7 @@ public class WifiInjector {
     private final WifiPermissionsUtil mWifiPermissionsUtil;
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
+    private final NetworkScoreManager mNetworkScoreManager;
 
     private final boolean mUseRealLogger;
 
@@ -133,6 +135,12 @@ public class WifiInjector {
         mWifiApConfigStore = new WifiApConfigStore(mContext, mBackupManagerProxy);
         mWifiNative = WifiNative.getWlanNativeInterface();
 
+        // Wifi Network Scores
+        mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
+        mNetworkScoreManager = (NetworkScoreManager) mContext.getSystemService(
+                Context.NETWORK_SCORE_SERVICE);
+        mNetworkScoreManager.registerNetworkScoreCache(mWifiNetworkScoreCache);
+
         // WifiConfigManager/Store objects and their dependencies.
         // New config store
         mWifiKeyStore = new WifiKeyStore(mKeyStore);
@@ -160,8 +168,8 @@ public class WifiInjector {
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
-                mWifiServiceHandlerThread.getLooper(), mWifiStateMachine,
-                mFrameworkFacade, null, this);
+                mWifiServiceHandlerThread.getLooper(), mWifiStateMachine, mNetworkScoreManager,
+                mWifiNetworkScoreCache, mFrameworkFacade, this);
         mWifiWakeupController = new WifiWakeupController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
@@ -176,7 +184,6 @@ public class WifiInjector {
         mSimAccessor = new SIMAccessor(mContext);
         mPasspointManager = new PasspointManager(mContext, mWifiNative, mWifiKeyStore, mClock,
                 mSimAccessor, new PasspointObjectFactory());
-        mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
     }
 
     /**

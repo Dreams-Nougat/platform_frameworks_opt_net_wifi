@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.net.NetworkInfo;
+import android.net.NetworkScoreManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiScanner;
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Unit tests for {@link com.android.server.wifi.WifiScanningServiceImpl}.
+ * Unit tests for {@link com.android.server.wifi.WifiNotificationController}.
  */
 @SmallTest
 public class WifiNotificationControllerTest {
@@ -61,6 +62,8 @@ public class WifiNotificationControllerTest {
     @Mock private NotificationManager mNotificationManager;
     @Mock private WifiInjector mWifiInjector;
     @Mock private WifiScanner mWifiScanner;
+    @Mock private NetworkScoreManager mScoreManager;
+    @Mock private WifiNetworkScoreCache mScoreCache;
     WifiNotificationController mWifiNotificationController;
 
     /**
@@ -87,8 +90,8 @@ public class WifiNotificationControllerTest {
 
         TestLooper mock_looper = new TestLooper();
         mWifiNotificationController = new WifiNotificationController(
-                mContext, mock_looper.getLooper(), mWifiStateMachine, mFrameworkFacade,
-                mock(Notification.Builder.class), mWifiInjector);
+                mContext, mock_looper.getLooper(), mWifiStateMachine, mScoreManager, mScoreCache,
+                mFrameworkFacade, mWifiInjector);
         ArgumentCaptor<BroadcastReceiver> broadcastReceiverCaptor =
                 ArgumentCaptor.forClass(BroadcastReceiver.class);
 
@@ -97,21 +100,22 @@ public class WifiNotificationControllerTest {
         mBroadcastReceiver = broadcastReceiverCaptor.getValue();
     }
 
-    private void setOpenAccessPoint() {
+    private void setOpenAccessPoint(int score) {
         List<ScanResult> scanResults = new ArrayList<>();
         ScanResult scanResult = new ScanResult();
         scanResult.capabilities = "[ESS]";
         scanResults.add(scanResult);
         when(mWifiScanner.getSingleScanResults()).thenReturn(scanResults);
+        when(mScoreCache.getNetworkScore(scanResult)).thenReturn(score);
     }
 
     /** Verifies that a notification is displayed (and retracted) given system events. */
     @Test
-    public void verifyNotificationDisplayed() throws Exception {
+    public void verifyNotificationDisplayedForStrongNetwork() throws Exception {
         TestUtil.sendWifiStateChanged(mBroadcastReceiver, mContext, WifiManager.WIFI_STATE_ENABLED);
         TestUtil.sendNetworkStateChanged(mBroadcastReceiver, mContext,
                 NetworkInfo.DetailedState.DISCONNECTED);
-        setOpenAccessPoint();
+        setOpenAccessPoint(Byte.MAX_VALUE);
 
         // The notification should not be displayed after only two scan results.
         TestUtil.sendScanResultsAvailable(mBroadcastReceiver, mContext);
@@ -142,5 +146,23 @@ public class WifiNotificationControllerTest {
                 NetworkInfo.DetailedState.CONNECTED);
         verify(mNotificationManager)
                 .cancelAsUser(any(String.class), anyInt(), any(UserHandle.class));
+    }
+
+    /** Verifies that a notification is not displayed fpr bad networks. */
+    @Test
+    public void verifyNotificationNeverDisplayedForBadNetwork() throws Exception {
+        TestUtil.sendWifiStateChanged(mBroadcastReceiver, mContext, WifiManager.WIFI_STATE_ENABLED);
+        TestUtil.sendNetworkStateChanged(mBroadcastReceiver, mContext,
+                NetworkInfo.DetailedState.DISCONNECTED);
+        setOpenAccessPoint(Byte.MIN_VALUE);
+
+        // The notification should not be displayed after only two scan results.
+        TestUtil.sendScanResultsAvailable(mBroadcastReceiver, mContext);
+        TestUtil.sendScanResultsAvailable(mBroadcastReceiver, mContext);
+        TestUtil.sendScanResultsAvailable(mBroadcastReceiver, mContext);
+        TestUtil.sendScanResultsAvailable(mBroadcastReceiver, mContext);
+        verify(mNotificationManager, never())
+                .notifyAsUser(any(String.class), anyInt(), any(Notification.class),
+                        any(UserHandle.class));
     }
 }
