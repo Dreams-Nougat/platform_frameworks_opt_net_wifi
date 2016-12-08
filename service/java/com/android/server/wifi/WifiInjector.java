@@ -158,7 +158,7 @@ public class WifiInjector {
 
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
                 mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
-                this, mBackupManagerProxy, mCountryCode, mWifiNative);
+                this, mBackupManagerProxy, mCountryCode, mWifiNative, mWifiNativeNew);
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
         mNotificationController = new WifiNotificationController(mContext,
