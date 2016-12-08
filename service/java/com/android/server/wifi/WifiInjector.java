@@ -17,6 +17,7 @@
 package com.android.server.wifi;
 
 import android.content.Context;
+import android.net.NetworkKey;
 import android.net.NetworkScoreManager;
 import android.net.NetworkScorerAppManager;
 import android.net.wifi.IApInterface;
@@ -102,6 +103,7 @@ public class WifiInjector {
     private final WifiPermissionsUtil mWifiPermissionsUtil;
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
+    private final NetworkScoreManager mNetworkScoreManager;
 
     private final boolean mUseRealLogger;
 
@@ -139,6 +141,17 @@ public class WifiInjector {
         mWifiApConfigStore = new WifiApConfigStore(mContext, mBackupManagerProxy);
         mWifiNative = WifiNative.getWlanNativeInterface();
 
+        // Wifi Network Scores
+        mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
+        mNetworkScoreManager = (NetworkScoreManager) mContext.getSystemService(
+                Context.NETWORK_SCORE_SERVICE);
+        if (mNetworkScoreManager != null) {
+            mNetworkScoreManager.registerNetworkScoreCache(
+                    NetworkKey.TYPE_WIFI,
+                    mWifiNetworkScoreCache,
+                    NetworkScoreManager.CACHE_FILTER_NONE);
+        }
+
         // WifiConfigManager/Store objects and their dependencies.
         // New config store
         mWifiKeyStore = new WifiKeyStore(mKeyStore);
@@ -174,8 +187,9 @@ public class WifiInjector {
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
-        mNotificationController = new WifiNotificationController(mContext,
-                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, null, this);
+        mNotificationController = new WifiNotificationController(
+                mContext, mWifiServiceHandlerThread.getLooper(),
+                mNetworkScoreManager, mWifiNetworkScoreCache, mFrameworkFacade, this);
         mWifiWakeupController = new WifiWakeupController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
