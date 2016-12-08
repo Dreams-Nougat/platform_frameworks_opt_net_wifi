@@ -1,0 +1,11 @@
+Revision: e49a6dbf8d14b856ff5cf258d5e341d2c4aa55bd
+Patch-set: 1
+File: tests/wifitests/src/com/android/server/wifi/RecommendedNetworkEvaluatorTest.java
+
+69:4-69:11
+Thu Dec 08 18:39:59 2016 +0000
+Author: Jeremy Joslin <1060801@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_7f5c879b
+Bytes: 49
+nit: should be on the same line as the field def.
+
