@@ -46,6 +46,14 @@ UUID: ad1edff1_3e0cd820
 Bytes: 40
 This will never happen. Remove try catch
 
+218
+Thu Dec 08 04:15:57 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_3e0cd820
+UUID: ad1edff1_3945d2b6
+Bytes: 130
+Actually, I see this elsewhere too. I would imagine this error checking is done at a lower level, but we should check with Jeremy.
+
 224:20-224:32
 Thu Dec 08 03:21:20 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
