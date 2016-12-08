@@ -1,6 +1,22 @@
 Revision: 3faf231010cef5026b97a6814f83df23536e189a
 Patch-set: 2
+File: service/java/com/android/server/wifi/RecommendedNetworkEvaluator.java
+
+104:0-106:9
+Thu Dec 08 22:19:54 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_cbe39118
+Bytes: 108
+Is this RecommendedNetworkEvaluator going to handle networks that are saved but marked as externally scored?
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
+
+472:49-472:88
+Thu Dec 08 22:19:54 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_106778d0
+Bytes: 167
+Why this evaluator specific input parameter needs to be passed down via WifiConnectivityManager? Can't RecommendedNetworkEvaluator obtain it via NETWORK_SCORE_SERVICE?
 
 527
 Thu Dec 08 19:55:54 2016 +0000
