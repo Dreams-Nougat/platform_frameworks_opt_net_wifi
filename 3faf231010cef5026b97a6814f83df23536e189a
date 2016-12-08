@@ -9,3 +9,13 @@ UUID: ad1edff1_ca9b8f5d
 Bytes: 228
 Why does WifiConnectivityManager need to know whether ExternalScoreEvaluator or RecommendedNetworkEvaluator should be employed?  Shouldn't this be an implementation detail of ExternalScoreEvaluator, or perhaps an factory object?
 
+527
+Thu Dec 08 20:59:43 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_ca9b8f5d
+UUID: ad1edff1_b061ec4f
+Bytes: 529
+The goal is to fully replace ExternalScoreEvaluator with RecommendedNetworkEvaluator. The logic for using external scores to recommend a WifiConfiguration will be pushed to the implementors of INetworkRecommendationProvider.
+
+After b/33224286 is fixed, the logic here will simply add a NetworkRecommendationEvaluator to WifiNetworkSelector if NETWORK_RECOMMENDATIONS_ENABLED is set (ExternalScoreEvaluator will be deleted).  I think this an appropriate place to put this logic since all of the NetworkEvaluators are created here.
+
