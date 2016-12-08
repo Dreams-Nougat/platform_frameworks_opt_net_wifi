@@ -1,0 +1,8 @@
+Verified+1: Michael Plass <mplass@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Etan Cohen <etancohen@google.com>
+Submitted-by: Etan Cohen <etancohen@google.com>
+Submitted-at: Thu, 08 Dec 2016 19:24:40 +0000
+Reviewed-on: https://android-review.googlesource.com/311391
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
