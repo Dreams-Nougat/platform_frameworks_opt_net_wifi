@@ -9,6 +9,14 @@ UUID: ad1edff1_cbe39118
 Bytes: 108
 Is this RecommendedNetworkEvaluator going to handle networks that are saved but marked as externally scored?
 
+106
+Thu Dec 08 22:48:43 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_cbe39118
+UUID: ad1edff1_dda7d88d
+Bytes: 12
+Yes it will.
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 472:49-472:88
@@ -17,6 +25,16 @@ Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_106778d0
 Bytes: 167
 Why this evaluator specific input parameter needs to be passed down via WifiConnectivityManager? Can't RecommendedNetworkEvaluator obtain it via NETWORK_SCORE_SERVICE?
+
+472
+Thu Dec 08 22:48:43 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_106778d0
+UUID: ad1edff1_3d1b745b
+Bytes: 607
+RecommendedNetworkEvaluator could obtain NetworkScoreManager from Context, but it is better to inject direct dependencies instead of indirect ones. go/di-practices/inject-direct-dependencies
+
+Using that logic, it would make more sense to actually inject SavedNetworkEvaluator, RecommendedNetworkEvaluator and ExternalScoreEvaluator directly into WifiConnectivityManager instead of constructing those objects within this constructor. I'd be happy to make that change in this commit if you agree. That would remove the WifiNetworkScoreCache and NetworkScoreManager arguments and add ones for the 3 evaluators.
 
 527
 Thu Dec 08 19:55:54 2016 +0000
