@@ -1,0 +1,70 @@
+Revision: a4d7bb9d29e127cb8f4bf2591682e0bb5fabc518
+Patch-set: 6
+File: /COMMIT_MSG
+
+11
+Thu Dec 08 21:32:11 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_30aabc4e
+Bytes: 232
+(Cont'd from PS3)
+
+Please list WifiHandler here, so that a reader can get the important information by skimming the commit message.
+
+As is, a reviewer will miss this information, unless they very carefully parse the paragraph below.
+
+15:16-16:65
+Thu Dec 08 21:32:11 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_50dbb00a
+Bytes: 162
+No need to describe the implementation details of WifiAsyncChannel here. (That code was added in its own CL, with its own explanation of implementation strategy.)
+
+17
+Thu Dec 08 21:32:11 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_f00764f6
+Bytes: 1353
+The rest of this commit message is hard to follow.
+- Using a single, long, paragraph makes the text hard to skim.
+- The relationship between the subtopics of this paragraph, and the goals above is hard to see.
+- The paragraph contains information that isn't relevant to this commit. (E.g., implementation details of WifiAsyncChannel, and WifiHandler.)
+
+Please have a look at go/lotl-178, and incorporate some of that advice here. The ideal structure of this commit message might be something like:
+
+   Log API surfaces...
+
+   The following interfaces may be used...
+   - AIDL...
+   - Async...
+   - Handler ...
+
+   We trace these interfaces as follows:
+   - AIDL: manual addition of WifiLog.trace() calls
+   - AsyncChannel:
+     - use of WifiAsyncChannel
+     - addition of trace() calls to replySucceeded() and
+       replyFailed() calls [1]
+   - Handler: use of WifiHandler
+
+   [1] This compensates for the fact that WifiScanningService uses a fully-connected AsyncChannel. In fully-connected mode, replies can't be logged by WifiAsyncChannel, because the replies aren't sent using replyToMessage().
+
+Key features of the structure above:
+- easy to skim
+- mapping from problem to solution is clear
+- most important information is at the top, with greater levels of details as we reader further (e.g., the detail about replyToMessage() is at the bottom).
+
+24:26-25:48
+Thu Dec 08 21:32:11 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_d087c09f
+Bytes: 95
+Similar to comment at line 15: no need to describe the implementation details of other classes.
+
+26
+Thu Dec 08 21:32:11 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ad1edff1_30b4fc82
+Bytes: 171
+Recommend leaving this last sentence out. It's unsurprising that a mock was added to a test fixture. So, unless there's something subtle going on, no need to mention this.
+
