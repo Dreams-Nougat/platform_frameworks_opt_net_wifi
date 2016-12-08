@@ -17,6 +17,16 @@ UUID: ad1edff1_dda7d88d
 Bytes: 12
 Yes it will.
 
+106
+Thu Dec 08 23:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_dda7d88d
+UUID: ad1edff1_1da790a2
+Bytes: 329
+Can you describe the behavior of NetworkScoreManager#requestRecommendation when the scan results contain a mix of saved but externally scored networks and ephemeral networks? In the scenario of untrusted networks allowed and not allowed.
+
+Also, how does NetworkScoreManager tell which ones are ephemeral and which ones are saved?
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 472:49-472:88
@@ -35,6 +45,14 @@ Bytes: 607
 RecommendedNetworkEvaluator could obtain NetworkScoreManager from Context, but it is better to inject direct dependencies instead of indirect ones. go/di-practices/inject-direct-dependencies
 
 Using that logic, it would make more sense to actually inject SavedNetworkEvaluator, RecommendedNetworkEvaluator and ExternalScoreEvaluator directly into WifiConnectivityManager instead of constructing those objects within this constructor. I'd be happy to make that change in this commit if you agree. That would remove the WifiNetworkScoreCache and NetworkScoreManager arguments and add ones for the 3 evaluators.
+
+472
+Thu Dec 08 23:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_3d1b745b
+UUID: ad1edff1_a05af798
+Bytes: 78
+Thanks for the link to the DIP doc. Sure, let's follow the coding style guide.
 
 527
 Thu Dec 08 19:55:54 2016 +0000
