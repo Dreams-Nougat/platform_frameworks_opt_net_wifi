@@ -303,6 +303,9 @@ public class WifiStateMachineTest {
     TestLooper mLooper;
 
     @Mock WifiNative mWifiNative;
+    @Mock WifiNativeNew mWifiNativeNew;
+    @Mock WifiMonitorNew mWifiMonitorNew;
+    @Mock WifiP2pNativeNew mWifiP2pNativeNew;
     @Mock WifiScanner mWifiScanner;
     @Mock SupplicantStateTracker mSupplicantStateTracker;
     @Mock WifiMetrics mWifiMetrics;
@@ -388,7 +391,8 @@ public class WifiStateMachineTest {
         when(mClientInterface.disableSupplicant()).thenReturn(true);
 
         mWsm = new WifiStateMachine(context, factory, mLooper.getLooper(),
-            mUserManager, mWifiInjector, mBackupManagerProxy, mCountryCode, mWifiNative);
+                mUserManager, mWifiInjector, mBackupManagerProxy, mCountryCode, mWifiNative,
+                mWifiNativeNew, mWifiMonitorNew, mWifiP2pNativeNew);
         mWsmThread = getWsmHandlerThread(mWsm);
 
         final AsyncChannel channel = new AsyncChannel();
