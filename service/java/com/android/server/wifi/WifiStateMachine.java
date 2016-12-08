@@ -195,6 +195,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     private WifiInjector mWifiInjector;
     private WifiMonitor mWifiMonitor;
     private WifiNative mWifiNative;
+    private WifiNativeNew mWifiNativeNew;
+    private WifiMonitorNew mWifiMonitorNew;
+    private WifiP2pNativeNew mWifiP2pNativeNew;
     private WifiConfigManager mWifiConfigManager;
     private WifiSupplicantControl mWifiSupplicantControl;
     private WifiConnectivityManager mWifiConnectivityManager;
@@ -848,7 +851,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     public WifiStateMachine(Context context, FrameworkFacade facade, Looper looper,
                             UserManager userManager, WifiInjector wifiInjector,
                             BackupManagerProxy backupManagerProxy, WifiCountryCode countryCode,
-                            WifiNative wifiNative) {
+                            WifiNative wifiNative, WifiNativeNew wifiNativeNew,
+                            WifiMonitorNew wifiMonitorNew, WifiP2pNativeNew wifiP2pNativeNew) {
         super("WifiStateMachine", looper);
         mWifiInjector = wifiInjector;
         mWifiMetrics = mWifiInjector.getWifiMetrics();
@@ -858,6 +862,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mContext = context;
         mFacade = facade;
         mWifiNative = wifiNative;
+        mWifiNativeNew = wifiNativeNew;
+        mWifiMonitorNew = wifiMonitorNew;
+        mWifiP2pNativeNew = wifiP2pNativeNew;
         mBackupManagerProxy = backupManagerProxy;
 
         // TODO refactor WifiNative use of context out into it's own class
@@ -3984,7 +3991,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     } catch (IllegalStateException ie) {
                         loge("Unable to change interface settings: " + ie);
                     }
-
+                    if (!mWifiNativeNew.startHidlHal()) {
+                        Log.e(TAG, "Failed to start HIDL HAL for client mode");
+                    }
                     if (!mWifiNative.startHal()) {
                         // starting HAL is optional
                         Log.e(TAG, "Failed to start HAL for client mode");
