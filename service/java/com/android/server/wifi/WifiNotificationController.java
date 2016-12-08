@@ -26,6 +26,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.net.NetworkInfo;
+import android.net.NetworkKey;
+import android.net.NetworkScoreManager;
+import android.net.WifiKey;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiScanner;
@@ -35,12 +38,16 @@ import android.os.Message;
 import android.os.UserHandle;
 import android.provider.Settings;
 
+import com.android.internal.annotations.VisibleForTesting;
+import com.android.server.wifi.util.ScanResultUtil;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /* Takes care of handling the "open wi-fi network available" notification @hide */
-final class WifiNotificationController {
+class WifiNotificationController {
     /**
      * The icon to show in the 'available networks' notification. This will also
      * be the ID of the Notification given to the NotificationManager.
@@ -67,7 +74,7 @@ final class WifiNotificationController {
     /**
      * The Notification object given to the NotificationManager.
      */
-    private Notification.Builder mNotificationBuilder;
+    private final Notification.Builder mNotificationBuilder;
     /**
      * Whether the notification is being shown, as set by us. That is, if the
      * user cancels the notification, we will not receive the callback so this
@@ -89,7 +96,15 @@ final class WifiNotificationController {
      */
     private int mNumScansSinceNetworkStateChange;
 
+    /**
+     * Minimum network score to show notification.
+     * TODO(b/33457699): change to be not hardcoded.
+     */
+    private static final int MIN_SCORE_TO_SHOW_NOTIFICATION = 20;
+
     private final Context mContext;
+    private final NetworkScoreManager mScoreManager;
+    private final WifiNetworkScoreCache mScoreCache;
     private NetworkInfo mNetworkInfo;
     private NetworkInfo.DetailedState mDetailedState;
     private volatile int mWifiState;
@@ -97,15 +112,39 @@ final class WifiNotificationController {
     private WifiInjector mWifiInjector;
     private WifiScanner mWifiScanner;
 
-    WifiNotificationController(Context context,
-                               Looper looper,
-                               FrameworkFacade framework,
-                               Notification.Builder builder,
-                               WifiInjector wifiInjector) {
+    WifiNotificationController(Context context, Looper looper,
+            NetworkScoreManager networkScoreManager, WifiNetworkScoreCache wifiNetworkScoreCache,
+            FrameworkFacade framework, WifiInjector wifiInjector) {
+        this(
+                context,
+                looper,
+                networkScoreManager,
+                wifiNetworkScoreCache,
+                framework,
+                wifiInjector,
+                new Notification.Builder(context)
+                        .setWhen(0)
+                        .setSmallIcon(ICON_NETWORKS_AVAILABLE)
+                        .setAutoCancel(true)
+                        .setContentIntent(
+                                TaskStackBuilder.create(context).addNextIntentWithParentStack(
+                                        new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK))
+                                        .getPendingIntent(0, 0, null, UserHandle.CURRENT))
+                        .setColor(context.getResources().getColor(
+                                com.android.internal.R.color.system_notification_accent_color)));
+    }
+
+    @VisibleForTesting
+    WifiNotificationController(Context context, Looper looper,
+            NetworkScoreManager networkScoreManager, WifiNetworkScoreCache wifiNetworkScoreCache,
+            FrameworkFacade framework, WifiInjector wifiInjector,
+            Notification.Builder notificationBuilder) {
         mContext = context;
         mFrameworkFacade = framework;
-        mNotificationBuilder = builder;
         mWifiInjector = wifiInjector;
+        mScoreManager = networkScoreManager;
+        mScoreCache = wifiNetworkScoreCache;
+        mNotificationBuilder = notificationBuilder;
         mWifiState = WifiManager.WIFI_STATE_UNKNOWN;
         mDetailedState = NetworkInfo.DetailedState.IDLE;
 
@@ -183,39 +222,79 @@ final class WifiNotificationController {
         if (networkInfo != null)
             state = networkInfo.getState();
 
-        if ((state == NetworkInfo.State.DISCONNECTED)
-                || (state == NetworkInfo.State.UNKNOWN)) {
-            if (scanResults != null) {
-                int numOpenNetworks = 0;
-                for (int i = scanResults.size() - 1; i >= 0; i--) {
-                    ScanResult scanResult = scanResults.get(i);
-
-                    //A capability of [ESS] represents an open access point
-                    //that is available for an STA to connect
-                    if (scanResult.capabilities != null &&
-                            scanResult.capabilities.equals("[ESS]")) {
-                        numOpenNetworks++;
-                    }
+        if ((state == NetworkInfo.State.DISCONNECTED
+                || state == NetworkInfo.State.UNKNOWN)
+                && scanResults != null) {
+            ArrayList<ScanResult> openNetworks = new ArrayList<>();
+            for (int i = scanResults.size() - 1; i >= 0; i--) {
+                ScanResult scanResult = scanResults.get(i);
+                //A capability of [ESS] represents an open access point
+                //that is available for an STA to connect
+                if (scanResult.capabilities != null
+                        && scanResult.capabilities.equals("[ESS]")) {
+                    openNetworks.add(scanResult);
                 }
-
-                if (numOpenNetworks > 0) {
-                    if (++mNumScansSinceNetworkStateChange >= NUM_SCANS_BEFORE_ACTUALLY_SCANNING) {
-                        /*
-                         * We've scanned continuously at least
-                         * NUM_SCANS_BEFORE_NOTIFICATION times. The user
-                         * probably does not have a remembered network in range,
-                         * since otherwise supplicant would have tried to
-                         * associate and thus resetting this counter.
-                         */
-                        setNotificationVisible(true, numOpenNetworks, false, 0);
-                    }
-                    return;
-                }
+            }
+            ScanResult bestNetwork = checkGoodOpenNetwork(openNetworks);
+            if (bestNetwork != null
+                    && ++mNumScansSinceNetworkStateChange >= NUM_SCANS_BEFORE_ACTUALLY_SCANNING) {
+                /*
+                 * We have scanned continuously at least
+                 * NUM_SCANS_BEFORE_NOTIFICATION times. The user
+                 * probably does not have a remembered network in range,
+                 * since otherwise supplicant would have tried to
+                 * associate and thus resetting this counter.
+                 */
+                setNotificationVisible(true, openNetworks.size(), false, 0);
+                return;
             }
         }
 
         // No open networks in range, remove the notification
         setNotificationVisible(false, 0, false, 0);
+    }
+
+    /**
+     * Uses the score cache to see if open access points with a good score exist.
+     * @param openNetworks List of open network scan results
+     * @return returns number of nearby open networks.
+     */
+    private ScanResult checkGoodOpenNetwork(List<ScanResult> openNetworks) {
+        if (openNetworks == null || openNetworks.isEmpty()) {
+            return null;
+        }
+        ArrayList<NetworkKey> openNetworkKeys = new ArrayList<>();
+        for (int i = openNetworks.size() - 1; i >= 0; i--) {
+            ScanResult openNetwork = openNetworks.get(i);
+            try {
+                if (!mScoreCache.isScoredNetwork(openNetwork)) {
+                    WifiKey wifiKey = new WifiKey(
+                            ScanResultUtil.createQuotedSSID(openNetwork.SSID),
+                            openNetwork.BSSID);
+                    NetworkKey networkKey = new NetworkKey(wifiKey);
+                    openNetworkKeys.add(networkKey);
+                }
+            } catch (IllegalArgumentException e) {
+                // invalid SSID, skip scan result.
+            }
+        }
+        mScoreManager.requestScores(openNetworkKeys.toArray(
+                new NetworkKey[openNetworkKeys.size()]));
+
+        ScanResult bestOpenNetwork = null;
+        int bestScore = Byte.MIN_VALUE;
+        for (int i = openNetworks.size() - 1; i >= 0; i--) {
+            ScanResult scanResult = openNetworks.get(i);
+            int score = mScoreCache.getNetworkScore(scanResult);
+            if (score > bestScore) {
+                bestOpenNetwork = scanResult;
+                bestScore = score;
+            }
+        }
+        if (bestScore >= MIN_SCORE_TO_SHOW_NOTIFICATION) {
+            return bestOpenNetwork;
+        }
+        return null;
     }
 
     /**
@@ -260,20 +339,6 @@ final class WifiNotificationController {
             // Not enough time has passed to show the notification again
             if (System.currentTimeMillis() < mNotificationRepeatTime) {
                 return;
-            }
-
-            if (mNotificationBuilder == null) {
-                // Cache the Notification builder object.
-                mNotificationBuilder = new Notification.Builder(mContext)
-                        .setWhen(0)
-                        .setSmallIcon(ICON_NETWORKS_AVAILABLE)
-                        .setAutoCancel(true)
-                        .setContentIntent(TaskStackBuilder.create(mContext)
-                                .addNextIntentWithParentStack(
-                                        new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK))
-                                .getPendingIntent(0, 0, null, UserHandle.CURRENT))
-                        .setColor(mContext.getResources().getColor(
-                                com.android.internal.R.color.system_notification_accent_color));
             }
 
             CharSequence title = mContext.getResources().getQuantityText(
