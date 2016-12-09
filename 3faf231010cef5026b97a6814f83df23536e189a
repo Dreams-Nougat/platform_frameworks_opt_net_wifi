@@ -27,6 +27,20 @@ Can you describe the behavior of NetworkScoreManager#requestRecommendation when 
 
 Also, how does NetworkScoreManager tell which ones are ephemeral and which ones are saved?
 
+106
+Fri Dec 09 01:46:47 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_1da790a2
+UUID: 3a26a7ad_bf2a9bed
+Bytes: 1553
+NetworkScoreManager#requestRecommendation calls through to the current NetworkRecommendationProvider (not implemented yet). The implementors of NetworkRecommendationProvider will receive the RecommendationResult and pass back a recommended network in the form of a RecommendationResult. See go/intelligent-network-selection-dd for more details on this plumbing.
+
+The implementors of NetworkRecommendationProvider will query WifiManager#getConfiguredNetworks to determine whether a ScanResult corresponds to a saved network. For ephemeral, it looks like we'll have to expose the ephemeral bit as a @SystemApi so the provider can access it.
+
+When untrusted networks are not allowed, the NetworkRecommendationProvider will use similar logic to SavedNetworkEvaluator to choose a WifiConfiguration out of the current user's saved networks (and ignore open, unsaved networks). If network scores are available, this information will also be used in ranking.
+
+When untrusted networks are allowed, network scores will be used to rank open networks as well as saved networks. The exact logic is TBD on exactly how this will work, but the initial code will preserve the current functionality of ExternalNetworkEvaluator. If an untrusted network is chosen, an ephemeral WifiConfiguration will be created through WifiManager#addNetwork and then returned by the API. It looks like we'll also have to expose NetworkSelectionStatus as a @SystemApi so that the ScanResult candidate can be returned. Alternatively, we could just add another field to RecommendationResult.
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 472:49-472:88
@@ -53,6 +67,14 @@ Parent: ad1edff1_3d1b745b
 UUID: ad1edff1_a05af798
 Bytes: 78
 Thanks for the link to the DIP doc. Sure, let's follow the coding style guide.
+
+472
+Fri Dec 09 01:46:47 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_a05af798
+UUID: 3a26a7ad_399eaba2
+Bytes: 4
+Done
 
 527
 Thu Dec 08 19:55:54 2016 +0000
