@@ -1,0 +1,35 @@
+Revision: 8f78374516d67e42e539786b5b5a1882954a631f
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+251
+Fri Dec 09 19:58:56 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_7328b74b
+Bytes: 139
+Rather than nest more conditionals making this method larger, can you factor this method out so it doesn't continue to get more cumbersome?
+
+257
+Fri Dec 09 19:58:56 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_53d13b0e
+Bytes: 785
+It seems like this logic sitting here in the notification controller is a bit awkward.  First you filter for open networks, then you request scores for those open networks from the score manager, and then you ask the score cache to get to get a network score for each of these open networks (presuming, I think that the score manager is related to the score cache in some way not visible to the notification controller).
+
+It would make more sense to me and anyone reading this code that we'd ask some facility opaque to WifiNotificationController how confident it was that there were good networks to associate to, given the scan results.  Within here you could also encapsulate concepts of whether this device had a suitable scoring mechanism and what to do under those circumstances.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
+
+114:23-114:39
+Fri Dec 09 19:58:56 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_1354e314
+Bytes: 705
+Having a refactor here makes sense.  However the way you've done it creates an asymmetry.  There are some sequences of calls where:
+
+   when(mWifiScanner.getSingleScanResults()).thenReturn(scanResults);
+
+needs to be called by the test implementation, and other situations where it does not.  Also "createScanResult" (as opposed to "setOpenAccessPoint") loses the information that the scan result being created is open.
+
+Could you restructure these methods so that their usage is more consistent?  For example "addOpenAccessPoint" and "addOpenAccessPointWithScore" might be one way, although you'll need to make decisions about the storage ownership of "scanResult".  Having it class-wide might make sense.
+
