@@ -41,6 +41,16 @@ When untrusted networks are not allowed, the NetworkRecommendationProvider will 
 
 When untrusted networks are allowed, network scores will be used to rank open networks as well as saved networks. The exact logic is TBD on exactly how this will work, but the initial code will preserve the current functionality of ExternalNetworkEvaluator. If an untrusted network is chosen, an ephemeral WifiConfiguration will be created through WifiManager#addNetwork and then returned by the API. It looks like we'll also have to expose NetworkSelectionStatus as a @SystemApi so that the ScanResult candidate can be returned. Alternatively, we could just add another field to RecommendationResult.
 
+106
+Fri Dec 09 04:27:06 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_bf2a9bed
+UUID: 3a26a7ad_ea296f9c
+Bytes: 687
+1) Saved but externally scored network is considered as trusted network. They should be evaluated and connected even if untrusted network is not allowed.
+2) Instead of having WifiManager#addNetwork to create WifiConfiguration, why not leave the details of such within Wifi stack, just as what we are doing today.  This way, NetworkRecommendationProvider can simply focus on network ranking.
+3) If NetworkRecommendationProvider needs to differentiate saved but externally scored network and ephemeral network, can we add a hidden field in scan result to indicate network type and have RecommendedNetworkEvaluator set it? This way you don't need to query WifiManager#getConfiguredNetworks.
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 472:49-472:88
