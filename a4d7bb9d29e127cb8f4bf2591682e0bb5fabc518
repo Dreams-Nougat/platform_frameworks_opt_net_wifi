@@ -13,12 +13,28 @@ Please list WifiHandler here, so that a reader can get the important information
 
 As is, a reviewer will miss this information, unless they very carefully parse the paragraph below.
 
+11
+Fri Dec 09 04:33:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_30aabc4e
+UUID: ad1edff1_0bad0965
+Bytes: 106
+Ok.. but WifiHandler is not an API to reach into WifiScanning service. Will have to reword line 9 as well.
+
 15:16-16:65
 Thu Dec 08 21:32:11 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_50dbb00a
 Bytes: 162
 No need to describe the implementation details of WifiAsyncChannel here. (That code was added in its own CL, with its own explanation of implementation strategy.)
+
+15:16-16:65
+Fri Dec 09 04:33:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_50dbb00a
+UUID: ad1edff1_8bb839ad
+Bytes: 11
+Will remove
 
 17
 Thu Dec 08 21:32:11 2016 +0000
@@ -54,6 +70,14 @@ Key features of the structure above:
 - mapping from problem to solution is clear
 - most important information is at the top, with greater levels of details as we reader further (e.g., the detail about replyToMessage() is at the bottom).
 
+17
+Fri Dec 09 04:33:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_f00764f6
+UUID: 3a26a7ad_0a54ab14
+Bytes: 147
+Have tried to take your advice in shortening my commit message and describing in bullet points what it's trying to do. Let me know if this is okay.
+
 24:26-25:48
 Thu Dec 08 21:32:11 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -61,10 +85,26 @@ UUID: ad1edff1_d087c09f
 Bytes: 95
 Similar to comment at line 15: no need to describe the implementation details of other classes.
 
+24:26-25:48
+Fri Dec 09 04:33:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_d087c09f
+UUID: ad1edff1_6bc7e534
+Bytes: 3
+Ok.
+
 26
 Thu Dec 08 21:32:11 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ad1edff1_30b4fc82
 Bytes: 171
 Recommend leaving this last sentence out. It's unsurprising that a mock was added to a test fixture. So, unless there's something subtle going on, no need to mention this.
+
+26
+Fri Dec 09 04:33:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ad1edff1_30b4fc82
+UUID: ad1edff1_abe65dcc
+Bytes: 14
+Ok will remove
 
