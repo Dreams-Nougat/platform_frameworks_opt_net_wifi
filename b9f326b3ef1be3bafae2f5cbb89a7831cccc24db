@@ -66,3 +66,11 @@ Then all you need to do is make sure that the handling code for CMD_ADD_OR_UPDAT
 
 Roshan, I assume this is safe to do?
 
+5305:23-5305:34
+Fri Dec 09 02:05:22 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 2d3f4f99_6eb36fcb
+UUID: 3a26a7ad_7f2c03c9
+Bytes: 124
+Yeah. That's safe. You can use |mLastNetworkId| to check if the network being updated is the currently connected network ID.
+
