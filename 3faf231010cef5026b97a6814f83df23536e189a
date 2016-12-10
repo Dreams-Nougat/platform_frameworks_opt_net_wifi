@@ -51,6 +51,20 @@ Bytes: 687
 2) Instead of having WifiManager#addNetwork to create WifiConfiguration, why not leave the details of such within Wifi stack, just as what we are doing today.  This way, NetworkRecommendationProvider can simply focus on network ranking.
 3) If NetworkRecommendationProvider needs to differentiate saved but externally scored network and ephemeral network, can we add a hidden field in scan result to indicate network type and have RecommendedNetworkEvaluator set it? This way you don't need to query WifiManager#getConfiguredNetworks.
 
+106
+Sat Dec 10 01:04:46 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_ea296f9c
+UUID: 3a26a7ad_67758da7
+Bytes: 653
+1) That is the current plan for implementing the NetworkRecommendationProvider.
+2) I'll leave this the logic  for adding/updating networks to the framework makes sense. I'll just need to add to RecommendationResult a ScanResult field so the chosen ScanResult can be returned as well as a WifiConfiguration (since NetworkSelectionStatus is hidden).
+3) Would simply exposing the untrusted bit in ScanResult work? 
+
+b/33490132 contains the API changes for 2) and 3)
+
+I updated this change to reflect this new design. I also filtered out untrusted networks from the ScanResults passed to the NetworkScoreManager instead of passing along NetworkCapabilities.
+
 File: service/java/com/android/server/wifi/WifiConnectivityManager.java
 
 472:49-472:88
