@@ -9,3 +9,11 @@ UUID: 3a26a7ad_67690d36
 Bytes: 295
 Having this test buried within a method named "checkGoodOpenNetwork" doesn't seem right.  Should this test move back out to checkAndSetNotification?  Doing these tests out of order (making sure that we've seen NUM_SCANS_... of GOOD networks before displaying the notification) makes sense to me.
 
+278
+Sat Dec 10 00:51:09 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_67690d36
+UUID: 3a26a7ad_22a2e390
+Bytes: 4
+Done
+
