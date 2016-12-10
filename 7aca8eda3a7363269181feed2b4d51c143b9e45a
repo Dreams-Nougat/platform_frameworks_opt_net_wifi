@@ -1,0 +1,32 @@
+Revision: 7aca8eda3a7363269181feed2b4d51c143b9e45a
+Patch-set: 3
+File: service/java/com/android/server/wifi/RecommendedNetworkEvaluator.java
+
+52
+Sat Dec 10 00:12:22 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_021ec7d6
+Bytes: 10
+blank line
+
+53
+Sat Dec 10 00:12:22 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_e22aabee
+Bytes: 10
+blank line
+
+62
+Sat Dec 10 00:12:22 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_2208a393
+Bytes: 25
+indexed iterator, please.
+
+86:51-86:61
+Sat Dec 10 00:12:22 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_a2a15349
+Bytes: 129
+fyi: depending on uses of scan details in the interface and other calls, it might be worth changing interfaces up and down to [].
+
