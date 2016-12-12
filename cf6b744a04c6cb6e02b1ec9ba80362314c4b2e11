@@ -1,0 +1,11 @@
+Revision: cf6b744a04c6cb6e02b1ec9ba80362314c4b2e11
+Patch-set: 8
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+233:16-234:69
+Mon Dec 12 23:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_a3040480
+Bytes: 294
+I think I have this correct...  As pstew mentions, we do an extra loop through the scan results to pull out the open networks.  Can' this just be part of the call below?  In checkGoodOpenNetwork(scanResults) we could trivially check each scan result for the capability and also if it is scored.
+

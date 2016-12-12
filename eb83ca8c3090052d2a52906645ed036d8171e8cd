@@ -17,6 +17,16 @@ UUID: 3a26a7ad_532b70ae
 Bytes: 80
 Yes, preferred to do this as apposed to passing in a null object in WifiInjector
 
+118:8-135:5
+Mon Dec 12 23:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_532b70ae
+UUID: fa632f25_23e754cd
+Bytes: 512
+I like that this is allowing us to make mNotificationBuilder be final and I don't like passing in null either.  I want to get this set of comments in before our meeting, so I can't go look at the test...  but could we create the object in the constructor like it was constructed below?  I am guessing not...  but haven't had a chance to look.
+
+I am not opposed to this style..  and we don't handle this well in the current code.  It is just different than what we are doing and it might end up as the example. :)
+
 227:0-227:12
 Mon Dec 12 05:38:56 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -49,6 +59,14 @@ Bytes: 336
 The idea was to not allocate a List iterator and to do scanResults.size() once, suggested to me previously and part of android best practices. I do think the optimizations are a little trivial here though, so can go either way.
 
 https://docs.google.com/document/d/1772U-6hNWjEYNpsvqFo-mwPSrBD_r6Wn08qeAd6ltBk/view#heading=h.woei4s95qf53
+
+228:0-228:63
+Mon Dec 12 23:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_733aecda
+UUID: fa632f25_c3202012
+Bytes: 113
+Yeah, in this case I think it would be a bit easier to read if there was an iterator and am leaning towards that.
 
 236
 Mon Dec 12 17:06:22 2016 +0000
@@ -85,6 +103,26 @@ Bytes: 419
 The call returns false when no scorer is active, and we plan to turn off the feature when the recommendation service is not up, so it shouldn't need to check the boolean.
 
 When the broadcast is sent to trigger the score cache to be updated, the following code may not retrieve the updated scores yet, which is fine because the behavior should still pick the best qualified network based on existing scores in the cache.
+
+280:36-280:51
+Mon Dec 12 23:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_48f54fa9
+Bytes: 351
+Question about the requestScores call:
+Why are we only requesting score updates for the scores that already have a value?  Shouldn't all open networks get a score (including those that don't have a score yet)?
+
+I think this is confusing because we go get the cached score for all open networks - even those that we just saw didn't have a cached score.
+
+280:0-280:60
+Mon Dec 12 23:54:28 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_fe2a43ee
+UUID: fa632f25_08219761
+Bytes: 490
+I guess I have two questions on this:
+1 - I am not sure what is actually doing the score update.  In other words, can you help me understand who/what is doing the actual computation for scores?  I thought I saw a comment in ScoreManager that the caller would be doing the work, and I want to make sure that this is not WifiScanner.
+2 - Would it be worth restructuring this to base the notification on the completion of new scores?  It seems like it is always one set of scan results behind.
 
 284:38-284:45
 Mon Dec 12 17:06:22 2016 +0000
