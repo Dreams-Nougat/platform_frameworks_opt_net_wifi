@@ -1,0 +1,11 @@
+Revision: d0258ee4816148ff4ab9ac6b854fc5c51ea53be3
+Base-for-patch-set: 1
+File: libwifi_hal/Android.mk
+
+16
+Mon Dec 12 23:07:54 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_e827fb23
+Bytes: 197
+If I had to guess this was done so that vendors could provide their own HAL implementation without conflicting with this one.  However, let's remove and see whether that's of any practical concern.
+
