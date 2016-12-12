@@ -9,12 +9,28 @@ UUID: 3a26a7ad_cdfebff7
 Bytes: 112
 Is this being used to make it easier to test?  It might be just me, but I find this much more difficult to read.
 
+118:8-135:5
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_cdfebff7
+UUID: 3a26a7ad_532b70ae
+Bytes: 80
+Yes, preferred to do this as apposed to passing in a null object in WifiInjector
+
 227:0-227:12
 Mon Dec 12 05:38:56 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 3a26a7ad_2d3d33ee
 Bytes: 113
 In the existing code we bow out if the scan results list is empty.  Is there a reason we are not doing that here?
+
+227:0-227:12
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_2d3d33ee
+UUID: 3a26a7ad_931c6893
+Bytes: 25
+thanks, added null check.
 
 228:0-228:63
 Mon Dec 12 05:38:56 2016 +0000
@@ -24,12 +40,30 @@ Bytes: 196
 I realize this is in the existing code, but why does this start at the end and go to 0?  It just makes it a bit odd to read.  We could also switch to:
 "for (ScanResult scanResult : scanResults) {"
 
+228:0-228:63
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_0d3a77f5
+UUID: 3a26a7ad_733aecda
+Bytes: 336
+The idea was to not allocate a List iterator and to do scanResults.size() once, suggested to me previously and part of android best practices. I do think the optimizations are a little trivial here though, so can go either way.
+
+https://docs.google.com/document/d/1772U-6hNWjEYNpsvqFo-mwPSrBD_r6Wn08qeAd6ltBk/view#heading=h.woei4s95qf53
+
 236
 Mon Dec 12 17:06:22 2016 +0000
 Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 3a26a7ad_1883d758
 Bytes: 367
 The loop above looks for "open networks".  The call below asks for a "good open network".  When I made my comment in patchset #5, I talked about the test below (regarding mNumScansSincenetworkStateChange), and this looks good.  Pulling the code up to filter open networks when there's  a method dedicated for returning "good open networks" doesn't make as much sense.
+
+236
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_1883d758
+UUID: 3a26a7ad_738c2c8b
+Bytes: 190
+Agreed, this should live in checkGoodOpenNetwork() eventually. I did this because the current notification needs an openNetworks.size(), but I will move this in future CLs when that changes.
 
 280:0-280:60
 Mon Dec 12 05:38:56 2016 +0000
@@ -42,12 +76,30 @@ It looks like this asks NetworkScoreManager to recalculate scores for the networ
 
 So then the NetworkScoreManager sends a broadcast to trigger the scores to be redone.  This code then forges ahead and checks the existing scores.  Is that ok?  It is certainly possible that I am missing something, but this flow seems confusing.
 
+280:0-280:60
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_0d15d75f
+UUID: 3a26a7ad_fe2a43ee
+Bytes: 419
+The call returns false when no scorer is active, and we plan to turn off the feature when the recommendation service is not up, so it shouldn't need to check the boolean.
+
+When the broadcast is sent to trigger the score cache to be updated, the following code may not retrieve the updated scores yet, which is fine because the behavior should still pick the best qualified network based on existing scores in the cache.
+
 284:38-284:45
 Mon Dec 12 17:06:22 2016 +0000
 Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 3a26a7ad_587a6f99
 Bytes: 110
 "score" isn't needed in this scope.  Please remove this and do "int score = mScoreCache.getNetworks..." below.
+
+284:38-284:45
+Mon Dec 12 18:41:04 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_587a6f99
+UUID: 3a26a7ad_53cc90c9
+Bytes: 4
+Done
 
 File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
 
