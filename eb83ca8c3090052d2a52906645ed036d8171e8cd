@@ -1,0 +1,46 @@
+Revision: eb83ca8c3090052d2a52906645ed036d8171e8cd
+Patch-set: 7
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+118:8-135:5
+Mon Dec 12 05:38:56 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_cdfebff7
+Bytes: 112
+Is this being used to make it easier to test?  It might be just me, but I find this much more difficult to read.
+
+227:0-227:12
+Mon Dec 12 05:38:56 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_2d3d33ee
+Bytes: 113
+In the existing code we bow out if the scan results list is empty.  Is there a reason we are not doing that here?
+
+228:0-228:63
+Mon Dec 12 05:38:56 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_0d3a77f5
+Bytes: 196
+I realize this is in the existing code, but why does this start at the end and go to 0?  It just makes it a bit odd to read.  We could also switch to:
+"for (ScanResult scanResult : scanResults) {"
+
+280:0-280:60
+Mon Dec 12 05:38:56 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_0d15d75f
+Bytes: 488
+I haven't been in this code before so I am checking if I get it.
+
+It looks like this asks NetworkScoreManager to recalculate scores for the networks in the provided array.  This call doesn't happen to check the returned boolean (should it?).
+
+So then the NetworkScoreManager sends a broadcast to trigger the scores to be redone.  This code then forges ahead and checks the existing scores.  Is that ok?  It is certainly possible that I am missing something, but this flow seems confusing.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
+
+60:38-60:61
+Mon Dec 12 05:38:56 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_ed117b73
+Bytes: 27
+This should be updated too.
+
