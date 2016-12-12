@@ -24,6 +24,13 @@ Bytes: 196
 I realize this is in the existing code, but why does this start at the end and go to 0?  It just makes it a bit odd to read.  We could also switch to:
 "for (ScanResult scanResult : scanResults) {"
 
+236
+Mon Dec 12 17:06:22 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_1883d758
+Bytes: 367
+The loop above looks for "open networks".  The call below asks for a "good open network".  When I made my comment in patchset #5, I talked about the test below (regarding mNumScansSincenetworkStateChange), and this looks good.  Pulling the code up to filter open networks when there's  a method dedicated for returning "good open networks" doesn't make as much sense.
+
 280:0-280:60
 Mon Dec 12 05:38:56 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -34,6 +41,13 @@ I haven't been in this code before so I am checking if I get it.
 It looks like this asks NetworkScoreManager to recalculate scores for the networks in the provided array.  This call doesn't happen to check the returned boolean (should it?).
 
 So then the NetworkScoreManager sends a broadcast to trigger the scores to be redone.  This code then forges ahead and checks the existing scores.  Is that ok?  It is certainly possible that I am missing something, but this flow seems confusing.
+
+284:38-284:45
+Mon Dec 12 17:06:22 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 3a26a7ad_587a6f99
+Bytes: 110
+"score" isn't needed in this scope.  Please remove this and do "int score = mScoreCache.getNetworks..." below.
 
 File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
 
