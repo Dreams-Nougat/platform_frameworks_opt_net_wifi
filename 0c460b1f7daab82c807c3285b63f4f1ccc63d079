@@ -9,6 +9,14 @@ UUID: 3a26a7ad_be0debb2
 Bytes: 176
 Can we create these objects outside of makeWifiConnectivityManager() so it is consistent with other objects creation. Note, we don't need a getter methods for these evaluators.
 
+385
+Mon Dec 12 19:42:28 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_be0debb2
+UUID: 3a26a7ad_3e655bc8
+Bytes: 4
+Done
+
 File: tests/wifitests/src/com/android/server/wifi/RecommendedNetworkEvaluatorTest.java
 
 213
@@ -17,4 +25,14 @@ Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 3a26a7ad_5e993706
 Bytes: 63
 Can we add some tests for saved but externally scored networks?
+
+213
+Mon Dec 12 19:42:28 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 3a26a7ad_5e993706
+UUID: 3a26a7ad_d96d611f
+Bytes: 612
+RecommendedNetworkEvaluator does not check the useExternalScored bit - it simply filters ScanResults based on whether untrusted networks are supported (this filtering is tested in the above testEvaluateNetworks* tests). NetworkRecommendationProvider contains all of that logic for actually deciding which WifiConfiguration to select based on whether they are saved and/or have external scores (and we'll add tests for this behavior when we check it in).
+
+SavedNetworkEvaluator contains the logic for not considering networks that have useExternalScores set for selection (I added a test for this in this change).
 
