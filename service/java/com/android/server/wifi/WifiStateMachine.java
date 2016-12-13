@@ -4129,6 +4129,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 logd("SupplicantStartedState enter");
             }
 
+            if (!mWifiNativeNew.startSupplicantHidl()) {
+                Log.e(TAG, "Failed to start HIDL Supplicant Interface");
+            }
+
             /* Wifi is available as long as we have a connection to supplicant */
             mNetworkInfo.setIsAvailable(true);
             if (mNetworkAgent != null) mNetworkAgent.sendNetworkInfo(mNetworkInfo);
