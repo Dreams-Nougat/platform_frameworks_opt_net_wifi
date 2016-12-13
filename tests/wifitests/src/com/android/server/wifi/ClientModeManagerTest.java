@@ -141,16 +141,20 @@ public class ClientModeManagerTest {
         mWifiMonitorMock.sendMessage(TEST_INTERFACE_NAME, WifiMonitor.SUP_CONNECTION_EVENT);
         mLooper.dispatchAll();
 
-        mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, true);
-        mLooper.dispatchAll();
-
         order.verify(mContext).sendBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
         List<Intent> intents = intent.getAllValues();
         assertTrue(intents.get(0).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
 
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, true);
+        mLooper.dispatchAll();
+
+        order.verify(mContext, times(2)).sendStickyBroadcastAsUser(intent.capture(),
+                                                                   eq(UserHandle.ALL));
+        intents = intent.getAllValues();
         assertEquals(WifiManager.WIFI_STATE_ENABLED,
-                     intents.get(1).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
+                     intents.get(1).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+        assertEquals(WifiManager.WIFI_STATE_ENABLED,
+                     intents.get(2).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
     }
 
     /**
@@ -168,7 +172,7 @@ public class ClientModeManagerTest {
         mClientModeManager.start();
         mLooper.dispatchAll();
         verify(mWifiMonitor, never()).startMonitoring(anyString());
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLED);
     }
 
     /**
@@ -185,7 +189,7 @@ public class ClientModeManagerTest {
         mClientModeManager.start();
         mLooper.dispatchAll();
         verify(mWifiMonitor, never()).startMonitoring(anyString());
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLED);
     }
 
     /**
@@ -203,7 +207,7 @@ public class ClientModeManagerTest {
         mClientModeManager.start();
         mLooper.dispatchAll();
         verify(mWifiMonitor, never()).startMonitoring(anyString());
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLED);
     }
 
     /**
@@ -219,7 +223,7 @@ public class ClientModeManagerTest {
         doThrow(new RemoteException()).when(mClientInterfaceBinder).linkToDeath(any(), anyInt());
         mClientModeManager.start();
         mLooper.dispatchAll();
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLED);
         verify(mWifiMonitor, never()).startMonitoring(anyString());
     }
 
@@ -249,16 +253,25 @@ public class ClientModeManagerTest {
         mClientModeManager.stop();
         mLooper.dispatchAll();
 
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        order.verify(mContext, times(2)).sendStickyBroadcastAsUser(intent.capture(),
+                                                                   eq(UserHandle.ALL));
         List<Intent> intents = intent.getAllValues();
+        assertEquals(WifiManager.WIFI_STATE_DISABLING,
+                     intents.get(0).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+
         assertEquals(WifiManager.WIFI_STATE_DISABLED,
-                     intents.get(0).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
+                     intents.get(1).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
 
         order.verify(mWifiNative).stopSupplicant();
         order.verify(mWifiNative).closeSupplicantConnection();
         order.verify(mWifiMonitor).stopAllMonitoring();
         order.verify(mContext).sendBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        assertFalse(intents.get(1).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, true));
+        intents = intent.getAllValues();
+        assertFalse(intents.get(2).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, true));
+        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        intents = intent.getAllValues();
+        assertEquals(WifiManager.WIFI_STATE_DISABLED,
+                     intents.get(3).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
     }
 
     /**
@@ -268,17 +281,13 @@ public class ClientModeManagerTest {
     @Test
     public void handlesWificondInterfaceDeath() throws Exception {
         startClientModeAndVerifyEnabled();
+
         ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
 
         when(mWifiNative.stopSupplicant()).thenReturn(true);
         mDeathListenerCaptor.getValue().binderDied();
         mLooper.dispatchAll();
-        InOrder order = inOrder(mListener, mContext);
-        order.verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        assertEquals(WifiManager.WIFI_STATE_DISABLED,
-                     intent.getValue().getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE,
-                                                   WifiManager.WIFI_STATE_ENABLED));
+        verifyClientModeDisabled();
     }
 
     /**
@@ -291,29 +300,24 @@ public class ClientModeManagerTest {
     public void handlesInterfaceDownWhenStarted() throws Exception  {
         ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
         startClientModeAndVerifyEnabled();
+        reset(mContext);
+        reset(mListener);
         when(mWifiNative.stopSupplicant()).thenReturn(true);
 
         mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, false);
         mLooper.dispatchAll();
 
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
-        InOrder order = inOrder(mListener, mContext);
-        order.verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        assertEquals(WifiManager.WIFI_STATE_DISABLED,
-                     intent.getValue().getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE,
-                                                   WifiManager.WIFI_STATE_ENABLED));
+        verifyClientModeDisabled();
     }
 
     /**
      * Test ClientModeManager ignores a CMD_STOP in idle mode.
      *
-     * Expectation: ClientModeManager should do make extra calls to clean up if the interface down
+     * Expectation: ClientModeManager should not make extra calls to clean up if the interface down
      * notification is delivered twice while active.
      */
     @Test
     public void handlesDuplicateInterfaceDown() throws Exception  {
-        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
         startClientModeAndVerifyEnabled();
 
         when(mWifiNative.stopSupplicant()).thenReturn(true);
@@ -324,42 +328,7 @@ public class ClientModeManagerTest {
         mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, false);
         mLooper.dispatchAll();
 
-        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
-        InOrder order = inOrder(mListener, mContext);
-        order.verify(mListener).onStateChanged(WifiManager.WIFI_STATE_UNKNOWN);
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        assertEquals(WifiManager.WIFI_STATE_DISABLED,
-                     intent.getValue().getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE,
-                                                   WifiManager.WIFI_STATE_ENABLED));
-    }
-
-    /**
-     * Test that a message from a previous instance of NetworkObserver does not stop ClientMode.
-     *
-     * This test creates a Clientmanager and verifies the mode, then holds on to the previous
-     * NetworkObserver to use for an out of date callback.  The message created from this callback
-     * should be dropped and the ClientModeManager should remain active.
-     */
-    @Test
-    public void startClientModeTwiceAndTriggerOldNetworkObserverStaysActive() throws Exception {
-        startClientModeAndVerifyEnabled();
-        BaseNetworkObserver firstNetworkObserver = mNetworkObserverCaptor.getValue();
-
-        when(mWifiNative.stopSupplicant()).thenReturn(true);
-        mClientModeManager.stop();
-        mLooper.dispatchAll();
-
-        // now start another ClientModeManager
-        startClientModeAndVerifyEnabled();
-
-        // clear expectations for mContext since we should not be updating anything when we get the
-        // old interface status change.
-        reset(mContext);
-        // now trigger callback on old NetworkObserver
-        firstNetworkObserver.interfaceLinkStateChanged(TEST_INTERFACE_NAME, false);
-        mLooper.dispatchAll();
-        // since we drop the interface status change, we should not signal that wifi status changed
-        verify(mContext, never()).sendStickyBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
+        verifyClientModeDisabled();
     }
 
     /**
@@ -383,6 +352,11 @@ public class ClientModeManagerTest {
         mClientModeManager.start();
         mLooper.dispatchAll();
 
+        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        List<Intent> intents = intent.getAllValues();
+        assertEquals(WifiManager.WIFI_STATE_ENABLING,
+                     intents.get(0).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+
         order.verify(mClientInterfaceBinder).linkToDeath(mDeathListenerCaptor.capture(), eq(0));
         order.verify(mNmService).registerObserver(mNetworkObserverCaptor.capture());
         mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, true);
@@ -391,12 +365,16 @@ public class ClientModeManagerTest {
         mLooper.dispatchAll();
 
         order.verify(mContext).sendBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        List<Intent> intents = intent.getAllValues();
-        assertTrue(intents.get(0).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
+        intents = intent.getAllValues();
+        assertTrue(intents.get(1).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
 
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        order.verify(mContext, times(2)).sendStickyBroadcastAsUser(intent.capture(),
+                                                                   eq(UserHandle.ALL));
+        intents = intent.getAllValues();
         assertEquals(WifiManager.WIFI_STATE_ENABLED,
-                     intents.get(1).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
+                     intents.get(2).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+        assertEquals(WifiManager.WIFI_STATE_ENABLED,
+                     intents.get(3).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
     }
 
     /**
@@ -404,6 +382,7 @@ public class ClientModeManagerTest {
      *
      * This method creates a ClientManager and verifies that the broadcasts for supplicant
      * connected and scanning available are send.
+     * Note: Resets expectations on mContext and mListener.
      */
     protected void startClientModeAndVerifyEnabled() throws Exception {
         InOrder order = inOrder(mListener, mClientInterfaceBinder, mClientInterface,
@@ -417,6 +396,11 @@ public class ClientModeManagerTest {
         mClientModeManager.start();
         mLooper.dispatchAll();
 
+        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        List<Intent> intents = intent.getAllValues();
+        assertEquals(WifiManager.WIFI_STATE_ENABLING,
+                     intents.get(0).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+
         order.verify(mClientInterfaceBinder).linkToDeath(mDeathListenerCaptor.capture(), eq(0));
         order.verify(mNmService).registerObserver(mNetworkObserverCaptor.capture());
         mNetworkObserverCaptor.getValue().interfaceLinkStateChanged(TEST_INTERFACE_NAME, true);
@@ -425,26 +409,64 @@ public class ClientModeManagerTest {
         mLooper.dispatchAll();
 
         order.verify(mContext).sendBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
-        List<Intent> intents = intent.getAllValues();
-        assertTrue(intents.get(0).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
+        intents = intent.getAllValues();
+        assertTrue(intents.get(1).getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
 
-        order.verify(mContext).sendStickyBroadcastAsUser(intent.capture(), eq(UserHandle.ALL));
+        order.verify(mContext, times(2)).sendStickyBroadcastAsUser(intent.capture(),
+                                                                   eq(UserHandle.ALL));
+        intents = intent.getAllValues();
         assertEquals(WifiManager.WIFI_STATE_ENABLED,
-                     intents.get(1).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
+                     intents.get(2).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+        assertEquals(WifiManager.WIFI_STATE_ENABLED,
+                     intents.get(3).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE, -1));
+
+        // startup verifies several calls, reset mocks after verifications complete.
+        reset(mContext);
+        reset(mListener);
+        reset(mWifiNative);
+        reset(mWifiMonitor);
     }
 
     /**
      * Verifies that ClientMode was not disabled (assuming it was started).
      */
     protected void verifyClientModeNotDisabled() throws Exception {
-        // A single sticky broadcast should be sent when scanning service is enabled.  Any
-        // additional sticky broadcasts would be disabling the scanning service.
-        // Explicitly noted times(1) to make this stand out.
-        verify(mContext, times(1)).sendStickyBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
-        // A single broadcast should be sent when supplicant connects.  Any additional broadcasts
+        // A single sticky broadcast should be sent when scanning service is enabled. In the
+        // startClientModeAndVerifyEnabled helper we reset the expectations on mContext and mLister
+        // so we should not see any additional sticky broadcasts since they would be disabling
+        // the scanning service.
+        verify(mContext, never()).sendStickyBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
+        // A single broadcast should be sent when supplicant connects and is check in the
+        // startClientModeAndVerifyEnabled helper. Any additional broadcasts
         // (not sticky) would be supplicant disconnecting.
-        verify(mContext, times(1)).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
+        verify(mContext, never()).sendBroadcastAsUser(any(Intent.class), eq(UserHandle.ALL));
         verify(mWifiNative, never()).closeSupplicantConnection();
         verify(mWifiMonitor, never()).stopAllMonitoring();
+    }
+
+    /**
+     * Verifies that ClientMode was disabled and proper notifications were sent.
+     * Note: Resets expectations on mContext and mListener.
+     */
+    protected void verifyClientModeDisabled() throws Exception {
+        ArgumentCaptor<Intent> intent = ArgumentCaptor.forClass(Intent.class);
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLING);
+        InOrder order = inOrder(mListener, mContext);
+        order.verify(mContext, times(3)).sendStickyBroadcastAsUser(intent.capture(),
+                                                                   eq(UserHandle.ALL));
+        List<Intent> intents = intent.getAllValues();
+
+        assertEquals(WifiManager.WIFI_STATE_DISABLING,
+                     intents.get(0).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+
+        assertEquals(WifiManager.WIFI_STATE_DISABLED,
+                     intents.get(1).getIntExtra(WifiManager.EXTRA_SCAN_AVAILABLE,
+                                                WifiManager.WIFI_STATE_ENABLED));
+        verify(mListener).onStateChanged(WifiManager.WIFI_STATE_DISABLED);
+        assertEquals(WifiManager.WIFI_STATE_DISABLED,
+                     intents.get(2).getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1));
+        // stopping client mode verifies several calls, reset mocks after verifications complete.
+        reset(mContext);
+        reset(mListener);
     }
 }
