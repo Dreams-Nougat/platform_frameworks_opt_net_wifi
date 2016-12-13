@@ -1,0 +1,75 @@
+Revision: 174ad0d08a27f20f3d93b605d21d941f65dcefb1
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiNativeNew.java
+
+47:50-47:77
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_8f8f660e
+Bytes: 27
+This could be local, right?
+
+47:11-47:20
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_0f84f6f3
+Bytes: 47
+Is there any significance to the extra spacing?
+
+48:34-48:48
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_6f5f6a90
+Bytes: 40
+Should we have Hidl in this name or not?
+
+61:8-61:60
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_efb41a84
+Bytes: 1506
+The old WifiNative has locking in most of its methods. Presumably we will need that as well?
+
+Also, I'm seeing this failure some of the time:
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: WifiStateMachine
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: java.util.NoSuchElementException
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at android.os.HwBinder.getService(Native Method)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at android.hardware.wifi.V1_0.IWifi.getService(IWifi.java:24)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at com.android.server.wifi.WifiNativeNew.startHidlHal(WifiNativeNew.java:61)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at com.android.server.wifi.WifiStateMachine$InitialState.processMessage(WifiStateMachine.java:3989)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at com.android.internal.util.StateMachine$SmHandler.processMsg(StateMachine.java:990)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at com.android.internal.util.StateMachine$SmHandler.handleMessage(StateMachine.java:807)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:102)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:154)
+04-20 00:27:23.669  6154  6358 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:61)
+
+Should I be catching an exception, or should lower levels be catching it and turning it into an error return?
+
+107:40-107:83
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_4fc0ae1e
+Bytes: 89
+Is this what is meant by a lambda in the comment above, or are we talking java 8 lambdas?
+
+123:8-128:45
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_2fd0d2de
+Bytes: 143
+Shortly after I coded this, I saw the ToT post warning against deeply nested for loops. But this seems pretty clear, given the data structures.
+
+129:28-129:32
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_2f2bb2f4
+Bytes: 88
+Could early-out here, if we don't care about the possibility of multiple matches. Do we?
+
+156:16-156:39
+Tue Dec 13 19:10:09 2016 +0000
+Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_ef07fa82
+Bytes: 32
+Is it cool to copy the ref here?
+
