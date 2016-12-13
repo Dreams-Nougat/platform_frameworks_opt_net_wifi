@@ -111,11 +111,27 @@ public class ClientModeManager implements ActiveModeManager {
     /**
      * Update wifi state.
      * @param state new Wifi state
+     * @param prevState previous Wifi state
      */
-    private void updateWifiState(int state) {
+    private void updateWifiState(int state, int prevState) {
         if (mListener != null) {
             mListener.onStateChanged(state);
         }
+        sendWifiStateUpdateBroadcast(state, prevState);
+    }
+
+    /**
+     * Send sticky broadcast to system services with an update to wifi state.
+     *
+     * @param newWifiState the new wifi state
+     * @param prevWifiState the previous wifi state
+     */
+    private void sendWifiStateUpdateBroadcast(int newWifiState, int prevWifiState) {
+        final Intent intent = new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+        intent.putExtra(WifiManager.EXTRA_WIFI_STATE, newWifiState);
+        intent.putExtra(WifiManager.EXTRA_PREVIOUS_WIFI_STATE, prevWifiState);
+        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
     }
 
     private class ClientModeStateMachine extends StateMachine {
@@ -207,10 +223,12 @@ public class ClientModeManager implements ActiveModeManager {
             public boolean processMessage(Message message) {
                 switch (message.what) {
                     case CMD_START:
-                        updateWifiState(WifiManager.WIFI_STATE_ENABLING);
+                        updateWifiState(WifiManager.WIFI_STATE_ENABLING,
+                                                    WifiManager.WIFI_STATE_DISABLED);
                         if (!mDeathRecipient.linkToDeath(mClientInterface.asBinder())) {
                             mDeathRecipient.unlinkToDeath();
-                            updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
+                            updateWifiState(WifiManager.WIFI_STATE_DISABLED,
+                                            WifiManager.WIFI_STATE_ENABLING);
                             break;
                         }
 
@@ -221,7 +239,8 @@ public class ClientModeManager implements ActiveModeManager {
                         } catch (RemoteException e) {
                             mDeathRecipient.unlinkToDeath();
                             unregisterObserver();
-                            updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
+                            updateWifiState(WifiManager.WIFI_STATE_DISABLED,
+                                            WifiManager.WIFI_STATE_ENABLING);
                             break;
                         }
 
@@ -236,7 +255,8 @@ public class ClientModeManager implements ActiveModeManager {
                                 Log.e(TAG, "Failed to start supplicant!");
                                 mDeathRecipient.unlinkToDeath();
                                 unregisterObserver();
-                                updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
+                                updateWifiState(WifiManager.WIFI_STATE_DISABLED,
+                                                WifiManager.WIFI_STATE_ENABLING);
                                 break;
                             }
                             registerWifiMonitorHandlers();
@@ -245,7 +265,11 @@ public class ClientModeManager implements ActiveModeManager {
                             Log.e(TAG, "RemoteException when starting supplicant");
                             mDeathRecipient.unlinkToDeath();
                             unregisterObserver();
-                            updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
+                            mWifiNative.stopSupplicant();
+                            mWifiNative.closeSupplicantConnection();
+
+                            updateWifiState(WifiManager.WIFI_STATE_DISABLED,
+                                            WifiManager.WIFI_STATE_ENABLING);
                             break;
                         }
                         mStartCalled = true;
@@ -269,6 +293,10 @@ public class ClientModeManager implements ActiveModeManager {
                         mStartCalled = false;
                         transitionTo(mStartedState);
                         break;
+                    case WifiMonitor.SUP_DISCONNECTION_EVENT:
+                        // we are not in the started state so it is ok to drop this.
+                        Log.d(TAG, "received supplicant disconnect event when idle, ignoring");
+                        break;
                     case CMD_STOP:
                         // We are not in an active mode and the only way to receive a CMD_STOP is if
                         // we were listening to interface down when we were running.  This should be
@@ -285,31 +313,31 @@ public class ClientModeManager implements ActiveModeManager {
 
         private class StartedState extends State {
 
-            private void onUpChanged(boolean isUp) {
+            /**
+             * Helper method to handle interface changes.
+             *
+             * @param boolean interface status.  up = true
+             * @return boolean returns true if the interface has changed and ClientMode needs to
+             * react.
+             */
+            private boolean onUpChanged(boolean isUp) {
                 if (isUp == mIfaceIsUp) {
-                    return;  // no change
+                    return false;  // no change
                 }
                 mIfaceIsUp = isUp;
-                if (isUp) {
-                    Log.d(TAG, "Wifi is ready to use for client mode");
-                    updateWifiState(WifiManager.WIFI_STATE_ENABLED);
-                    sendScanAvailableBroadcast(true);
-                } else {
-                    // if the interface goes down we should exit and go back to idle state.
-                    mStateMachine.sendMessage(CMD_STOP);
-                }
+                return true;
             }
 
             @Override
             public void enter() {
                 Log.d(TAG, "entering StartedState");
-                updateWifiState(WifiManager.WIFI_STATE_ENABLED);
                 sendSupplicantConnectionChangedBroadcast(true);
 
                 if (mIfaceIsUp) {
                     // we already received the interface up notification when we were starting
                     // supplicant.
-                    updateWifiState(WifiManager.WIFI_STATE_ENABLED);
+                    updateWifiState(WifiManager.WIFI_STATE_ENABLED,
+                                    WifiManager.WIFI_STATE_ENABLING);
                     sendScanAvailableBroadcast(true);
                 }
             }
@@ -319,23 +347,39 @@ public class ClientModeManager implements ActiveModeManager {
                 switch (message.what) {
                     case CMD_INTERFACE_STATUS_CHANGED:
                         if (message.obj != mNetworkObserver) {
+                            Log.d(TAG, "got a message for an old networkobserver.");
                             // This is not from our current observer
                             break;
                         }
                         boolean isUp = message.arg1 == 1;
-                        onUpChanged(isUp);
+                        if (onUpChanged(isUp)) {
+                            if (isUp) {
+                                // interface changed from down to up.  we should indicate we are
+                                // ready for ClientMode and send out updates.
+                                Log.d(TAG, "Wifi is ready to use for client mode");
+                                updateWifiState(WifiManager.WIFI_STATE_ENABLED,
+                                                WifiManager.WIFI_STATE_ENABLING);
+                                sendScanAvailableBroadcast(true);
+                            } else {
+                                // interface has gone down, we need to stop ClientMode.
+                                transitionTo(mIdleState);
+                            }
+                        }
                         break;
                     case CMD_START:
                         // Already started, ignore this command.
                         break;
                     case CMD_CLIENT_INTERFACE_BINDER_DEATH:
                         Log.d(TAG, "interface binder death!  restart services?");
-                        updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
                         transitionTo(mIdleState);
                         break;
                     case CMD_STOP:
                         Log.d(TAG, "Stopping client mode.");
-                        updateWifiState(WifiManager.WIFI_STATE_UNKNOWN);
+                        transitionTo(mIdleState);
+                        break;
+                    case WifiMonitor.SUP_DISCONNECTION_EVENT:
+                        // Supplicant disconnected, we should stop
+                        Log.d(TAG, "received supplicant disconnect.  Stop client mode.");
                         transitionTo(mIdleState);
                         break;
                     default:
@@ -349,8 +393,8 @@ public class ClientModeManager implements ActiveModeManager {
              */
             @Override
             public void exit() {
-                // let system know wifi is disabled
-                updateWifiState(WifiManager.WIFI_STATE_DISABLING);
+                // let system know wifi is disabling
+                updateWifiState(WifiManager.WIFI_STATE_DISABLING, WifiManager.WIFI_STATE_ENABLED);
                 // let WifiScanner know that wifi is down.
                 sendScanAvailableBroadcast(false);
 
@@ -366,6 +410,8 @@ public class ClientModeManager implements ActiveModeManager {
                 mWifiNative.closeSupplicantConnection();
                 mWifiMonitor.stopAllMonitoring();
                 sendSupplicantConnectionChangedBroadcast(false);
+                // let system know wifi is disabled
+                updateWifiState(WifiManager.WIFI_STATE_DISABLED, WifiManager.WIFI_STATE_DISABLING);
             }
         }
 
