@@ -76,7 +76,8 @@ LOCAL_JAVA_LIBRARIES := \
 LOCAL_STATIC_JAVA_LIBRARIES := \
 	android.hardware.wifi@1.0-java-static \
 	android.hardware.wifi.supplicant@1.0-java-static \
-	android.hidl.base@1.0-java-static
+	android.hidl.base@1.0-java-static \
+	android.hidl.manager@1.0-java
 LOCAL_REQUIRED_MODULES := services
 LOCAL_MODULE_TAGS :=
 LOCAL_MODULE := wifi-service
