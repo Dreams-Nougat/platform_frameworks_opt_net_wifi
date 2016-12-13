@@ -1028,15 +1028,15 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     }
 
     /**
-     * Add a Passpoint configuration.
+     * Add or update a Passpoint configuration.
      *
      * @param config The Passpoint configuration to be added
      * @return true on success or false on failure
      */
     @Override
-    public boolean addPasspointConfiguration(PasspointConfiguration config) {
+    public boolean addOrUpdatePasspointConfiguration(PasspointConfiguration config) {
         enforceChangePermission();
-        return mPasspointManager.addProvider(config);
+        return mPasspointManager.addOrUpdateProvider(config);
     }
 
     /**
@@ -1054,7 +1054,9 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     /**
      * Return the list of the installed Passpoint configurations.
      *
-     * @return A list of {@link PasspointConfiguration} or null
+     * An empty list will be returned when no configuration is installed.
+     *
+     * @return A list of {@link PasspointConfiguration}
      */
     @Override
     public List<PasspointConfiguration> getPasspointConfigurations() {
