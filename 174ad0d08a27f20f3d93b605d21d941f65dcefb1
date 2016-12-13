@@ -45,6 +45,15 @@ Also, I'm seeing this failure some of the time:
 
 Should I be catching an exception, or should lower levels be catching it and turning it into an error return?
 
+67:28-67:46
+Tue Dec 13 19:19:36 2016 +0000
+Author: Roshan Pius <1074459@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: fa632f25_4a56dcea
+Bytes: 199
+We should catch RemoteException for these binder calls
+:
+https://cs.corp.google.com/android/frameworks/base/core/java/android/os/RemoteException.java?type=cs&q=RemoteException&sq=package:android&l=24
+
 107:40-107:83
 Tue Dec 13 19:10:09 2016 +0000
 Author: Michael Plass <1126614@85c56323-6fa9-3386-8a01-6480fb634889>
