@@ -3719,6 +3719,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                     break;
                 case CMD_BOOT_COMPLETED:
                     maybeRegisterNetworkFactory();
+                    mWifiNativeNew.registerForServiceNotification();
                     break;
                 case CMD_SCREEN_STATE_CHANGED:
                     handleScreenStateChanged(message.arg1 != 0);
@@ -4128,6 +4129,10 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
             if (mVerboseLoggingEnabled) {
                 logd("SupplicantStartedState enter");
             }
+
+            /*if (!mWifiNativeNew.startSupplicantHidl()) {
+                Log.e(TAG, "Failed to start HIDL Supplicant Interface");
+            }*/
 
             /* Wifi is available as long as we have a connection to supplicant */
             mNetworkInfo.setIsAvailable(true);
