@@ -92,9 +92,8 @@ public class ClientModeManager implements ActiveModeManager {
      * Disconnect from any currently connected networks and stop client mode.
      */
     public void stop() {
-        // Explicitly exit the current state.  This is a no-op if it is not running, otherwise it
-        // will stop and clean up the state.
-        mStateMachine.getCurrentState().exit();
+        // Explicitly exit the StartedState.
+        mStateMachine.stopNow();
     }
 
     /**
@@ -178,6 +177,9 @@ public class ClientModeManager implements ActiveModeManager {
                                          getHandler());
             mWifiMonitor.registerHandler(mClientInterface.getInterfaceName(),
                                          WifiMonitor.SUP_DISCONNECTION_EVENT,
+                                         getHandler());
+            mWifiMonitor.registerHandler(mClientInterface.getInterfaceName(),
+                                         WifiMonitor.SUPPLICANT_STATE_CHANGE_EVENT,
                                          getHandler());
         }
 
@@ -339,6 +341,9 @@ public class ClientModeManager implements ActiveModeManager {
                     updateWifiState(WifiManager.WIFI_STATE_ENABLED,
                                     WifiManager.WIFI_STATE_ENABLING);
                     sendScanAvailableBroadcast(true);
+
+                    // Since Wifi is ready, head to Disconnected state.
+                    transitionTo(mDisconnectedState);
                 }
             }
 
@@ -360,6 +365,9 @@ public class ClientModeManager implements ActiveModeManager {
                                 updateWifiState(WifiManager.WIFI_STATE_ENABLED,
                                                 WifiManager.WIFI_STATE_ENABLING);
                                 sendScanAvailableBroadcast(true);
+
+                                // we are ready to go, head to disconnected state.
+                                transitionTo(mDisconnectedState);
                             } else {
                                 // interface has gone down, we need to stop ClientMode.
                                 transitionTo(mIdleState);
@@ -497,6 +505,10 @@ public class ClientModeManager implements ActiveModeManager {
         private class DisconnectedState extends State {
             @Override
             public void enter() {
+                Log.d(TAG, "entering DisconnectedState");
+                // TODO: is this the best place?
+                //mWifiConnectivityManager.handleConnectionStateChanged(
+                //        WifiConnectivityManager.WIFI_STATE_DISCONNECTED);
             }
 
             @Override
@@ -548,6 +560,13 @@ public class ClientModeManager implements ActiveModeManager {
 
         private void logStateAndMessage(Message message, State state) {
             Log.d(TAG, state.getClass().getSimpleName() + " " + getLogRecString(message));
+        }
+
+        protected void stopNow() {
+            if (getCurrentState() != mIdleState) {
+                Log.d(TAG, "Calling StartedState.exit to stop client mode now");
+                mStartedState.exit();
+            }
         }
     }
 }
