@@ -1,0 +1,22 @@
+Revision: 434dc1e87bdb8050571848197a617b2c9c3e7db2
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiNativeNew.java
+
+64:28-64:52
+Wed Dec 14 23:56:40 2016 +0000
+Author: Steven Moreland <1120458@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_47c8b610
+Bytes: 53
+can you put TODO(b/33639391) here please?
+
+Thank you.
+
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+3722:35-3722:65
+Wed Dec 14 23:56:40 2016 +0000
+Author: Steven Moreland <1120458@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_27310247
+Bytes: 18
+check return value
+
