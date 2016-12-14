@@ -21,6 +21,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import android.net.wifi.aware.ConfigRequest;
 import android.net.wifi.aware.PublishConfig;
@@ -31,6 +32,7 @@ import android.os.Bundle;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.android.server.wifi.HalMockUtils;
+import com.android.server.wifi.WifiInjector;
 import com.android.server.wifi.WifiNative;
 
 import libcore.util.HexEncoding;
@@ -44,18 +46,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.lang.reflect.Field;
-
 /**
  * Unit test harness for WifiAwareNative + JNI code interfacing to the HAL.
  */
 @SmallTest
 public class WifiAwareHalTest {
-    private WifiAwareNative mDut = WifiAwareNative.getInstance();
+    private WifiAwareNative mDut;
     private ArgumentCaptor<String> mArgs = ArgumentCaptor.forClass(String.class);
 
-    @Mock
-    private WifiAwareHalMock mAwareHalMock;
+    @Mock private WifiInjector mMockInjector;
+    @Mock private WifiAwareHalMock mAwareHalMock;
     @Mock private WifiAwareStateManager mAwareStateManager;
 
     @Rule
@@ -65,13 +65,15 @@ public class WifiAwareHalTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        resetWifiAwareNative();
+        when(mMockInjector.getWifiAwareStateManager()).thenReturn(mAwareStateManager);
+
+        mDut = new WifiAwareNative(mMockInjector, false);
+        when(mMockInjector.getWifiAwareNative()).thenReturn(mDut);
 
         HalMockUtils.initHalMockLibrary();
         WifiAwareHalMock.initAwareHalMockLibrary(mDut);
         WifiAwareNative.initAwareHandlersNative(WifiNative.class, WifiNative.sWlan0Index);
         HalMockUtils.setHalMockObject(mAwareHalMock);
-        installMockAwareStateManager(mAwareStateManager);
     }
 
     @Test
@@ -1217,18 +1219,5 @@ public class WifiAwareHalTest {
             collector.checkThat("ndp id #" + i, ndpIdsCaptor.getAllValues().get(i),
                     equalTo(ndpIdBase + i));
         }
-    }
-
-    private static void installMockAwareStateManager(WifiAwareStateManager awareStateManager)
-            throws Exception {
-        Field field = WifiAwareStateManager.class.getDeclaredField("sAwareStateManagerSingleton");
-        field.setAccessible(true);
-        field.set(null, awareStateManager);
-    }
-
-    private static void resetWifiAwareNative() throws Exception {
-        Field field = WifiAwareNative.class.getDeclaredField("sWifiAwareNativeSingleton");
-        field.setAccessible(true);
-        field.set(null, null);
     }
 }

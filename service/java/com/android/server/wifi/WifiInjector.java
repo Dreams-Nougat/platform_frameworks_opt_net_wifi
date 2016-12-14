@@ -42,6 +42,8 @@ import com.android.internal.R;
 import com.android.server.am.BatteryStatsService;
 import com.android.server.net.DelayedDiskWrite;
 import com.android.server.net.IpConfigStore;
+import com.android.server.wifi.aware.WifiAwareNative;
+import com.android.server.wifi.aware.WifiAwareStateManager;
 import com.android.server.wifi.hotspot2.PasspointManager;
 import com.android.server.wifi.hotspot2.PasspointObjectFactory;
 import com.android.server.wifi.util.WifiPermissionsUtil;
@@ -103,6 +105,9 @@ public class WifiInjector {
     private final WifiPermissionsUtil mWifiPermissionsUtil;
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
+    private WifiAwareStateManager mWifiAwareStateManager;
+    private WifiAwareNative mWifiAwareNative;
+    private HandlerThread mWifiAwareHandlerThread;
 
     private final boolean mUseRealLogger;
 
@@ -399,5 +404,39 @@ public class WifiInjector {
 
     public WifiPermissionsWrapper getWifiPermissionsWrapper() {
         return mWifiPermissionsWrapper;
+    }
+
+    /**
+     * Returns a singleton instance of WifiAwareStateManager for injection. Uses lazy
+     * initialization.
+     */
+    public WifiAwareStateManager getWifiAwareStateManager() {
+        if (mWifiAwareStateManager == null) { // lazy initialization
+            mWifiAwareStateManager = new WifiAwareStateManager(this);
+        }
+        return mWifiAwareStateManager;
+    }
+
+    /**
+     * Returns a singleton instance of WifiAwareNative for injection. Uses lazy initialization.
+     */
+    public WifiAwareNative getWifiAwareNative() {
+        if (mWifiAwareNative == null) { // lazy initialization
+            mWifiAwareNative = new WifiAwareNative(this, true);
+        }
+        return mWifiAwareNative;
+    }
+
+    /**
+     * Returns a singleton instance of a HandlerThread for injection. Uses lazy initialization.
+     *
+     * TODO: share worker thread with other Wi-Fi handlers (b/27924886)
+     */
+    public HandlerThread getmWifiAwareHandlerThread() {
+        if (mWifiAwareHandlerThread == null) { // lazy initialization
+            mWifiAwareHandlerThread = new HandlerThread("wifiAwareService");
+            mWifiAwareHandlerThread.start();
+        }
+        return mWifiAwareHandlerThread;
     }
 }

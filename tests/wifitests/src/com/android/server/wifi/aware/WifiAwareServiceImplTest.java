@@ -37,11 +37,14 @@ import android.net.wifi.aware.IWifiAwareEventCallback;
 import android.net.wifi.aware.PublishConfig;
 import android.net.wifi.aware.SubscribeConfig;
 import android.net.wifi.aware.WifiAwareCharacteristics;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
+
+import com.android.server.wifi.WifiInjector;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +66,8 @@ public class WifiAwareServiceImplTest {
     private int mDefaultUid = 1500;
 
     @Mock
+    WifiInjector mMockInjector;
+    @Mock
     private Context mContextMock;
     @Mock
     private PackageManager mPackageManagerMock;
@@ -74,6 +79,8 @@ public class WifiAwareServiceImplTest {
     private IWifiAwareEventCallback mCallbackMock;
     @Mock
     private IWifiAwareDiscoverySessionCallback mSessionCallbackMock;
+
+    private HandlerThread mHandlerThread;
 
     /**
      * Using instead of spy to avoid native crash failures - possibly due to
@@ -103,25 +110,20 @@ public class WifiAwareServiceImplTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        when(mMockInjector.getWifiAwareStateManager()).thenReturn(mAwareStateManagerMock);
+        mHandlerThread = new HandlerThread("wifiAwareServiceUnitTest");
+        mHandlerThread.start();
+        when(mMockInjector.getmWifiAwareHandlerThread()).thenReturn(mHandlerThread);
+
         when(mContextMock.getApplicationContext()).thenReturn(mContextMock);
         when(mContextMock.getPackageManager()).thenReturn(mPackageManagerMock);
         when(mPackageManagerMock.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE))
                 .thenReturn(true);
         when(mAwareStateManagerMock.getCharacteristics()).thenReturn(getCharacteristics());
 
-        installMockAwareStateManager();
-
         mDut = new WifiAwareServiceImplSpy(mContextMock);
         mDut.fakeUid = mDefaultUid;
-    }
-
-    /**
-     * Validate start() function: passes a valid looper.
-     */
-    @Test
-    public void testStart() {
-        mDut.start();
-
+        mDut.start(mMockInjector);
         verify(mAwareStateManagerMock).start(eq(mContextMock), any(Looper.class));
     }
 
@@ -652,13 +654,6 @@ public class WifiAwareServiceImplTest {
                 eq(false));
 
         return clientId.getValue();
-    }
-
-    private void installMockAwareStateManager()
-            throws Exception {
-        Field field = WifiAwareStateManager.class.getDeclaredField("sAwareStateManagerSingleton");
-        field.setAccessible(true);
-        field.set(null, mAwareStateManagerMock);
     }
 
     private static WifiAwareCharacteristics getCharacteristics() {
