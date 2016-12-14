@@ -28,12 +28,13 @@ import android.net.wifi.aware.SubscribeConfig;
 import android.net.wifi.aware.WifiAwareCharacteristics;
 import android.net.wifi.aware.WifiAwareDiscoveryBaseSession;
 import android.os.Binder;
-import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
+
+import com.android.server.wifi.WifiInjector;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -51,6 +52,7 @@ public class WifiAwareServiceImpl extends IWifiAwareManager.Stub {
     private static final boolean VDBG = false; // STOPSHIP if true
 
     private Context mContext;
+    private WifiInjector mWifiInjector;
     private WifiAwareStateManager mStateManager;
 
     private final Object mLock = new Object();
@@ -62,7 +64,6 @@ public class WifiAwareServiceImpl extends IWifiAwareManager.Stub {
 
     public WifiAwareServiceImpl(Context context) {
         mContext = context.getApplicationContext();
-        mStateManager = WifiAwareStateManager.getInstance();
     }
 
     /**
@@ -77,14 +78,11 @@ public class WifiAwareServiceImpl extends IWifiAwareManager.Stub {
      * Start the service: allocate a new thread (for now), start the handlers of
      * the components of the service.
      */
-    public void start() {
+    public void start(WifiInjector wifiInjector) {
         Log.i(TAG, "Starting Wi-Fi Aware service");
 
-        // TODO: share worker thread with other Wi-Fi handlers (b/27924886)
-        HandlerThread wifiAwareThread = new HandlerThread("wifiAwareService");
-        wifiAwareThread.start();
-
-        mStateManager.start(mContext, wifiAwareThread.getLooper());
+        mStateManager = wifiInjector.getWifiAwareStateManager();
+        mStateManager.start(mContext, wifiInjector.getmWifiAwareHandlerThread().getLooper());
     }
 
     /**
