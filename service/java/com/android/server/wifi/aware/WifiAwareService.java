@@ -20,6 +20,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.server.SystemService;
+import com.android.server.wifi.WifiInjector;
 
 /**
  * Service implementing Wi-Fi Aware functionality. Delegates actual interface
@@ -43,7 +44,12 @@ public final class WifiAwareService extends SystemService {
     @Override
     public void onBootPhase(int phase) {
         if (phase == SystemService.PHASE_SYSTEM_SERVICES_READY) {
-            mImpl.start();
+            WifiInjector wifiInjector = WifiInjector.getInstance();
+            if (wifiInjector == null) {
+                Log.e(TAG, "onBootPhase(PHASE_SYSTEM_SERVICES_READY): NULL injector!");
+                return;
+            }
+            mImpl.start(wifiInjector);
         } else if (phase == SystemService.PHASE_BOOT_COMPLETED) {
             mImpl.startLate();
         }

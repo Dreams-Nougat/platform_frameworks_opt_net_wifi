@@ -58,6 +58,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
+import com.android.server.wifi.WifiInjector;
+
 import libcore.util.HexEncoding;
 
 import org.junit.Before;
@@ -69,7 +71,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -83,6 +84,7 @@ public class WifiAwareStateManagerTest {
     private TestLooper mMockLooper;
     private Random mRandomNg = new Random(15687);
     private WifiAwareStateManager mDut;
+    @Mock private WifiInjector mMockInjector;
     @Mock private WifiAwareNative mMockNative;
     @Mock private Context mMockContext;
     @Mock private AppOpsManager mMockAppOpsManager;
@@ -102,6 +104,8 @@ public class WifiAwareStateManagerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        when(mMockInjector.getWifiAwareNative()).thenReturn(mMockNative);
+
         mAlarmManager = new TestAlarmManager();
         when(mMockContext.getSystemService(Context.ALARM_SERVICE))
                 .thenReturn(mAlarmManager.getAlarmManager());
@@ -120,7 +124,8 @@ public class WifiAwareStateManagerTest {
 
         mMockLooper = new TestLooper();
 
-        mDut = installNewAwareStateManager();
+        mDut = new WifiAwareStateManager(mMockInjector);
+        when(mMockInjector.getWifiAwareStateManager()).thenReturn(mDut);
         mDut.start(mMockContext, mMockLooper.getLooper());
         installMocksInStateManager(mDut, mMockAwareRttStateManager, mMockAwareDataPathStatemanager);
 
@@ -135,8 +140,6 @@ public class WifiAwareStateManagerTest {
         when(mMockNative.stopPublish(anyShort(), anyInt())).thenReturn(true);
         when(mMockNative.stopSubscribe(anyShort(), anyInt())).thenReturn(true);
         when(mMockNative.getCapabilities(anyShort())).thenReturn(true);
-
-        installMockWifiAwareNative(mMockNative);
     }
 
     /**
@@ -2506,20 +2509,6 @@ public class WifiAwareStateManagerTest {
      * Utilities
      */
 
-    private static WifiAwareStateManager installNewAwareStateManager()
-            throws Exception {
-        Constructor<WifiAwareStateManager> ctr =
-                WifiAwareStateManager.class.getDeclaredConstructor();
-        ctr.setAccessible(true);
-        WifiAwareStateManager awareStateManager = ctr.newInstance();
-
-        Field field = WifiAwareStateManager.class.getDeclaredField("sAwareStateManagerSingleton");
-        field.setAccessible(true);
-        field.set(null, awareStateManager);
-
-        return WifiAwareStateManager.getInstance();
-    }
-
     private static void installMocksInStateManager(WifiAwareStateManager awareStateManager,
             WifiAwareRttStateManager mockRtt, WifiAwareDataPathStateManager mockDpMgr)
             throws Exception {
@@ -2530,12 +2519,6 @@ public class WifiAwareStateManagerTest {
         field = WifiAwareStateManager.class.getDeclaredField("mDataPathMgr");
         field.setAccessible(true);
         field.set(awareStateManager, mockDpMgr);
-    }
-
-    private static void installMockWifiAwareNative(WifiAwareNative obj) throws Exception {
-        Field field = WifiAwareNative.class.getDeclaredField("sWifiAwareNativeSingleton");
-        field.setAccessible(true);
-        field.set(null, obj);
     }
 
     private static WifiAwareClientState getInternalClientState(WifiAwareStateManager dut,
