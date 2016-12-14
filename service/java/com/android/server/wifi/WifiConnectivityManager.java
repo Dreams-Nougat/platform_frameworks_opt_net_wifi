@@ -29,7 +29,6 @@ import android.net.wifi.WifiScanner.PnoSettings;
 import android.net.wifi.WifiScanner.ScanSettings;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.util.LocalLog;
 
 import com.android.internal.R;
@@ -116,10 +115,6 @@ public class WifiConnectivityManager {
     public static final int WIFI_STATE_CONNECTED = 1;
     public static final int WIFI_STATE_DISCONNECTED = 2;
     public static final int WIFI_STATE_TRANSITIONING = 3;
-
-    // Saved network evaluator priority
-    private static final int SAVED_NETWORK_EVALUATOR_PRIORITY = 1;
-    private static final int EXTERNAL_SCORE_EVALUATOR_PRIORITY = 2;
 
     private final WifiStateMachine mStateMachine;
     private final WifiScanner mScanner;
@@ -516,16 +511,6 @@ public class WifiConnectivityManager {
                     + " sameNetworkBonus " + mSameNetworkBonus
                     + " secureNetworkBonus " + mSecureBonus
                     + " initialScoreMax " + mInitialScoreMax);
-
-        // Register the network evaluators
-        mNetworkSelector.registerNetworkEvaluator(savedNetworkEvaluator,
-                SAVED_NETWORK_EVALUATOR_PRIORITY);
-        final WifiNetworkSelector.NetworkEvaluator networkEvaluator =
-                frameworkFacade.getIntegerSetting(context,
-                        Settings.Global.NETWORK_RECOMMENDATIONS_ENABLED, 0) == 1
-                        ? recommendedNetworkEvaluator : externalScoreEvaluator;
-        mNetworkSelector.registerNetworkEvaluator(networkEvaluator,
-                EXTERNAL_SCORE_EVALUATOR_PRIORITY);
 
         // Register for all single scan results
         mScanner.registerScanListener(mAllSingleScanListener);

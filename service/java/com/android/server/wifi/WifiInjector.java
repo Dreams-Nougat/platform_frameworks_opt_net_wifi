@@ -59,6 +59,10 @@ public class WifiInjector {
     private static final String BOOT_DEFAULT_WIFI_COUNTRY_CODE = "ro.boot.wificountrycode";
     private static final String WIFICOND_SERVICE_NAME = "wificond";
 
+    // Saved network evaluator priority
+    private static final int SAVED_NETWORK_EVALUATOR_PRIORITY = 1;
+    private static final int EXTERNAL_SCORE_EVALUATOR_PRIORITY = 2;
+
     static WifiInjector sWifiInjector = null;
 
     private final Context mContext;
@@ -170,6 +174,17 @@ public class WifiInjector {
                 mContext, mWifiConfigManager, mWifiNetworkScoreCache, mClock, localLog);
         mRecommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
                 mWifiNetworkScoreCache, mNetworkScoreManager, mWifiConfigManager, localLog);
+
+        // Register the network evaluators
+        mWifiNetworkSelector.registerNetworkEvaluator(mSavedNetworkEvaluator,
+                SAVED_NETWORK_EVALUATOR_PRIORITY);
+        final WifiNetworkSelector.NetworkEvaluator networkEvaluator =
+                mFrameworkFacade.getIntegerSetting(context,
+                        Settings.Global.NETWORK_RECOMMENDATIONS_ENABLED, 0) == 1
+                        ? mRecommendedNetworkEvaluator : mExternalScoreEvaluator;
+        mWifiNetworkSelector.registerNetworkEvaluator(networkEvaluator,
+                EXTERNAL_SCORE_EVALUATOR_PRIORITY);
+
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
                 mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
@@ -178,7 +193,7 @@ public class WifiInjector {
         mNotificationController = new WifiNotificationController(mContext,
                 mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, null, this);
         mWifiWakeupController = new WifiWakeupController(mContext,
-                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
+                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, mWifiNetworkSelector);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
         mWifiController = new WifiController(mContext, mWifiStateMachine, mSettingsStore,
                 mLockManager, mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);

@@ -16,19 +16,33 @@
 
 package com.android.server.wifi;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.WifiScanner;
+import android.net.wifi.WifiSsid;
 import android.os.test.TestLooper;
 import android.provider.Settings;
 
+import com.google.android.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -40,7 +54,30 @@ import java.io.StringWriter;
  * Unit tests for {@link com.android.server.wifi.WifiWakeupController}.
  */
 public class WifiWakeupControllerTest {
-    public static final String TAG = "WifiScanningServiceTest";
+    private static final ScanDetail OPEN_SCAN_DETAIL = buildScanDetail("ssid");
+    private static final ScanDetail SAVED_SCAN_DETAIL = buildScanDetail("ssid1");
+    private static final ScanDetail SAVED_SCAN_DETAIL_EXTERNAL = buildScanDetail("ssid2");
+
+    private static final WifiConfiguration SAVED_WIFI_CONFIGURATION = new WifiConfiguration();
+    private static final WifiConfiguration SAVED_WIFI_CONFIGURATION_EXTERNAL =
+            new WifiConfiguration();
+
+    static {
+        SAVED_WIFI_CONFIGURATION.networkId = 1;
+        SAVED_WIFI_CONFIGURATION.SSID = SAVED_SCAN_DETAIL.getSSID();
+        SAVED_WIFI_CONFIGURATION.getNetworkSelectionStatus().setCandidate(
+                SAVED_SCAN_DETAIL.getScanResult());
+
+        SAVED_WIFI_CONFIGURATION_EXTERNAL.networkId = 2;
+        SAVED_WIFI_CONFIGURATION_EXTERNAL.SSID = SAVED_SCAN_DETAIL_EXTERNAL.getSSID();
+        SAVED_WIFI_CONFIGURATION_EXTERNAL.getNetworkSelectionStatus().setCandidate(
+                SAVED_SCAN_DETAIL_EXTERNAL.getScanResult());
+    }
+
+    private static ScanDetail buildScanDetail(String ssid) {
+        return new ScanDetail(WifiSsid.createFromAsciiEncoded(ssid),
+                "00:00:00:00:00:00", "", 0, 0, 0, 0);
+    }
 
     @Mock private Context mContext;
     @Mock private WifiStateMachine mWifiStateMachine;
@@ -48,31 +85,77 @@ public class WifiWakeupControllerTest {
     @Mock private NotificationManager mNotificationManager;
     @Mock private WifiScanner mWifiScanner;
     @Mock private ContentResolver mContentResolver;
+    @Mock private WifiNetworkSelector mWifiNetworkSelector;
+    @Mock private WifiManager mWifiManager;
+
+    @Captor private ArgumentCaptor<BroadcastReceiver> mBroadcastReceiverCaptor;
+
     private WifiWakeupController mWifiWakeupController;
+    private BroadcastReceiver mBroadcastReceiver;
 
-
-    /** Initialize objects before each test run. */
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        when(mContext.getSystemService(Context.WIFI_SERVICE)).thenReturn(mWifiManager);
         when(mContext.getContentResolver()).thenReturn(mContentResolver);
         when(mFrameworkFacade.getIntegerSetting(mContext,
                 Settings.Global.WIFI_WAKEUP_ENABLED, 0)).thenReturn(1);
         TestLooper testLooper = new TestLooper();
         mWifiWakeupController = new WifiWakeupController(
-                mContext, testLooper.getLooper(), mFrameworkFacade);
+                mContext, testLooper.getLooper(), mFrameworkFacade, mWifiNetworkSelector);
+
+        verify(mContext)
+                .registerReceiver(mBroadcastReceiverCaptor.capture(), any(IntentFilter.class));
+        mBroadcastReceiver = mBroadcastReceiverCaptor.getValue();
     }
 
-    /** Test WifiWakeupEnabledSettingObserver enables feature correctly. */
     @Test
-    public void testEnableWifiWakeup() {
-        assertTrue(mWifiWakeupController.mWifiWakeupEnabled);
+    public void testWifiWakeup_success() {
+        when(mWifiManager.getConfiguredNetworks()).thenReturn(
+                Lists.newArrayList(SAVED_WIFI_CONFIGURATION, SAVED_WIFI_CONFIGURATION_EXTERNAL));
+        mBroadcastReceiver.onReceive(mContext,
+                new Intent(WifiManager.CONFIGURED_NETWORKS_CHANGED_ACTION));
 
+        mBroadcastReceiver.onReceive(mContext, new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION)
+                .putExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED));
+
+        when(mWifiNetworkSelector.selectNetwork(anyListOf(ScanDetail.class), any(WifiInfo.class),
+                eq(false), eq(true), eq(true))).thenReturn(SAVED_WIFI_CONFIGURATION);
+
+        when(mWifiManager.getScanResults())
+                .thenReturn(Lists.newArrayList(SAVED_SCAN_DETAIL.getScanResult()));
+
+        mBroadcastReceiver.onReceive(mContext,
+                new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+        verify(mWifiManager).setWifiEnabled(true);
+    }
+
+    @Test
+    public void testWifiWakeup_noop_featureDisabled() {
         when(mFrameworkFacade.getIntegerSetting(mContext,
                 Settings.Global.WIFI_WAKEUP_ENABLED, 0)).thenReturn(0);
         mWifiWakeupController.mContentObserver.onChange(true);
-        assertFalse(mWifiWakeupController.mWifiWakeupEnabled);
+
+        when(mWifiManager.getConfiguredNetworks()).thenReturn(
+                Lists.newArrayList(SAVED_WIFI_CONFIGURATION, SAVED_WIFI_CONFIGURATION_EXTERNAL));
+        mBroadcastReceiver.onReceive(mContext,
+                new Intent(WifiManager.CONFIGURED_NETWORKS_CHANGED_ACTION));
+
+        mBroadcastReceiver.onReceive(mContext, new Intent(WifiManager.WIFI_STATE_CHANGED_ACTION)
+                .putExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED));
+
+        when(mWifiNetworkSelector.selectNetwork(anyListOf(ScanDetail.class), any(WifiInfo.class),
+                eq(false), eq(true), eq(true))).thenReturn(SAVED_WIFI_CONFIGURATION);
+
+        when(mWifiManager.getScanResults())
+                .thenReturn(Lists.newArrayList(SAVED_SCAN_DETAIL.getScanResult()));
+
+        mBroadcastReceiver.onReceive(mContext,
+                new Intent(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+        verifyZeroInteractions(mWifiManager, mContext, mWifiNetworkSelector);
     }
 
     /** Test dump() does not crash. */
@@ -82,5 +165,4 @@ public class WifiWakeupControllerTest {
         mWifiWakeupController.dump(
                 new FileDescriptor(), new PrintWriter(stringWriter), new String[0]);
     }
-
 }
