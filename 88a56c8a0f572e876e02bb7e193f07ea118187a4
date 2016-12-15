@@ -9,6 +9,14 @@ UUID: ba845725_a24b1dcb
 Bytes: 37
 ACTION_CONNECT_TO_RECOMMENDED_NETWORK
 
+98:24-98:46
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_a24b1dcb
+UUID: ba845725_ee3fbee5
+Bytes: 4
+Done
+
 130:8-130:15
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,12 +24,28 @@ UUID: ba845725_df1e2e48
 Bytes: 23
 mWifiNotificationHelper
 
+130:8-130:15
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_df1e2e48
+UUID: ba845725_0e3df2ed
+Bytes: 4
+Done
+
 140:8-140:26
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_e278b531
 Bytes: 123
 You can revert this back to registering an anonymous class since we don't need the references to mBroadcastReceiver anymore
+
+140:8-140:26
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e278b531
+UUID: ba845725_4e128a78
+Bytes: 4
+Done
 
 172:33-172:40
 Thu Dec 15 03:58:36 2016 +0000
@@ -37,12 +61,28 @@ UUID: ba845725_e24515b6
 Bytes: 42
 add /* broadcastPermission */ next to null
 
+191:62-191:66
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e24515b6
+UUID: ba845725_8e456269
+Bytes: 4
+Done
+
 215:19-215:38
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_42bfc15d
 Bytes: 90
 looks like you don't need the null check here if you have it below in checkGoodOpenNetwork
+
+215:19-215:38
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_42bfc15d
+UUID: ba845725_ee533e2c
+Bytes: 4
+Done
 
 243:33-243:53
 Thu Dec 15 03:58:36 2016 +0000
@@ -51,12 +91,28 @@ UUID: ba845725_82c8d911
 Bytes: 406
 getOpenNetworkRecommendation or something that indicates that we're asking the network recommendation service. Now that I think of it, it might make sense to actually pass the ScoredNetwork object back in the RecommendationResult so that you'll be able to display the right badge here later. Otherwise, you'd have to register a score cache, request the score and wait for it to be updated. Filed b/33649968
 
+243:33-243:53
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_82c8d911
+UUID: ba845725_4e4b6a76
+Bytes: 4
+Done
+
 252
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_822c59ca
 Bytes: 82
 Rearrange logic to "[ESS]".equals(scanResult.capabilities) to avoid the null check
+
+252
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_822c59ca
+UUID: ba845725_2e4e3688
+Bytes: 4
+Done
 
 278:24-278:28
 Thu Dec 15 03:58:36 2016 +0000
@@ -65,6 +121,14 @@ UUID: ba845725_8217f96d
 Bytes: 78
 I think create* is a more common pattern for method names that create objects.
 
+278:24-278:28
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_8217f96d
+UUID: ba845725_4e7d2a83
+Bytes: 4
+Done
+
 303:11-303:15
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -72,12 +136,28 @@ UUID: ba845725_a2031d2a
 Bytes: 15
 make a constant
 
+303:11-303:15
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_a2031d2a
+UUID: ba845725_4eafeac6
+Bytes: 4
+Done
+
 322
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_e2fd15f9
 Bytes: 15
 make a constant
+
+322
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e2fd15f9
+UUID: ba845725_6e0f4e1a
+Bytes: 4
+Done
 
 File: service/java/com/android/server/wifi/WifiNotificationHelper.java
 
@@ -88,6 +168,14 @@ UUID: ba845725_222acd90
 Bytes: 176
 Might be useful to have a constructor that takes in Context so you can store it in a field and not pass it in to every method. It will make using and testing this class cleaner
 
+32
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_222acd90
+UUID: ba845725_8efba2c5
+Bytes: 4
+Done
+
 42:16-42:20
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -95,12 +183,28 @@ UUID: ba845725_4237c1f4
 Bytes: 110
 There are lots of nulls throughout. Please use /* */ comments inline to show the parameter name of the method.
 
+42:16-42:20
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_4237c1f4
+UUID: ba845725_6e510ef1
+Bytes: 4
+Done
+
 92
 Thu Dec 15 03:58:36 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_a245dd68
 Bytes: 72
 extra line. also consider changing all of these methods names to create*
+
+92
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_a245dd68
+UUID: ba845725_ce603abb
+Bytes: 4
+Done
 
 File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
 
@@ -110,6 +214,14 @@ Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_0254e914
 Bytes: 23
 this is a copy of above
+
+103:37-103:62
+Thu Dec 15 20:08:27 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_0254e914
+UUID: ba845725_2e6f16a9
+Bytes: 4
+Done
 
 234
 Thu Dec 15 03:58:36 2016 +0000
