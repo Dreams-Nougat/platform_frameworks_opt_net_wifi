@@ -351,8 +351,7 @@ public class WifiStateMachineTest {
         when(mWifiInjector.getWifiSupplicantControl()).thenReturn(mWifiSupplicantControl);
         when(mWifiInjector.getWifiScanner()).thenReturn(mWifiScanner);
         when(mWifiInjector.getWifiNetworkSelector()).thenReturn(mock(WifiNetworkSelector.class));
-        when(mWifiInjector.makeWifiConnectivityManager(any(WifiInfo.class), anyBoolean()))
-                .thenReturn(mWifiConnectivityManager);
+        when(mWifiInjector.getWifiConnectivityManager()).thenReturn(mWifiConnectivityManager);
 
         when(mWifiNative.getInterfaceName()).thenReturn("mockWlan");
         when(mWifiSupplicantControl.getFrameworkNetworkId(anyInt())).thenReturn(0);
@@ -388,7 +387,7 @@ public class WifiStateMachineTest {
         when(mClientInterface.disableSupplicant()).thenReturn(true);
 
         mWsm = new WifiStateMachine(context, factory, mLooper.getLooper(),
-            mUserManager, mWifiInjector, mBackupManagerProxy, mCountryCode, mWifiNative);
+                mWifiInjector, mBackupManagerProxy, mCountryCode, mWifiNative, new WifiInfo());
         mWsmThread = getWsmHandlerThread(mWsm);
 
         final AsyncChannel channel = new AsyncChannel();

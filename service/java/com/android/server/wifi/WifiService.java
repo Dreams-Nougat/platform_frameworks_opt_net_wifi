@@ -39,9 +39,7 @@ public final class WifiService extends SystemService {
 
     @Override
     public void onBootPhase(int phase) {
-        if (phase == SystemService.PHASE_SYSTEM_SERVICES_READY) {
-            mImpl.checkAndStartWifi();
-        }
+        mImpl.onBootPhase(phase);
     }
 
     @Override

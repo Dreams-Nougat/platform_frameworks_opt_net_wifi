@@ -29,7 +29,6 @@ import static com.android.server.wifi.WifiController.CMD_USER_PRESENT;
 import static com.android.server.wifi.WifiController.CMD_WIFI_TOGGLED;
 
 import android.Manifest;
-import android.app.AppOpsManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -85,6 +84,7 @@ import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.util.AsyncChannel;
+import com.android.server.SystemService;
 import com.android.server.wifi.hotspot2.PasspointManager;
 import com.android.server.wifi.util.WifiPermissionsUtil;
 
@@ -129,8 +129,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     private final Context mContext;
     private final FrameworkFacade mFacade;
 
-    private final PowerManager mPowerManager;
-    private final AppOpsManager mAppOps;
+    private PowerManager mPowerManager;
     private final UserManager mUserManager;
     private final WifiCountryCode mCountryCode;
     // Debug counter tracking scan requests sent by WifiManager
@@ -326,12 +325,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         mWifiStateMachine = mWifiInjector.getWifiStateMachine();
         mWifiStateMachine.enableRssiPolling(true);
         mSettingsStore = mWifiInjector.getWifiSettingsStore();
-        mPowerManager = mContext.getSystemService(PowerManager.class);
-        mAppOps = (AppOpsManager) mContext.getSystemService(Context.APP_OPS_SERVICE);
         mCertManager = mWifiInjector.getWifiCertManager();
-
-        mNotificationController = mWifiInjector.getWifiNotificationController();
-        mWifiWakeupController = mWifiInjector.getWifiWakeupController();
 
         mWifiLockManager = mWifiInjector.getWifiLockManager();
         mWifiMulticastLockManager = mWifiInjector.getWifiMulticastLockManager();
@@ -350,6 +344,20 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         enableVerboseLoggingInternal(getVerboseLoggingLevel());
     }
 
+    /**
+     * Initializes fields based on the current {@link SystemService} boot phase.
+     */
+    public void onBootPhase(int phase) {
+        mWifiInjector.onBootPhase(phase);
+        if (phase == SystemService.PHASE_SYSTEM_SERVICES_READY) {
+            mPowerManager = mContext.getSystemService(PowerManager.class);
+        } else if (phase == SystemService.PHASE_BOOT_COMPLETED) {
+            mWifiScanner = mWifiInjector.getWifiScanner();
+            mNotificationController = mWifiInjector.getWifiNotificationController();
+            mWifiWakeupController = mWifiInjector.getWifiWakeupController();
+            checkAndStartWifi();
+        }
+    }
 
     /**
      * Check if Wi-Fi needs to be enabled and start
@@ -357,7 +365,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
      *
      * This function is used only at boot time
      */
-    public void checkAndStartWifi() {
+    private void checkAndStartWifi() {
         /* Check if wi-fi needs to be enabled */
         boolean wifiEnabled = mSettingsStore.isWifiToggleEnabled();
         Slog.i(TAG, "WifiService starting up with Wi-Fi " +
@@ -455,9 +463,6 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     public void startScan(ScanSettings settings, WorkSource workSource) {
         enforceChangePermission();
         synchronized (this) {
-            if (mWifiScanner == null) {
-                mWifiScanner = mWifiInjector.getWifiScanner();
-            }
             if (mInIdleMode) {
                 // Need to send an immediate scan result broadcast in case the
                 // caller is waiting for a result ..
@@ -1017,9 +1022,6 @@ public class WifiServiceImpl extends IWifiManager.Stub {
             if (!mWifiPermissionsUtil.canAccessScanResults(callingPackage,
                       uid, Build.VERSION_CODES.M)) {
                 return new ArrayList<ScanResult>();
-            }
-            if (mWifiScanner == null) {
-                mWifiScanner = mWifiInjector.getWifiScanner();
             }
             return mWifiScanner.getSingleScanResults();
         } finally {
