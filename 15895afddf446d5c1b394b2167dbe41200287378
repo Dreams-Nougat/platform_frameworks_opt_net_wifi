@@ -1,0 +1,29 @@
+Revision: 15895afddf446d5c1b394b2167dbe41200287378
+Patch-set: 2
+File: service/java/com/android/server/wifi/aware/WifiAwareNative.java
+
+130:27-130:52
+Thu Dec 15 22:08:45 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_699e653f
+Bytes: 71
+this should be handed the WifiAwareStateManager instead of WifiInjector
+
+File: service/java/com/android/server/wifi/aware/WifiAwareServiceImpl.java
+
+80:22-80:47
+Thu Dec 15 22:08:45 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_293aad27
+Bytes: 67
+the objects should be passed in instead of handing in WifiInjector.
+
+File: service/java/com/android/server/wifi/aware/WifiAwareStateManager.java
+
+198:33-198:58
+Thu Dec 15 22:08:45 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_09cb2943
+Bytes: 31
+pass in WifiAwareNative instead
+
