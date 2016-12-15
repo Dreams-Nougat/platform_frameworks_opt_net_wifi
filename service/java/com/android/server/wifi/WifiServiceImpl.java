@@ -29,7 +29,6 @@ import static com.android.server.wifi.WifiController.CMD_USER_PRESENT;
 import static com.android.server.wifi.WifiController.CMD_WIFI_TOGGLED;
 
 import android.Manifest;
-import android.app.AppOpsManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -129,8 +128,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
     private final Context mContext;
     private final FrameworkFacade mFacade;
 
-    private final PowerManager mPowerManager;
-    private final AppOpsManager mAppOps;
+    private PowerManager mPowerManager;
     private final UserManager mUserManager;
     private final WifiCountryCode mCountryCode;
     // Debug counter tracking scan requests sent by WifiManager
@@ -326,12 +324,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         mWifiStateMachine = mWifiInjector.getWifiStateMachine();
         mWifiStateMachine.enableRssiPolling(true);
         mSettingsStore = mWifiInjector.getWifiSettingsStore();
-        mPowerManager = mContext.getSystemService(PowerManager.class);
-        mAppOps = (AppOpsManager) mContext.getSystemService(Context.APP_OPS_SERVICE);
         mCertManager = mWifiInjector.getWifiCertManager();
-
-        mNotificationController = mWifiInjector.getWifiNotificationController();
-        mWifiWakeupController = mWifiInjector.getWifiWakeupController();
 
         mWifiLockManager = mWifiInjector.getWifiLockManager();
         mWifiMulticastLockManager = mWifiInjector.getWifiMulticastLockManager();
@@ -350,6 +343,16 @@ public class WifiServiceImpl extends IWifiManager.Stub {
         enableVerboseLoggingInternal(getVerboseLoggingLevel());
     }
 
+    /**
+     * Initializes all fields that depend on system services. Called on PHASE_SYSTEM_SERVICES_READY.
+     */
+    public void systemServicesReady() {
+        mWifiInjector.systemServicesReady();
+        mPowerManager = mContext.getSystemService(PowerManager.class);
+        mNotificationController = mWifiInjector.getWifiNotificationController();
+        mWifiWakeupController = mWifiInjector.getWifiWakeupController();
+        checkAndStartWifi();
+    }
 
     /**
      * Check if Wi-Fi needs to be enabled and start
@@ -357,7 +360,7 @@ public class WifiServiceImpl extends IWifiManager.Stub {
      *
      * This function is used only at boot time
      */
-    public void checkAndStartWifi() {
+    private void checkAndStartWifi() {
         /* Check if wi-fi needs to be enabled */
         boolean wifiEnabled = mSettingsStore.isWifiToggleEnabled();
         Slog.i(TAG, "WifiService starting up with Wi-Fi " +

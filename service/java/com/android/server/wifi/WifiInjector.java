@@ -16,6 +16,8 @@
 
 package com.android.server.wifi;
 
+import static com.android.internal.util.Preconditions.checkState;
+
 import android.content.Context;
 import android.net.NetworkScoreManager;
 import android.net.NetworkScorerAppManager;
@@ -36,7 +38,6 @@ import android.os.UserManager;
 import android.provider.Settings;
 import android.security.KeyStore;
 import android.telephony.TelephonyManager;
-import android.util.LocalLog;
 
 import com.android.internal.R;
 import com.android.server.am.BatteryStatsService;
@@ -73,8 +74,6 @@ public class WifiInjector {
     private final WifiStateMachine mWifiStateMachine;
     private final WifiSettingsStore mSettingsStore;
     private final WifiCertManager mCertManager;
-    private final WifiNotificationController mNotificationController;
-    private final WifiWakeupController mWifiWakeupController;
     private final WifiLockManager mLockManager;
     private final WifiController mWifiController;
     private final Clock mClock = new Clock();
@@ -95,16 +94,20 @@ public class WifiInjector {
     private final WifiNetworkSelector mWifiNetworkSelector;
     private final SavedNetworkEvaluator mSavedNetworkEvaluator;
     private final ExternalScoreEvaluator mExternalScoreEvaluator;
-    private final RecommendedNetworkEvaluator mRecommendedNetworkEvaluator;
     private final WifiNetworkScoreCache mWifiNetworkScoreCache;
-    private final NetworkScoreManager mNetworkScoreManager;
-    private WifiScanner mWifiScanner;
     private final WifiPermissionsWrapper mWifiPermissionsWrapper;
     private final WifiPermissionsUtil mWifiPermissionsUtil;
     private final PasspointManager mPasspointManager;
     private final SIMAccessor mSimAccessor;
+    private final WifiInfo mWifiInfo;
+    private WifiScanner mWifiScanner;
+    private WifiConnectivityManager mWifiConnectivityManager;
+    private TelephonyManager mTelephonyManager;
+    private WifiNotificationController mNotificationController;
+    private WifiWakeupController mWifiWakeupController;
 
     private final boolean mUseRealLogger;
+    private boolean mSystemServicesInitialized = false;
 
     public WifiInjector(Context context) {
         if (context == null) {
@@ -159,26 +162,20 @@ public class WifiInjector {
         mWifiConfigManager = new WifiConfigManager(mContext, mFrameworkFacade, mClock,
                 UserManager.get(mContext), TelephonyManager.from(mContext),
                 mWifiKeyStore, mWifiConfigStore, mWifiConfigStoreLegacy);
-        mNetworkScoreManager = (NetworkScoreManager)
-                mContext.getSystemService(Context.NETWORK_SCORE_SERVICE);
+
         mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
         mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager, mClock);
-        LocalLog localLog = mWifiNetworkSelector.getLocalLog();
         mSavedNetworkEvaluator = new SavedNetworkEvaluator(mContext,
-                mWifiConfigManager, mClock, localLog);
+                mWifiConfigManager, mClock, mWifiNetworkSelector.getLocalLog());
         mExternalScoreEvaluator = new ExternalScoreEvaluator(
-                mContext, mWifiConfigManager, mWifiNetworkScoreCache, mClock, localLog);
-        mRecommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
-                mWifiNetworkScoreCache, mNetworkScoreManager, mWifiConfigManager, localLog);
+                mContext, mWifiConfigManager, mWifiNetworkScoreCache, mClock,
+                mWifiNetworkSelector.getLocalLog());
+        mWifiInfo = new WifiInfo();
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
-                mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
-                this, mBackupManagerProxy, mCountryCode, mWifiNative);
+                mWifiStateMachineHandlerThread.getLooper(),
+                this, mBackupManagerProxy, mCountryCode, mWifiNative, mWifiInfo);
         mSettingsStore = new WifiSettingsStore(mContext);
         mCertManager = new WifiCertManager(mContext);
-        mNotificationController = new WifiNotificationController(mContext,
-                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, null, this);
-        mWifiWakeupController = new WifiWakeupController(mContext,
-                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
         mLockManager = new WifiLockManager(mContext, BatteryStatsService.getService());
         mWifiController = new WifiController(mContext, mWifiStateMachine, mSettingsStore,
                 mLockManager, mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
@@ -207,12 +204,39 @@ public class WifiInjector {
         return sWifiInjector;
     }
 
-    public WifiMetrics getWifiMetrics() {
-        return mWifiMetrics;
+    /**
+     * Initialize everything that depends on system services.
+     */
+    public void systemServicesReady() {
+        mSystemServicesInitialized = true;
+        mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        mNotificationController = new WifiNotificationController(mContext,
+                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, null, null);
+        mWifiWakeupController = new WifiWakeupController(mContext,
+                mWifiServiceHandlerThread.getLooper(), mFrameworkFacade);
+        NetworkScoreManager networkScoreManager = (NetworkScoreManager)
+                mContext.getSystemService(Context.NETWORK_SCORE_SERVICE);
+        mWifiScanner = new WifiScanner(mContext,
+                IWifiScanner.Stub.asInterface(ServiceManager.getService(
+                        Context.WIFI_SCANNING_SERVICE)),
+                mWifiStateMachineHandlerThread.getLooper());
+        RecommendedNetworkEvaluator recommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
+                mWifiNetworkScoreCache, networkScoreManager, mWifiConfigManager,
+                mWifiNetworkSelector.getLocalLog());
+        mWifiConnectivityManager = new WifiConnectivityManager(mContext, mWifiStateMachine,
+                mWifiScanner,
+                mWifiConfigManager, mWifiInfo, mWifiNetworkSelector, mWifiLastResortWatchdog,
+                mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(), mClock,
+                mFrameworkFacade, mSavedNetworkEvaluator,
+                mExternalScoreEvaluator, recommendedNetworkEvaluator);
     }
 
-    public BackupManagerProxy getBackupManagerProxy() {
-        return mBackupManagerProxy;
+    private void ensureSystemServicesInitialized() {
+        checkState(mSystemServicesInitialized, "System services have not yet been initialized.");
+    }
+
+    public WifiMetrics getWifiMetrics() {
+        return mWifiMetrics;
     }
 
     public FrameworkFacade getFrameworkFacade() {
@@ -221,10 +245,6 @@ public class WifiInjector {
 
     public HandlerThread getWifiServiceHandlerThread() {
         return mWifiServiceHandlerThread;
-    }
-
-    public HandlerThread getWifiStateMachineHandlerThread() {
-        return mWifiStateMachineHandlerThread;
     }
 
     public WifiTrafficPoller getWifiTrafficPoller() {
@@ -252,10 +272,12 @@ public class WifiInjector {
     }
 
     public WifiNotificationController getWifiNotificationController() {
+        ensureSystemServicesInitialized();
         return mNotificationController;
     }
 
     public WifiWakeupController getWifiWakeupController() {
+        ensureSystemServicesInitialized();
         return mWifiWakeupController;
     }
 
@@ -307,9 +329,13 @@ public class WifiInjector {
         return mPasspointManager;
     }
 
-    public TelephonyManager makeTelephonyManager() {
-        // may not be available when WiFi starts
-        return (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+    /**
+     * Obtain an instance of TelephonyManager. Must be called after
+     * {@link #systemServicesReady()} since it may be started after WifiService.
+     */
+    public TelephonyManager getTelephonyManager() {
+        ensureSystemServicesInitialized();
+        return mTelephonyManager;
     }
 
     public IWificond makeWificond() {
@@ -355,17 +381,11 @@ public class WifiInjector {
     }
 
     /**
-     * Obtain an instance of WifiScanner.
-     * If it was not already created, then obtain an instance.  Note, this must be done lazily since
-     * WifiScannerService is separate and created later.
+     * Obtain an instance of WifiScanner. Must be called after {@link #systemServicesReady()} since
+     * WifiScannerService is started after WifiService.
      */
-    public synchronized WifiScanner getWifiScanner() {
-        if (mWifiScanner == null) {
-            mWifiScanner = new WifiScanner(mContext,
-                    IWifiScanner.Stub.asInterface(ServiceManager.getService(
-                            Context.WIFI_SCANNING_SERVICE)),
-                    mWifiStateMachineHandlerThread.getLooper());
-        }
+    public WifiScanner getWifiScanner() {
+        ensureSystemServicesInitialized();
         return mWifiScanner;
     }
 
@@ -377,20 +397,12 @@ public class WifiInjector {
     }
 
     /**
-     * Obtain a new instance of WifiConnectivityManager.
-     *
-     * Create and return a new WifiConnectivityManager.
-     * @param wifiInfo WifiInfo object for updating wifi state.
-     * @param hasConnectionRequests boolean indicating if WifiConnectivityManager to start
-     * immediately based on connection requests.
+     * Obtain an instance of WifiConnectivityManager. Must be called after
+     * {@link #systemServicesReady()} since WifiScannerService is started after WifiService.
      */
-    public WifiConnectivityManager makeWifiConnectivityManager(WifiInfo wifiInfo,
-                                                               boolean hasConnectionRequests) {
-        return new WifiConnectivityManager(mContext, mWifiStateMachine, getWifiScanner(),
-                mWifiConfigManager, wifiInfo, mWifiNetworkSelector, mWifiLastResortWatchdog,
-                mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(), mClock,
-                hasConnectionRequests, mFrameworkFacade, mSavedNetworkEvaluator,
-                mExternalScoreEvaluator, mRecommendedNetworkEvaluator);
+    public WifiConnectivityManager getWifiConnectivityManager() {
+        ensureSystemServicesInitialized();
+        return mWifiConnectivityManager;
     }
 
     public WifiPermissionsUtil getWifiPermissionsUtil() {
