@@ -1,5 +1,14 @@
 Revision: b268be8afafd205b13d085064f1d2588b42b30c7
 Patch-set: 2
+File: service/java/com/android/server/wifi/WifiConnectivityManager.java
+
+139:20-139:58
+Thu Dec 15 21:38:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e4643dce
+Bytes: 158
+since this object will be started much earlier (ie - before we even know if wifi is going in to client mode, or enabled at all), this should default to false.
+
 File: service/java/com/android/server/wifi/WifiInjector.java
 
 19:7-19:13
@@ -9,10 +18,42 @@ UUID: ba845725_894abc9e
 Bytes: 26
 Make this a regular import
 
+172:8-172:35
+Thu Dec 15 21:38:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e4efddcf
+Bytes: 27
+I don't think we need this.
+
+175:69-175:79
+Thu Dec 15 21:38:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_a42de55c
+Bytes: 91
+I think we can just do new WifiInfo() here.  I don't think we hang on to this for anything.
+
+210:16-210:36
+Thu Dec 15 21:38:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_a444051b
+Bytes: 300
+I like this phased approach.  It is a much more formal (and understandable) way to initialize objects in a safe way.
+
+The main concern I have is that now we are creating the objects by default as soon as we get the SystemServicesReady message.  These were previously only created if they were needed.
+
 234:17-234:50
 Thu Dec 15 21:29:10 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_660db21a
 Bytes: 69
 Have you verified that using this won't cause an unhandled exception?
+
+File: service/java/com/android/server/wifi/WifiStateMachine.java
+
+850:35-850:52
+Thu Dec 15 21:38:00 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_240d751b
+Bytes: 50
+I have a CL in a huge stack that does this too! :)
 
