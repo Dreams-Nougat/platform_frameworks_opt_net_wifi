@@ -43,6 +43,7 @@ import com.android.server.am.BatteryStatsService;
 import com.android.server.net.DelayedDiskWrite;
 import com.android.server.net.IpConfigStore;
 import com.android.server.wifi.aware.WifiAwareNative;
+import com.android.server.wifi.aware.WifiAwareNativeNew;
 import com.android.server.wifi.aware.WifiAwareStateManager;
 import com.android.server.wifi.hotspot2.PasspointManager;
 import com.android.server.wifi.hotspot2.PasspointObjectFactory;
@@ -107,6 +108,7 @@ public class WifiInjector {
     private final SIMAccessor mSimAccessor;
     private WifiAwareStateManager mWifiAwareStateManager;
     private WifiAwareNative mWifiAwareNative;
+    private WifiAwareNativeNew mWifiAwareNativeNew;
     private HandlerThread mWifiAwareHandlerThread;
 
     private final boolean mUseRealLogger;
@@ -425,6 +427,16 @@ public class WifiInjector {
             mWifiAwareNative = new WifiAwareNative(this, true);
         }
         return mWifiAwareNative;
+    }
+
+    /**
+     * Returns a singleton instance of WifiAwareNative for injection. Uses lazy initialization.
+     */
+    public WifiAwareNativeNew getWifiAwareNativeNew() {
+        if (mWifiAwareNativeNew == null) { // lazy initialization
+            mWifiAwareNativeNew = new WifiAwareNativeNew(this);
+        }
+        return mWifiAwareNativeNew;
     }
 
     /**
