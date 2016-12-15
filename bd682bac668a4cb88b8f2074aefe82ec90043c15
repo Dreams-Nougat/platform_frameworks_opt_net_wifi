@@ -9,12 +9,28 @@ UUID: ba845725_666f72a8
 Bytes: 153
 Consider adding a deleteIntent to every notification so you can update this state correctly. This will be useful for logging user behavior in the future.
 
+75:37-75:70
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_666f72a8
+UUID: ba845725_6ceaf3c0
+Bytes: 4
+Done
+
 290
 Thu Dec 15 21:38:32 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_e69e02a1
 Bytes: 88
 add TODO(33668991): work with UX to polish notification UI and figure out failure states
+
+290
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e69e02a1
+UUID: ba845725_091fa945
+Bytes: 4
+Done
 
 298:49-298:53
 Thu Dec 15 21:38:32 2016 +0000
@@ -23,12 +39,28 @@ UUID: ba845725_06e236b9
 Bytes: 20
 /* actionListener */
 
+298:49-298:53
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_06e236b9
+UUID: ba845725_c914b12b
+Bytes: 4
+Done
+
 304:17-304:28
 Thu Dec 15 21:38:32 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_6663f222
 Bytes: 339
 This will remove the notification after TIME_TO_SHOW_CONNECTING even if it is already connected because this callback was not removed from the handler in updateNotificationOnConnect. You can define an field mResetNotificationRunnable and call mHandler.removeCallbacks(mResetNotificationRunnable) in updateNotificationOnConnect to fix this.
+
+304:17-304:28
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_6663f222
+UUID: ba845725_a90f7d18
+Bytes: 4
+Done
 
 331
 Thu Dec 15 21:38:32 2016 +0000
@@ -37,12 +69,28 @@ UUID: ba845725_8637060b
 Bytes: 9
 /* tag */
 
+331
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_8637060b
+UUID: ba845725_af693d6a
+Bytes: 4
+Done
+
 350:41-350:45
 Thu Dec 15 21:38:32 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_e621a2c6
 Bytes: 9
 /* tag */
+
+350:41-350:45
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e621a2c6
+UUID: ba845725_8c99e765
+Bytes: 4
+Done
 
 File: service/java/com/android/server/wifi/WifiNotificationHelper.java
 
@@ -53,10 +101,26 @@ UUID: ba845725_260bba4a
 Bytes: 13
 private final
 
+32:4-32:11
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_260bba4a
+UUID: ba845725_c94af19f
+Bytes: 4
+Done
+
 100:17-100:24
 Thu Dec 15 21:38:32 2016 +0000
 Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_263e5a7c
 Bytes: 93
 looks like this isn't shown by default anymore past android N. might as well not even set it.
+
+100:17-100:24
+Thu Dec 15 22:45:53 2016 +0000
+Author: Stephen Chen <1124150@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_263e5a7c
+UUID: ba845725_e94fb5ad
+Bytes: 4
+Done
 
