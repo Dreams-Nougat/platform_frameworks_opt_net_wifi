@@ -1,0 +1,18 @@
+Revision: b268be8afafd205b13d085064f1d2588b42b30c7
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+19:7-19:13
+Thu Dec 15 21:29:10 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_894abc9e
+Bytes: 26
+Make this a regular import
+
+234:17-234:50
+Thu Dec 15 21:29:10 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_660db21a
+Bytes: 69
+Have you verified that using this won't cause an unhandled exception?
+
