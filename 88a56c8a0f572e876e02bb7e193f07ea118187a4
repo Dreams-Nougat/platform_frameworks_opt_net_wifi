@@ -1,0 +1,120 @@
+Revision: 88a56c8a0f572e876e02bb7e193f07ea118187a4
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+98:24-98:46
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_a24b1dcb
+Bytes: 37
+ACTION_CONNECT_TO_RECOMMENDED_NETWORK
+
+130:8-130:15
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_df1e2e48
+Bytes: 23
+mWifiNotificationHelper
+
+140:8-140:26
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e278b531
+Bytes: 123
+You can revert this back to registering an anonymous class since we don't need the references to mBroadcastReceiver anymore
+
+172:33-172:40
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e26ef53d
+Bytes: 224
+Receiving some subset of these states while you're trying to connect probably indicates that the connection failed. Either figure out which states should result in a failure case and hide the notification or add a TODO here.
+
+191:62-191:66
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e24515b6
+Bytes: 42
+add /* broadcastPermission */ next to null
+
+215:19-215:38
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_42bfc15d
+Bytes: 90
+looks like you don't need the null check here if you have it below in checkGoodOpenNetwork
+
+243:33-243:53
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_82c8d911
+Bytes: 406
+getOpenNetworkRecommendation or something that indicates that we're asking the network recommendation service. Now that I think of it, it might make sense to actually pass the ScoredNetwork object back in the RecommendationResult so that you'll be able to display the right badge here later. Otherwise, you'd have to register a score cache, request the score and wait for it to be updated. Filed b/33649968
+
+252
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_822c59ca
+Bytes: 82
+Rearrange logic to "[ESS]".equals(scanResult.capabilities) to avoid the null check
+
+278:24-278:28
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_8217f96d
+Bytes: 78
+I think create* is a more common pattern for method names that create objects.
+
+303:11-303:15
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_a2031d2a
+Bytes: 15
+make a constant
+
+322
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e2fd15f9
+Bytes: 15
+make a constant
+
+File: service/java/com/android/server/wifi/WifiNotificationHelper.java
+
+32
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_222acd90
+Bytes: 176
+Might be useful to have a constructor that takes in Context so you can store it in a field and not pass it in to every method. It will make using and testing this class cleaner
+
+42:16-42:20
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_4237c1f4
+Bytes: 110
+There are lots of nulls throughout. Please use /* */ comments inline to show the parameter name of the method.
+
+92
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_a245dd68
+Bytes: 72
+extra line. also consider changing all of these methods names to create*
+
+File: tests/wifitests/src/com/android/server/wifi/WifiNotificationControllerTest.java
+
+103:37-103:62
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_0254e914
+Bytes: 23
+this is a copy of above
+
+234
+Thu Dec 15 03:58:36 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_624be576
+Bytes: 64
+Add assertion that the notification is dismissed 3 seconds later
+
