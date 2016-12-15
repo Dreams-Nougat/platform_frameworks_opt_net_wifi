@@ -1,0 +1,62 @@
+Revision: bd682bac668a4cb88b8f2074aefe82ec90043c15
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+75:37-75:70
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_666f72a8
+Bytes: 153
+Consider adding a deleteIntent to every notification so you can update this state correctly. This will be useful for logging user behavior in the future.
+
+290
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e69e02a1
+Bytes: 88
+add TODO(33668991): work with UX to polish notification UI and figure out failure states
+
+298:49-298:53
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_06e236b9
+Bytes: 20
+/* actionListener */
+
+304:17-304:28
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_6663f222
+Bytes: 339
+This will remove the notification after TIME_TO_SHOW_CONNECTING even if it is already connected because this callback was not removed from the handler in updateNotificationOnConnect. You can define an field mResetNotificationRunnable and call mHandler.removeCallbacks(mResetNotificationRunnable) in updateNotificationOnConnect to fix this.
+
+331
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_8637060b
+Bytes: 9
+/* tag */
+
+350:41-350:45
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_e621a2c6
+Bytes: 9
+/* tag */
+
+File: service/java/com/android/server/wifi/WifiNotificationHelper.java
+
+32:4-32:11
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_260bba4a
+Bytes: 13
+private final
+
+100:17-100:24
+Thu Dec 15 21:38:32 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_263e5a7c
+Bytes: 93
+looks like this isn't shown by default anymore past android N. might as well not even set it.
+
