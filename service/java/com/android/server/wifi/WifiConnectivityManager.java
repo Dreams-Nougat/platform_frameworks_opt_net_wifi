@@ -470,7 +470,7 @@ public class WifiConnectivityManager {
             WifiScanner scanner, WifiConfigManager configManager, WifiInfo wifiInfo,
             WifiNetworkSelector networkSelector,
             WifiLastResortWatchdog wifiLastResortWatchdog, WifiMetrics wifiMetrics,
-            Looper looper, Clock clock, boolean enable, FrameworkFacade frameworkFacade,
+            Looper looper, Clock clock, FrameworkFacade frameworkFacade,
             SavedNetworkEvaluator savedNetworkEvaluator,
             ExternalScoreEvaluator externalScoreEvaluator,
             RecommendedNetworkEvaluator recommendedNetworkEvaluator) {
@@ -530,10 +530,7 @@ public class WifiConnectivityManager {
         // Register for all single scan results
         mScanner.registerScanListener(mAllSingleScanListener);
 
-        mWifiConnectivityManagerEnabled = enable;
-
-        localLog("ConnectivityScanManager initialized and "
-                + (enable ? "enabled" : "disabled"));
+        localLog("ConnectivityScanManager initialized");
     }
 
     /**

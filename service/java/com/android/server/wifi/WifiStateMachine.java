@@ -89,7 +89,6 @@ import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.UserHandle;
-import android.os.UserManager;
 import android.os.WorkSource;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -829,7 +828,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     private TelephonyManager mTelephonyManager;
     private TelephonyManager getTelephonyManager() {
         if (mTelephonyManager == null) {
-            mTelephonyManager = mWifiInjector.makeTelephonyManager();
+            mTelephonyManager = mWifiInjector.getTelephonyManager();
         }
         return mTelephonyManager;
     }
@@ -846,9 +845,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
     private final BackupManagerProxy mBackupManagerProxy;
 
     public WifiStateMachine(Context context, FrameworkFacade facade, Looper looper,
-                            UserManager userManager, WifiInjector wifiInjector,
-                            BackupManagerProxy backupManagerProxy, WifiCountryCode countryCode,
-                            WifiNative wifiNative) {
+            WifiInjector wifiInjector,
+            BackupManagerProxy backupManagerProxy, WifiCountryCode countryCode,
+            WifiNative wifiNative, WifiInfo wifiInfo) {
         super("WifiStateMachine", looper);
         mWifiInjector = wifiInjector;
         mWifiMetrics = mWifiInjector.getWifiMetrics();
@@ -885,7 +884,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
         mWifiMonitor = WifiMonitor.getInstance();
         mWifiDiagnostics = mWifiInjector.makeWifiDiagnostics(mWifiNative);
 
-        mWifiInfo = new WifiInfo();
+        mWifiInfo = wifiInfo;
         mWifiNetworkSelector = mWifiInjector.getWifiNetworkSelector();
         mSupplicantStateTracker =
                 mFacade.makeSupplicantStateTracker(context, mWifiConfigManager, getHandler());
@@ -1707,10 +1706,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
      */
     public WifiInfo syncRequestConnectionInfo() {
         return getWiFiInfoForUid(Binder.getCallingUid());
-    }
-
-    public WifiInfo getWifiInfo() {
-        return mWifiInfo;
     }
 
     public DhcpResults syncGetDhcpResults() {
@@ -4147,9 +4142,8 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 mWifiScanner = mWifiInjector.getWifiScanner();
 
                 synchronized (mWifiReqCountLock) {
-                    mWifiConnectivityManager =
-                            mWifiInjector.makeWifiConnectivityManager(mWifiInfo,
-                                                                      hasConnectionRequests());
+                    mWifiConnectivityManager = mWifiInjector.getWifiConnectivityManager();
+                    mWifiConnectivityManager.setWifiEnabled(hasConnectionRequests());
                     mWifiConnectivityManager.setUntrustedConnectionAllowed(mUntrustedReqCount > 0);
                     mWifiConnectivityManager.handleScreenStateChanged(mScreenOn);
                 }
