@@ -1,0 +1,11 @@
+Revision: ddd0a6fa724dce12d09e8656eb2762fa2bfc5fd5
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiNotificationController.java
+
+93:29-93:52
+Thu Dec 15 23:02:51 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_4f00c1e2
+Bytes: 30
+end these constants in _MILLIS
+
