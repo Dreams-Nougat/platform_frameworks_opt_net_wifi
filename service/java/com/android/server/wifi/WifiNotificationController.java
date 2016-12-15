@@ -97,18 +97,17 @@ public class WifiNotificationController {
     private NetworkInfo.DetailedState mDetailedState;
     private volatile int mWifiState;
     private FrameworkFacade mFrameworkFacade;
-    private WifiInjector mWifiInjector;
-    private WifiScanner mWifiScanner;
+    private final WifiScanner mWifiScanner;
 
     WifiNotificationController(Context context,
-                               Looper looper,
-                               FrameworkFacade framework,
-                               Notification.Builder builder,
-                               WifiInjector wifiInjector) {
+            Looper looper,
+            FrameworkFacade framework,
+            Notification.Builder builder,
+            WifiScanner wifiScanner) {
         mContext = context;
         mFrameworkFacade = framework;
         mNotificationBuilder = builder;
-        mWifiInjector = wifiInjector;
+        mWifiScanner = wifiScanner;
         mWifiState = WifiManager.WIFI_STATE_UNKNOWN;
         mDetailedState = NetworkInfo.DetailedState.IDLE;
 
@@ -156,9 +155,6 @@ public class WifiNotificationController {
                             }
                         } else if (intent.getAction().equals(
                                 WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                            if (mWifiScanner == null) {
-                                mWifiScanner = mWifiInjector.getWifiScanner();
-                            }
                             checkAndSetNotification(mNetworkInfo,
                                     mWifiScanner.getSingleScanResults());
                         }
