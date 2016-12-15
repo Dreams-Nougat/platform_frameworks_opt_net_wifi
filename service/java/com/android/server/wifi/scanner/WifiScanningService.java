@@ -42,15 +42,8 @@ public class WifiScanningService extends SystemService {
 
     @Override
     public void onStart() {
+        mImpl.startService();
         Log.i(TAG, "Publishing " + Context.WIFI_SCANNING_SERVICE);
         publishBinderService(Context.WIFI_SCANNING_SERVICE, mImpl);
-    }
-
-    @Override
-    public void onBootPhase(int phase) {
-        if (phase == SystemService.PHASE_SYSTEM_SERVICES_READY) {
-            Log.i(TAG, "Starting " + Context.WIFI_SCANNING_SERVICE);
-            mImpl.startService();
-        }
     }
 }
