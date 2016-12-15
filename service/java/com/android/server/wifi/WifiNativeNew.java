@@ -22,11 +22,16 @@ import android.hardware.wifi.V1_0.IWifiRttController;
 import android.hardware.wifi.V1_0.IWifiStaIface;
 import android.hardware.wifi.V1_0.IfaceType;
 import android.hardware.wifi.V1_0.StaBackgroundScanCapabilities;
+import android.hardware.wifi.V1_0.StaLinkLayerStats;
 import android.hardware.wifi.V1_0.WifiStatus;
 import android.hardware.wifi.V1_0.WifiStatusCode;
 import android.hardware.wifi.supplicant.V1_0.ISupplicant;
 import android.hardware.wifi.supplicant.V1_0.ISupplicantStaIface;
+import android.net.wifi.WifiLinkLayerStats;
+import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.util.MutableBoolean;
+import android.util.MutableInt;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -215,15 +220,13 @@ public class WifiNativeNew {
         public int max_number_of_white_listed_ssid;
     }
 
-    private boolean mOk; // why does a local not work for this?
-
     /** Gets the scan capabilities
      *
      * @param capabilities object to be filled in
      * @return true for success. false for failure
      */
     public boolean getScanCapabilities(ScanCapabilities capabilities) {
-        mOk = false;
+        MutableBoolean ok = new MutableBoolean(false);
         ScanCapabilities out = capabilities;
         if (!isHalStarted()) {
             return false;
@@ -245,12 +248,122 @@ public class WifiNativeNew {
                         out.max_number_epno_networks = 0;
                         out.max_number_epno_networks_by_ssid = 0;
                         out.max_number_of_white_listed_ssid = 0;
-                        mOk = true;
+                        ok.value = true;
                     }
                 }
         );
-        return mOk;
+        return ok.value;
     }
+
+    /** Get the link layer statistics
+     *
+     * @param iface is the name of the wifi interface (checked for null, otherwise ignored)
+     * @return the statistics, or null if unable to do so
+     */
+    public WifiLinkLayerStats getWifiLinkLayerStats(String iface) {
+        if (iface == null) return null;
+        if (!isHalStarted()) return null;
+        WifiLinkLayerStats out = new WifiLinkLayerStats();
+        MutableBoolean ok = new MutableBoolean(false);
+        mIWifiStaIface.getLinkLayerStats(
+                new IWifiStaIface.getLinkLayerStatsCallback() {
+                    public void onValues(
+                            WifiStatus status,
+                            StaLinkLayerStats stats) {
+                        if (status.code != WifiStatusCode.SUCCESS) return;
+                        out.status = 0; // TODO
+                        out.SSID = null; // TODO
+                        out.BSSID = null; // TODO
+                        out.beacon_rx = stats.iface.beaconRx;
+                        out.rssi_mgmt = stats.iface.avgRssiMgmt;
+                        /* WME Best Effort Access Category */
+                        out.rxmpdu_be = stats.iface.wmeBePktStats.rxMpdu;
+                        out.txmpdu_be = stats.iface.wmeBePktStats.txMpdu;
+                        out.lostmpdu_be = stats.iface.wmeBePktStats.lostMpdu;
+                        out.retries_be = stats.iface.wmeBePktStats.retries;
+                        /* WME Background Access Category */
+                        out.rxmpdu_bk = stats.iface.wmeBkPktStats.rxMpdu;
+                        out.txmpdu_bk = stats.iface.wmeBkPktStats.txMpdu;
+                        out.lostmpdu_bk = stats.iface.wmeBkPktStats.lostMpdu;
+                        out.retries_bk = stats.iface.wmeBkPktStats.retries;
+                        /* WME Video Access Category */
+                        out.rxmpdu_vi = stats.iface.wmeViPktStats.rxMpdu;
+                        out.txmpdu_vi = stats.iface.wmeViPktStats.txMpdu;
+                        out.lostmpdu_vi = stats.iface.wmeViPktStats.lostMpdu;
+                        out.retries_vi = stats.iface.wmeViPktStats.retries;
+                        /* WME Voice Access Category */
+                        out.rxmpdu_vo = stats.iface.wmeVoPktStats.rxMpdu;
+                        out.txmpdu_vo = stats.iface.wmeVoPktStats.txMpdu;
+                        out.lostmpdu_vo = stats.iface.wmeVoPktStats.lostMpdu;
+                        out.retries_vo = stats.iface.wmeVoPktStats.retries;
+                        out.on_time = stats.radio.onTimeInMs;
+                        out.tx_time = stats.radio.txTimeInMs;
+                        out.tx_time_per_level = new int[stats.radio.txTimeInMsPerLevel.size()];
+                        for (int i = 0; i < out.tx_time_per_level.length; i++) {
+                            out.tx_time_per_level[i] = stats.radio.txTimeInMsPerLevel.get(i);
+                        }
+                        out.rx_time = stats.radio.rxTimeInMs;
+                        out.on_time_scan = stats.radio.onTimeInMsForScan;
+                        ok.value = true;
+                    }
+                }
+        );
+        return ok.value ? out : null;
+    }
+
+    /** Enable link layer stats collection
+     *
+     * @param iface is the name of the wifi interface (checked for null, otherwise ignored)
+     * @param enable must be 1
+     */
+    public void setWifiLinkLayerStats(String iface, int enable) {
+        if (iface == null) return;
+        if (enable != 1) {
+            Log.e(TAG, "setWifiLinkLayerStats called with enable != 1");
+            return;
+        }
+        boolean debug = false;
+        WifiStatus status = mIWifiStaIface.enableLinkLayerStatsCollection(debug);
+        if (status.code != WifiStatusCode.SUCCESS) {
+            Log.e(TAG, "unable to enable link layer stats collection");
+        }
+    }
+
+    /** Get the supported features
+     *
+     * @return bitmask defined by WifiManager.WIFI_FEATURE_*
+     */
+    public int getSupportedFeatureSet() {
+        if (!isHalStarted()) return 0;
+        final MutableInt feat = new MutableInt(0);
+        final int nitYetOmplemented = 0;
+        mIWifiStaIface.getCapabilities(
+                new IWifiStaIface.getCapabilitiesCallback() {
+                    public void onValues(WifiStatus status, int capabilities) {
+                        if (status.code != WifiStatusCode.SUCCESS) return;
+                        if ((capabilities
+                                & IWifiStaIface.StaIfaceCapabilityMask.APF) != 0) {
+                            feat.value |= nitYetOmplemented;
+                        }
+                        if ((capabilities
+                                & IWifiStaIface.StaIfaceCapabilityMask.BACKGROUND_SCAN) != 0) {
+                            feat.value |= nitYetOmplemented;
+                        }
+                        if ((capabilities
+                                & IWifiStaIface.StaIfaceCapabilityMask.LINK_LAYER_STATS) != 0) {
+                            feat.value |= WifiManager.WIFI_FEATURE_LINK_LAYER_STATS;
+                        }
+                        if ((capabilities
+                                & IWifiStaIface.StaIfaceCapabilityMask.RSSI_MONITOR) != 0) {
+                            feat.value |= nitYetOmplemented;
+                        }
+                    }
+                }
+        );
+        return feat.value;
+    }
+
+
 
     private boolean startSupplicantHal() {
         return true;
