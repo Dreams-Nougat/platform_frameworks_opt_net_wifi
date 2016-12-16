@@ -9,6 +9,14 @@ UUID: ba845725_e4643dce
 Bytes: 158
 since this object will be started much earlier (ie - before we even know if wifi is going in to client mode, or enabled at all), this should default to false.
 
+139
+Fri Dec 16 00:02:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_e4643dce
+UUID: ba845725_15797a33
+Bytes: 4
+Done
+
 File: service/java/com/android/server/wifi/WifiInjector.java
 
 19:7-19:13
@@ -17,6 +25,14 @@ Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_894abc9e
 Bytes: 26
 Make this a regular import
+
+19
+Fri Dec 16 00:02:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_894abc9e
+UUID: ba845725_46e7ce27
+Bytes: 4
+Done
 
 172:8-172:35
 Thu Dec 15 21:38:00 2016 +0000
@@ -32,6 +48,14 @@ UUID: ba845725_a42de55c
 Bytes: 91
 I think we can just do new WifiInfo() here.  I don't think we hang on to this for anything.
 
+175
+Fri Dec 16 00:02:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_a42de55c
+UUID: ba845725_a0ff8a3b
+Bytes: 352
+This seems to be accesses a bunch internally in WifiStateMachine and it is also shared with WifiConnectivityManager, which passes this through to WifiNetworkSelector to inspect the currently connected network. By moving this up to WifiInjector, we can pass this on to WifiConnectivityManager directly instead of having a parameter in the getter method.
+
 210:16-210:36
 Thu Dec 15 21:38:00 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -41,12 +65,32 @@ I like this phased approach.  It is a much more formal (and understandable) way 
 
 The main concern I have is that now we are creating the objects by default as soon as we get the SystemServicesReady message.  These were previously only created if they were needed.
 
+210
+Fri Dec 16 00:02:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_a444051b
+UUID: ba845725_c078fe6c
+Bytes: 966
+At least right now, the 2 objects being created earlier are WifiScanner and WifiConnectivityManager. The only work WifiConnectivityManager does in its constructor is register a ScanListener with WifiScanner. WifiScanner binds itself to the WifiScanningService.
+
+I believe WifiScanningService should be calling WifiScanningServiceImpl#startService in WifiScanningService#onStart, so that a WifiScanner can be constructed in PHASE_SYSTEM_SERVICES_READY (the javadoc for this phase says that services should be published at this point, which I assume means clients should be able to connect to it). Otherwise WifiScanner's constructor throws an exception trying to access the service's Messenger since WifiScanningServiceImpl.mClientHandler isn't initialized until PHASE_SYSTEM_SERVICES_READY.
+
+I've tested this on device and everything seems to work properly and the tests pass. If you think this change is an issue, I can revert back to lazily creating these objects.
+
 234:17-234:50
 Thu Dec 15 21:29:10 2016 +0000
 Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: ba845725_660db21a
 Bytes: 69
 Have you verified that using this won't cause an unhandled exception?
+
+234
+Fri Dec 16 00:02:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_660db21a
+UUID: ba845725_9ae759f5
+Bytes: 102
+This assertion has not causes any exceptions when I ran this on a device, however, the see note above.
 
 File: service/java/com/android/server/wifi/WifiStateMachine.java
 
