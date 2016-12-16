@@ -1,0 +1,13 @@
+Revision: ce721cf61905475a5b4c57fdd1bc3dc4c25bd4f5
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiNotificationHelper.java
+
+43
+Fri Dec 16 19:21:48 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_5e64843a
+Bytes: 71
+@zpan
+
+What's the call on when we should be using WifiSsid in our code?
+
