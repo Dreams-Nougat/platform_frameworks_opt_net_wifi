@@ -1,0 +1,11 @@
+Revision: 066dedbca9d807b749a7543075c641a9d00343c3
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+408:4-427:5
+Fri Dec 16 16:48:27 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_8f8429f6
+Bytes: 79
+Per Rebecca: remove - not needed from injector. Can just be created in Service.
+
