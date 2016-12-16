@@ -1,0 +1,53 @@
+Revision: eee21c0c0285fade9d4554cc3b8c78f598fd8a0a
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiWakeupController.java
+
+44
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_aa49d336
+Bytes: 172
+It'd be nice to add a description of how this class makes its decision to re-enable Wifi, and how it decides to connect to a network for new engineers looking at this code.
+
+58
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_ca552fde
+Bytes: 26
+fyi: using ArraySet: Nice.
+
+72
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_6ac5fb48
+Bytes: 71
+bug to un-register for these config changes if our feature is disabled?
+
+161
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_4a067fd0
+Bytes: 234
+Protect log statments:
+private static final DEBUG = false;
+private static final VERBOSE = false;
+
+if (VERBOSE) Log.v
+
+or a fun pattern that only requires adb restart:
+private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG)
+
+171
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_aa771379
+Bytes: 3
+b/?
+
+185
+Fri Dec 16 19:07:51 2016 +0000
+Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_2af063ad
+Bytes: 96
+@jjoslin has background on outputting SSIDs in dumpsys / logs. Double check with him about this.
+
