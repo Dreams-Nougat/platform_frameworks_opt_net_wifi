@@ -31,7 +31,6 @@ import android.os.IBinder;
 import android.os.INetworkManagementService;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
-import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.Settings;
 import android.security.KeyStore;
@@ -58,6 +57,10 @@ import com.android.server.wifi.util.WifiPermissionsWrapper;
 public class WifiInjector {
     private static final String BOOT_DEFAULT_WIFI_COUNTRY_CODE = "ro.boot.wificountrycode";
     private static final String WIFICOND_SERVICE_NAME = "wificond";
+
+    // Saved network evaluator priority
+    private static final int SAVED_NETWORK_EVALUATOR_PRIORITY = 1;
+    private static final int EXTERNAL_SCORE_EVALUATOR_PRIORITY = 2;
 
     static WifiInjector sWifiInjector = null;
 
@@ -93,9 +96,6 @@ public class WifiInjector {
     private final WifiConfigStoreLegacy mWifiConfigStoreLegacy;
     private final WifiConfigManager mWifiConfigManager;
     private final WifiNetworkSelector mWifiNetworkSelector;
-    private final SavedNetworkEvaluator mSavedNetworkEvaluator;
-    private final ExternalScoreEvaluator mExternalScoreEvaluator;
-    private final RecommendedNetworkEvaluator mRecommendedNetworkEvaluator;
     private final WifiNetworkScoreCache mWifiNetworkScoreCache;
     private final NetworkScoreManager mNetworkScoreManager;
     private WifiScanner mWifiScanner;
@@ -163,12 +163,22 @@ public class WifiInjector {
         mWifiNetworkScoreCache = new WifiNetworkScoreCache(mContext);
         mWifiNetworkSelector = new WifiNetworkSelector(mContext, mWifiConfigManager, mClock);
         LocalLog localLog = mWifiNetworkSelector.getLocalLog();
-        mSavedNetworkEvaluator = new SavedNetworkEvaluator(mContext,
+        SavedNetworkEvaluator savedNetworkEvaluator = new SavedNetworkEvaluator(mContext,
                 mWifiConfigManager, mClock, localLog);
-        mExternalScoreEvaluator = new ExternalScoreEvaluator(
+        ExternalScoreEvaluator externalScoreEvaluator = new ExternalScoreEvaluator(
                 mContext, mWifiConfigManager, mWifiNetworkScoreCache, mClock, localLog);
-        mRecommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
+        RecommendedNetworkEvaluator recommendedNetworkEvaluator = new RecommendedNetworkEvaluator(
                 mWifiNetworkScoreCache, mNetworkScoreManager, mWifiConfigManager, localLog);
+        // Register the network evaluators
+        mWifiNetworkSelector.registerNetworkEvaluator(savedNetworkEvaluator,
+                SAVED_NETWORK_EVALUATOR_PRIORITY);
+        // TODO(b/33303775): Remove ExternalNetworkEvaluator
+        final WifiNetworkSelector.NetworkEvaluator networkEvaluator =
+                mFrameworkFacade.getIntegerSetting(context,
+                        Settings.Global.NETWORK_RECOMMENDATIONS_ENABLED, 0) == 1
+                        ? recommendedNetworkEvaluator : externalScoreEvaluator;
+        mWifiNetworkSelector.registerNetworkEvaluator(networkEvaluator,
+                EXTERNAL_SCORE_EVALUATOR_PRIORITY);
         mWifiStateMachine = new WifiStateMachine(mContext, mFrameworkFacade,
                 mWifiStateMachineHandlerThread.getLooper(), UserManager.get(mContext),
                 this, mBackupManagerProxy, mCountryCode, mWifiNative);
@@ -388,8 +398,8 @@ public class WifiInjector {
         return new WifiConnectivityManager(mContext, mWifiStateMachine, getWifiScanner(),
                 mWifiConfigManager, wifiInfo, mWifiNetworkSelector, mWifiLastResortWatchdog,
                 mWifiMetrics, mWifiStateMachineHandlerThread.getLooper(), mClock,
-                hasConnectionRequests, mFrameworkFacade, mSavedNetworkEvaluator,
-                mExternalScoreEvaluator, mRecommendedNetworkEvaluator);
+                hasConnectionRequests
+        );
     }
 
     public WifiPermissionsUtil getWifiPermissionsUtil() {
