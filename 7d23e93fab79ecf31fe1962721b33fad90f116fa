@@ -1,0 +1,8 @@
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Code-Review+2: Mukesh Agrawal <quiche@google.com>
+Verified+1: Aurimas Liutikas <aurimas@google.com>
+Submitted-by: Aurimas Liutikas <aurimas@google.com>
+Submitted-at: Fri, 16 Dec 2016 16:59:49 +0000
+Reviewed-on: https://android-review.googlesource.com/314693
+Project: platform/frameworks/opt/net/wifi
+Branch: refs/heads/master
