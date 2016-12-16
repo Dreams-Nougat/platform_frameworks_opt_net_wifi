@@ -50,6 +50,7 @@ class WifiWakeupController {
     private final Context mContext;
     private final FrameworkFacade mFrameworkFacade;
     private final WifiNetworkSelector mWifiNetworkSelector;
+    private final WifiWakeupHelper mWifiWakeupHelper;
     private final Handler mHandler;
     @VisibleForTesting final ContentObserver mContentObserver;
 
@@ -60,10 +61,11 @@ class WifiWakeupController {
     private boolean mWifiWakeupEnabled;
 
     WifiWakeupController(Context context, Looper looper, FrameworkFacade frameworkFacade,
-            WifiNetworkSelector wifiNetworkSelector) {
+            WifiNetworkSelector wifiNetworkSelector, WifiWakeupHelper wifiWakeupHelper) {
         mContext = context;
         mFrameworkFacade = frameworkFacade;
         mWifiNetworkSelector = wifiNetworkSelector;
+        mWifiWakeupHelper = wifiWakeupHelper;
         mHandler = new Handler(looper);
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -174,9 +176,9 @@ class WifiWakeupController {
                 wifiInfo, false /* connected */, true /* disconnected */,
                 true /* untrustedNetworkAllowed */);
         if (selectedNetwork != null) {
-            // TODO(b/33677088): show notification for wifi enablement
             Log.v(TAG, "Enabling wifi for ssid: " + selectedNetwork.SSID);
             wifiManager.setWifiEnabled(true /* enabled */);
+            mWifiWakeupHelper.showWifiEnabledNotification(selectedNetwork);
         }
     }
 

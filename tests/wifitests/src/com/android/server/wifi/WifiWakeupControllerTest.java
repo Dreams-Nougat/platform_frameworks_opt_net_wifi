@@ -94,6 +94,7 @@ public class WifiWakeupControllerTest {
     @Mock private ContentResolver mContentResolver;
     @Mock private WifiNetworkSelector mWifiNetworkSelector;
     @Mock private WifiManager mWifiManager;
+    @Mock private WifiWakeupHelper mWifiWakeupHelper;
     @Captor private ArgumentCaptor<BroadcastReceiver> mBroadcastReceiverCaptor;
 
     private WifiWakeupController mWifiWakeupController;
@@ -109,7 +110,8 @@ public class WifiWakeupControllerTest {
                 Settings.Global.WIFI_WAKEUP_ENABLED, 0)).thenReturn(1);
 
         mWifiWakeupController = new WifiWakeupController(
-                mContext, new TestLooper().getLooper(), mFrameworkFacade, mWifiNetworkSelector);
+                mContext, new TestLooper().getLooper(), mFrameworkFacade, mWifiNetworkSelector,
+                mWifiWakeupHelper);
 
         verify(mContext).registerReceiver(mBroadcastReceiverCaptor.capture(),
                 any(IntentFilter.class), anyString(), any(Handler.class));
