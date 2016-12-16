@@ -1,0 +1,18 @@
+Revision: 5d202c596532055f00547e76464f5190fc42faea
+Patch-set: 2
+File: service/java/com/android/server/wifi/SupplicantStateTracker.java
+
+3:0-3:53
+Fri Dec 16 11:13:37 2016 +0000
+Author: Atsushi Mito <1052219@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba7d3755_22216e14
+Bytes: 24
+Why is this line needed?
+
+17:1-18:48
+Fri Dec 16 11:13:37 2016 +0000
+Author: Atsushi Mito <1052219@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba7d3755_421e72d7
+Bytes: 14
+Same as above.
+
