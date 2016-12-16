@@ -10,3 +10,11 @@ Bytes: 196
 This hides the mocking that is actually occuring in WifiInjector.
 Instead of using a TestWifiServiceImpl, why not just add WifiInjector to the constructor of WifiServiceImpl, and mock like normal?
 
+50:0-50:63
+Fri Dec 16 00:31:46 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: ba845725_071089fd
+UUID: ba845725_aa53042d
+Bytes: 13
+Awesome idea!
+
