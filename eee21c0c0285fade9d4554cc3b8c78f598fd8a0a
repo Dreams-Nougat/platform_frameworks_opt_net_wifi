@@ -9,6 +9,14 @@ UUID: 1a772381_aa49d336
 Bytes: 172
 It'd be nice to add a description of how this class makes its decision to re-enable Wifi, and how it decides to connect to a network for new engineers looking at this code.
 
+44
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_aa49d336
+UUID: 1a772381_e155b1dd
+Bytes: 4
+Done
+
 58
 Fri Dec 16 19:07:51 2016 +0000
 Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,12 +24,28 @@ UUID: 1a772381_ca552fde
 Bytes: 26
 fyi: using ArraySet: Nice.
 
+58
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_ca552fde
+UUID: 1a772381_1e320cb8
+Bytes: 3
+Ack
+
 72
 Fri Dec 16 19:07:51 2016 +0000
 Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 1a772381_6ac5fb48
 Bytes: 71
 bug to un-register for these config changes if our feature is disabled?
+
+72
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_6ac5fb48
+UUID: 1a772381_de4ed43b
+Bytes: 4
+Done
 
 161
 Fri Dec 16 19:07:51 2016 +0000
@@ -37,6 +61,14 @@ if (VERBOSE) Log.v
 or a fun pattern that only requires adb restart:
 private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG)
 
+161
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_4a067fd0
+UUID: 1a772381_5e0644d0
+Bytes: 4
+Done
+
 171
 Fri Dec 16 19:07:51 2016 +0000
 Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -44,10 +76,26 @@ UUID: 1a772381_aa771379
 Bytes: 3
 b/?
 
+171
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_aa771379
+UUID: 1a772381_fed55004
+Bytes: 4
+Done
+
 185
 Fri Dec 16 19:07:51 2016 +0000
 Author: Joe LaPenna <1000691@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 1a772381_2af063ad
 Bytes: 96
 @jjoslin has background on outputting SSIDs in dumpsys / logs. Double check with him about this.
+
+185
+Fri Dec 16 20:55:56 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_2af063ad
+UUID: 1a772381_c1bc3511
+Bytes: 175
+Jeremy mentioned that there is no restriction that he is aware of for outputting SSIDs in dumpsys. In fact, WifiNetworkScoreCache#dump dumps all of the ssids and score curves.
 
