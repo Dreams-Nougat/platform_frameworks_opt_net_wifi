@@ -99,3 +99,11 @@ UUID: 1a772381_c1bc3511
 Bytes: 175
 Jeremy mentioned that there is no restriction that he is aware of for outputting SSIDs in dumpsys. In fact, WifiNetworkScoreCache#dump dumps all of the ssids and score curves.
 
+185
+Sat Dec 17 05:36:22 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_c1bc3511
+UUID: 1a772381_061c7a90
+Bytes: 44
+quiche@ - can you help out on this question?
+
