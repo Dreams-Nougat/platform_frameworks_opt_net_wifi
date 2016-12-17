@@ -1,0 +1,29 @@
+Revision: 106c972b4dda27612f25209423cb4fef3edfc090
+Patch-set: 4
+File: service/java/com/android/server/wifi/WifiWakeupController.java
+
+154:0-154:60
+Sat Dec 17 05:59:41 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_262336c0
+Bytes: 569
+does this mean that if a user toggles wifi off (say to save battery) but they have location scans on and a scan result comes in, then they would be fighting the notification?
+
+Also, I might be missing it, but since I don't see a lot of protection here between updating the wifi state and handling scan results, i can imagine that some scan results would come in and at that time, the user might have started hotspot or something.  This would cause wifi to be disabled, a scan result to come in and then the hotspot that was just started by the user would be turned off.
+
+183:9-183:13
+Sat Dec 17 05:59:41 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_662d2ea8
+Bytes: 134
+I asked quiche@ to comment on dumping ssids.  I know he has discussed this at length recently with the logging changes coming to wifi.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiWakeupControllerTest.java
+
+119:4-120:51
+Sat Dec 17 05:59:41 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: 1a772381_86088a4d
+Bytes: 110
+please add a comment for each test.  We are trying for a short summary + steps and expectations for each test.
+
