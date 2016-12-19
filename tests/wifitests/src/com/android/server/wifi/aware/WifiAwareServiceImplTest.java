@@ -31,12 +31,12 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.wifi.RttManager;
+import android.net.wifi.aware.Characteristics;
 import android.net.wifi.aware.ConfigRequest;
 import android.net.wifi.aware.IWifiAwareDiscoverySessionCallback;
 import android.net.wifi.aware.IWifiAwareEventCallback;
 import android.net.wifi.aware.PublishConfig;
 import android.net.wifi.aware.SubscribeConfig;
-import android.net.wifi.aware.WifiAwareCharacteristics;
 import android.os.IBinder;
 import android.os.Looper;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -661,7 +661,7 @@ public class WifiAwareServiceImplTest {
         field.set(null, mAwareStateManagerMock);
     }
 
-    private static WifiAwareCharacteristics getCharacteristics() {
+    private static Characteristics getCharacteristics() {
         WifiAwareNative.Capabilities cap = new WifiAwareNative.Capabilities();
         cap.maxConcurrentAwareClusters = 1;
         cap.maxPublishes = 2;

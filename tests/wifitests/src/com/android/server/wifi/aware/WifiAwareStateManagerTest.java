@@ -44,11 +44,11 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.RttManager;
 import android.net.wifi.aware.ConfigRequest;
+import android.net.wifi.aware.DiscoverySessionCallback;
 import android.net.wifi.aware.IWifiAwareDiscoverySessionCallback;
 import android.net.wifi.aware.IWifiAwareEventCallback;
 import android.net.wifi.aware.PublishConfig;
 import android.net.wifi.aware.SubscribeConfig;
-import android.net.wifi.aware.WifiAwareDiscoverySessionCallback;
 import android.net.wifi.aware.WifiAwareManager;
 import android.os.Message;
 import android.os.UserHandle;
@@ -492,7 +492,7 @@ public class WifiAwareStateManagerTest {
         final int uid = 1000;
         final int pid = 2000;
         final String callingPackage = "com.google.somePackage";
-        final int reasonTerminate = WifiAwareDiscoverySessionCallback.TERMINATE_REASON_DONE;
+        final int reasonTerminate = DiscoverySessionCallback.TERMINATE_REASON_DONE;
         final int publishId = 15;
 
         ConfigRequest configRequest = new ConfigRequest.Builder().build();
@@ -754,7 +754,7 @@ public class WifiAwareStateManagerTest {
         final int uid = 1000;
         final int pid = 2000;
         final String callingPackage = "com.google.somePackage";
-        final int reasonTerminate = WifiAwareDiscoverySessionCallback.TERMINATE_REASON_DONE;
+        final int reasonTerminate = DiscoverySessionCallback.TERMINATE_REASON_DONE;
         final int subscribeId = 15;
 
         ConfigRequest configRequest = new ConfigRequest.Builder().build();
@@ -2055,7 +2055,7 @@ public class WifiAwareStateManagerTest {
         final String serviceName = "some-service-name";
         final String ssi = "some much longer and more arbitrary data";
         final int publishCount = 7;
-        final int reason = WifiAwareDiscoverySessionCallback.TERMINATE_REASON_DONE;
+        final int reason = DiscoverySessionCallback.TERMINATE_REASON_DONE;
         final int publishId = 22;
 
         ConfigRequest configRequest = new ConfigRequest.Builder().setClusterLow(clusterLow)
