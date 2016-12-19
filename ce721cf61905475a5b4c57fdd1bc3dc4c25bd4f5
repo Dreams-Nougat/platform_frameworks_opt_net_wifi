@@ -11,3 +11,17 @@ Bytes: 71
 
 What's the call on when we should be using WifiSsid in our code?
 
+62
+Mon Dec 19 23:04:18 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_8e353bef
+Bytes: 73
+connectOption should be first, then optionsAction. confirmed with zhenga@
+
+79
+Mon Dec 19 23:04:18 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: ba845725_2d37123f
+Bytes: 19
+add inline comments
+
