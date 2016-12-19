@@ -107,3 +107,13 @@ UUID: 1a772381_061c7a90
 Bytes: 44
 quiche@ - can you help out on this question?
 
+185
+Mon Dec 19 23:05:21 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_061c7a90
+UUID: d7c9e645_8e4e9b85
+Bytes: 229
+AIUI, dumpsys and logs are two different beasts. For some context about logs, please see go/r-314495-logging.
+
+This particular case looks to be around dumpsys. For dumpsys, I think Joe and Jeremy are more knowledgeable than I am.
+
