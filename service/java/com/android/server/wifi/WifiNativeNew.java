@@ -15,18 +15,22 @@
  */
 package com.android.server.wifi;
 
-
+import android.annotation.Nullable;
 import android.hardware.wifi.V1_0.IWifi;
 import android.hardware.wifi.V1_0.IWifiChip;
 import android.hardware.wifi.V1_0.IWifiRttController;
 import android.hardware.wifi.V1_0.IWifiStaIface;
 import android.hardware.wifi.V1_0.IfaceType;
+import android.hardware.wifi.V1_0.RttConfig;
+import android.hardware.wifi.V1_0.RttResponder;
 import android.hardware.wifi.V1_0.StaBackgroundScanCapabilities;
 import android.hardware.wifi.V1_0.StaLinkLayerStats;
 import android.hardware.wifi.V1_0.WifiStatus;
 import android.hardware.wifi.V1_0.WifiStatusCode;
 import android.hardware.wifi.supplicant.V1_0.ISupplicant;
 import android.hardware.wifi.supplicant.V1_0.ISupplicantStaIface;
+import android.net.wifi.RttManager;
+import android.net.wifi.RttManager.ResponderConfig;
 import android.net.wifi.WifiLinkLayerStats;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -45,8 +49,25 @@ import java.util.NoSuchElementException;
  */
 public class WifiNativeNew {
 
-    private static final boolean DBG = false;
+    private static boolean sDGB = true; // TODO(mplass): false for production
     private static final String TAG = "WifiNativeNew";
+
+    void enableVerboseLogging(int verbose) {
+        if (verbose > 0) {
+            sDGB = true;
+        } else {
+            sDGB = false;
+        }
+    }
+
+    // TODO(mplass): figure out where we need locking in hidl world. b/33383725
+    public static final Object sLock = new Object();
+
+    // HAL command ids
+    private static int sCmdId = 1;
+    private static int getNewCmdIdLocked() {
+        return sCmdId++;
+    }
 
     // Vendor HAL HIDL interface objects.
     private static final String HAL_HIDL_SERVICE_NAME = "wifi";
@@ -54,7 +75,7 @@ public class WifiNativeNew {
     private     IWifiChip mHidlWifiChip;
     private         ArrayList<IWifiChip.ChipMode> mHidlWifiChipAvailableModes = null;
     private         IWifiStaIface mIWifiStaIface;
-    private         IWifiRttController mHidlWifiRttController;
+    private         IWifiRttController mIWifiRttController;
 
     // Supplicant HAL HIDL interface objects
     private ISupplicant mHidlSupplicant;
@@ -146,7 +167,7 @@ public class WifiNativeNew {
             Log.e(TAG, "Failed to find matching mode");
             return false;
         }
-        if (hits > 1) {
+        if (hits > 1 && sDGB) {
             Log.d(TAG, "number of matching modes: " + hits + ", picked modeId " + modeId);
         }
         WifiStatus wifiStatus = mHidlWifiChip.configureChip(modeId);
@@ -170,6 +191,20 @@ public class WifiNativeNew {
         if (mIWifiStaIface == null) {
             return false;
         }
+
+        /** Create the RTT controller */
+        mIWifiRttController = null;
+        mHidlWifiChip.createRttController(
+                mIWifiStaIface,
+                new IWifiChip.createRttControllerCallback() {
+                    public void onValues(WifiStatus status, IWifiRttController rtt) {
+                        if (status.code ==  WifiStatusCode.SUCCESS) {
+                            mIWifiRttController = rtt;
+                            Log.e(TAG, "Made " + mIWifiRttController);
+                        }
+                    }
+                }
+        );
 
         Log.i(TAG, "Retrieved the HIDL interface objects.");
         return true;
@@ -409,6 +444,127 @@ public class WifiNativeNew {
                 }
         );
         return feat.value;
+    }
+
+    /* Rtt related commands/events */
+    /** Interface for handling RTT events */
+    public interface RttEventHandler {
+        /** rtt result callback */
+        void onRttResults(RttManager.RttResult[] result);
+    }
+
+    private static RttEventHandler sRttEventHandler;
+    private static int sRttCmdId;
+
+    // Callback from native
+    // TODO(mplass): This is unused, presumably that's a problem.
+    private static void onRttResults(int id, RttManager.RttResult[] results) {
+        RttEventHandler handler = sRttEventHandler;
+        if (handler != null && id == sRttCmdId) {
+            if (sDGB) Log.d(TAG, "Received " + results.length + " rtt results");
+            handler.onRttResults(results);
+            sRttCmdId = 0;
+        } else {
+            Log.e(TAG, "RTT Received event for unknown cmdId " + id + ", expected " + sRttCmdId);
+        }
+    }
+
+    private ArrayList<RttConfig> rttConfigsFromRttParams(RttManager.RttParams[] params) {
+        return null; //TODO(mplass): code this
+    }
+
+    /** Starts a new rtt request
+     *
+     * @param params
+     * @param handler
+     * @return success indication
+     */
+    public boolean requestRtt(RttManager.RttParams[] params, RttEventHandler handler) {
+        ArrayList<RttConfig> rttConfigs = rttConfigsFromRttParams(params);
+        synchronized (sLock) {
+            if (isHalStarted()) {
+                if (sRttCmdId != 0) {
+                    Log.w(TAG, "Last one is still under measurement!");
+                    return false;
+                }
+                sRttCmdId = getNewCmdIdLocked();
+                sRttEventHandler = handler;
+                WifiStatus status = mIWifiRttController.rangeRequest(sRttCmdId, rttConfigs);
+                return status.code == WifiStatusCode.SUCCESS;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /** Cancels an outstanding rtt request
+     *
+     * @param params
+     * @return true if there was an outstanding request and it was successfully cancelled
+     */
+    public boolean cancelRtt(RttManager.RttParams[] params) {
+        synchronized (sLock) {
+            if (isHalStarted()) {
+                if (sRttCmdId == 0) return false;
+                ArrayList<byte[/* 6 */]> addrs = null; //TODO(mplass): is null OK here?
+                WifiStatus status = mIWifiRttController.rangeCancel(sRttCmdId, addrs);
+                sRttCmdId = 0;
+                return status.code == WifiStatusCode.SUCCESS;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private static int sRttResponderCmdId = 0;
+    /**
+     * Enables RTT responder role on the device.
+     *
+     * @return {@link ResponderConfig} if the responder role is successfully enabled,
+     * {@code null} otherwise.
+     */
+    @Nullable
+    public ResponderConfig enableRttResponder(int timeoutSeconds) {
+        synchronized (sLock) {
+            if (!isHalStarted()) return null;
+            if (mIWifiRttController == null) return null;
+            if (sRttResponderCmdId != 0) {
+                Log.e(TAG, "responder mode already enabled - this shouldn't happen");
+                return null;
+            }
+            ResponderConfig config = null;
+            int id = getNewCmdIdLocked();
+            RttResponder info = new RttResponder();
+            WifiStatus status = mIWifiRttController.enableResponder(
+                    /* cmdId */id,
+                    /* WifiChannelInfo channelHint */null,
+                    timeoutSeconds, info);
+            if (status.code == WifiStatusCode.SUCCESS) {
+                sRttResponderCmdId = id;
+                config = new ResponderConfig(); //TODO(mplass): populate this
+                if (sDGB) Log.d(TAG, "enabling rtt " + sRttResponderCmdId);
+            }
+            return config;
+        }
+    }
+
+    /**
+     * Disables RTT responder role.
+     *
+     * @return {@code true} if responder role is successfully disabled,
+     * {@code false} otherwise.
+     */
+    public boolean disableRttResponder() {
+        synchronized (sLock) {
+            if (!isHalStarted()) return false;
+            if (sRttResponderCmdId == 0) {
+                Log.e(TAG, "responder role not enabled yet");
+                return true; // TODO(mplass) - why is this false?
+            }
+            WifiStatus status = mIWifiRttController.disableResponder(sRttResponderCmdId);
+            sRttResponderCmdId = 0;
+            return status.code == WifiStatusCode.SUCCESS;
+        }
     }
 
 
