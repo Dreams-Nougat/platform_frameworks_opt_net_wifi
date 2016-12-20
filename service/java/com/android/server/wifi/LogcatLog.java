@@ -56,7 +56,7 @@ class LogcatLog implements WifiLog {
 
     @Override
     public LogMessage trace(String format) {
-        return makeLogMessage(Log.DEBUG, format);
+        return makeLogMessage(Log.VERBOSE, format);
     }
 
     @Override
