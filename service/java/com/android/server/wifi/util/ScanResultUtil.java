@@ -89,6 +89,18 @@ public class ScanResultUtil {
     }
 
     /**
+     * Helper method to return the unquoted SSID from a {@link WifiConfiguration} for the purpose
+     * of comparing it to {@link ScanResult#SSID}.
+     */
+    public static String getUnquotedSSID(WifiConfiguration wifiConfiguration) {
+        String ssid = wifiConfiguration.SSID;
+        if (ssid.length() > 1 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
+            return ssid.substring(1, ssid.length() - 1);
+        }
+        return ssid;
+    }
+
+    /**
      * Checks if the provided |scanResult| match with the provided |config|. Essentially checks
      * if the network config and scan result have the same SSID and encryption type.
      */
@@ -124,6 +136,16 @@ public class ScanResultUtil {
     public static WifiConfiguration createNetworkFromScanResult(ScanResult scanResult) {
         WifiConfiguration config = new WifiConfiguration();
         config.SSID = createQuotedSSID(scanResult.SSID);
+        setAllowedKeyManagementFromScanResult(scanResult, config);
+        return config;
+    }
+
+    /**
+     * Sets the {@link WifiConfiguration#allowedKeyManagement} field on the given
+     * {@link WifiConfiguration} based on its corresponding {@link ScanResult}.
+     */
+    public static void setAllowedKeyManagementFromScanResult(ScanResult scanResult,
+            WifiConfiguration config) {
         if (isScanResultForPskNetwork(scanResult)) {
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
         } else if (isScanResultForEapNetwork(scanResult)) {
@@ -136,7 +158,5 @@ public class ScanResultUtil {
         } else {
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
         }
-        return config;
     }
-
 }
