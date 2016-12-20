@@ -67,3 +67,13 @@ UUID: 1a772381_d7a30ee7
 Bytes: 55
 This is used only in the unit test, will move it there.
 
+40:28-40:41
+Tue Dec 20 17:03:26 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_d7a30ee7
+UUID: d7c9e645_d4318d48
+Bytes: 275
+This defines the number of bytes needed for a ProtoPort Tuple.  It is used by multiple test (HSConnectionCapabilityElementTest and ProtocolPortTupleTest) for constructing raw bytes for a tuple.
+
+I prefer leaving this definition here rather than adding one for each test file.
+
