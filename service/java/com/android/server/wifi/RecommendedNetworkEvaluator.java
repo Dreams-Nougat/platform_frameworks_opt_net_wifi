@@ -24,6 +24,7 @@ import android.net.WifiKey;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiNetworkScoreCache;
+import android.os.Process;
 import android.util.LocalLog;
 import android.util.Pair;
 
@@ -107,18 +108,55 @@ public class RecommendedNetworkEvaluator implements WifiNetworkSelector.NetworkE
             return null;
         }
 
+        ScanResult[] scanResultArray = scanResults.toArray(new ScanResult[scanResults.size()]);
         RecommendationRequest request = new RecommendationRequest.Builder()
-                .setScanResults(scanResults.toArray(new ScanResult[scanResults.size()]))
+                .setScanResults(scanResultArray)
                 // TODO: pass in currently recommended network
                 .build();
         RecommendationResult result = mNetworkScoreManager.requestRecommendation(request);
-        if (result != null && result.getWifiConfiguration() != null) {
-            WifiConfiguration wifiConfiguration = result.getWifiConfiguration();
-            // TODO(b/33490132): Get recommended ScanResult and optionally create a
-            // WifiConfiguration for untrusted networks. Also call setNetworkCandidateScanResult.
-            return wifiConfiguration;
+        if (result == null || result.getWifiConfiguration() == null) {
+            return null;
+        }
+
+        WifiConfiguration wifiConfiguration = result.getWifiConfiguration();
+        ScanResult scanResult = findMatchingScanResult(scanResultArray, wifiConfiguration);
+        if (scanResult == null) {
+            mLocalLog.log("Could not match WifiConfiguration to a ScanResult.");
+            return null;
+        }
+
+        final int networkId = wifiConfiguration.networkId == WifiConfiguration.INVALID_NETWORK_ID
+                ? addEphemeralNetwork(wifiConfiguration, scanResult) : wifiConfiguration.networkId;
+        mWifiConfigManager.setNetworkCandidateScanResult(networkId, scanResult, 0 /* score */);
+        return mWifiConfigManager.getConfiguredNetwork(networkId);
+    }
+
+    private ScanResult findMatchingScanResult(ScanResult[] scanResults,
+            WifiConfiguration wifiConfiguration) {
+        String ssid = ScanResultUtil.getUnquotedSSID(wifiConfiguration);
+        String bssid = wifiConfiguration.BSSID;
+        for (int i = 0; i < scanResults.length; i++) {
+            if (ssid.equals(scanResults[i].SSID) && bssid.equals(scanResults[i].BSSID)) {
+                return scanResults[i];
+            }
         }
         return null;
+    }
+
+    private int addEphemeralNetwork(WifiConfiguration wifiConfiguration, ScanResult scanResult) {
+        if (wifiConfiguration.allowedKeyManagement.isEmpty()) {
+            ScanResultUtil.setAllowedKeyManagementFromScanResult(scanResult,
+                    wifiConfiguration);
+        }
+        wifiConfiguration.ephemeral = true;
+        NetworkUpdateResult networkUpdateResult = mWifiConfigManager
+                .addOrUpdateNetwork(wifiConfiguration, Process.WIFI_UID);
+        if (networkUpdateResult.isSuccess()) {
+            return networkUpdateResult.getNetworkId();
+        }
+        mLocalLog.log("Failed to add ephemeral network for networkId: "
+                + WifiNetworkSelector.toScanId(scanResult));
+        return WifiConfiguration.INVALID_NETWORK_ID;
     }
 
     @Override

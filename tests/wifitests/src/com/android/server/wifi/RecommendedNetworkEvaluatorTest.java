@@ -33,6 +33,7 @@ import android.net.WifiKey;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiNetworkScoreCache;
 import android.net.wifi.WifiSsid;
+import android.os.Process;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.LocalLog;
 
@@ -57,11 +58,16 @@ public class RecommendedNetworkEvaluatorTest {
     private static final ScanDetail TRUSTED_SCAN_DETAIL = buildScanDetail("ssid");
     private static final ScanDetail UNTRUSTED_SCAN_DETAIL = buildScanDetail("ssid1");
     private static final WifiConfiguration TRUSTED_WIFI_CONFIGURATION = new WifiConfiguration();
+    private static final WifiConfiguration UNTRUSTED_WIFI_CONFIGURATION = new WifiConfiguration();
     static {
         TRUSTED_WIFI_CONFIGURATION.networkId = 5;
         TRUSTED_WIFI_CONFIGURATION.SSID = TRUSTED_SCAN_DETAIL.getSSID();
+        TRUSTED_WIFI_CONFIGURATION.BSSID = TRUSTED_SCAN_DETAIL.getBSSIDString();
         TRUSTED_WIFI_CONFIGURATION.getNetworkSelectionStatus().setCandidate(
                 TRUSTED_SCAN_DETAIL.getScanResult());
+
+        UNTRUSTED_WIFI_CONFIGURATION.SSID = UNTRUSTED_SCAN_DETAIL.getSSID();
+        UNTRUSTED_WIFI_CONFIGURATION.BSSID = UNTRUSTED_SCAN_DETAIL.getBSSIDString();
     }
 
     @Mock private NetworkScoreManager mNetworkScoreManager;
@@ -84,6 +90,8 @@ public class RecommendedNetworkEvaluatorTest {
                 .thenReturn(TRUSTED_WIFI_CONFIGURATION);
         when(mWifiConfigManager.getSavedNetworkForScanDetailAndCache(UNTRUSTED_SCAN_DETAIL))
                 .thenReturn(null);
+        when(mWifiConfigManager.getConfiguredNetwork(TRUSTED_WIFI_CONFIGURATION.networkId))
+                .thenReturn(TRUSTED_WIFI_CONFIGURATION);
     }
 
     @Test
@@ -163,6 +171,8 @@ public class RecommendedNetworkEvaluatorTest {
         when(mWifiConfigManager.wasEphemeralNetworkDeleted(anyString())).thenReturn(false);
         when(mNetworkScoreManager.requestRecommendation(any(RecommendationRequest.class)))
                 .thenReturn(new RecommendationResult(TRUSTED_WIFI_CONFIGURATION));
+        when(mWifiConfigManager.addOrUpdateNetwork(TRUSTED_WIFI_CONFIGURATION, Process.WIFI_UID))
+                .thenReturn(new NetworkUpdateResult(TRUSTED_WIFI_CONFIGURATION.networkId));
 
         WifiConfiguration result = mRecommendedNetworkEvaluator.evaluateNetworks(
                 Lists.newArrayList(TRUSTED_SCAN_DETAIL, UNTRUSTED_SCAN_DETAIL),
@@ -173,10 +183,12 @@ public class RecommendedNetworkEvaluatorTest {
         assertEquals(1, mRecommendationRequestCaptor.getValue().getScanResults().length);
         assertEquals(TRUSTED_SCAN_DETAIL.getScanResult(),
                 mRecommendationRequestCaptor.getValue().getScanResults()[0]);
+        verify(mWifiConfigManager).setNetworkCandidateScanResult(
+                TRUSTED_WIFI_CONFIGURATION.networkId, TRUSTED_SCAN_DETAIL.getScanResult(), 0);
     }
 
     @Test
-    public void testEvaluateNetworks_recommendation_untrustedNetworksAllowed() {
+    public void testEvaluateNetworks_trustedRecommendation_untrustedNetworksAllowed() {
         when(mWifiConfigManager.wasEphemeralNetworkDeleted(anyString())).thenReturn(false);
         when(mNetworkScoreManager.requestRecommendation(any(RecommendationRequest.class)))
                 .thenReturn(new RecommendationResult(TRUSTED_WIFI_CONFIGURATION));
@@ -192,6 +204,59 @@ public class RecommendedNetworkEvaluatorTest {
                 mRecommendationRequestCaptor.getValue().getScanResults()[0]);
         assertEquals(UNTRUSTED_SCAN_DETAIL.getScanResult(),
                 mRecommendationRequestCaptor.getValue().getScanResults()[1]);
+        verify(mWifiConfigManager).setNetworkCandidateScanResult(
+                TRUSTED_WIFI_CONFIGURATION.networkId, TRUSTED_SCAN_DETAIL.getScanResult(), 0);
+    }
+
+    @Test
+    public void testEvaluateNetworks_untrustedRecommendation_untrustedNetworksAllowed() {
+        NetworkUpdateResult networkUpdateResult = new NetworkUpdateResult(10);
+        when(mWifiConfigManager.addOrUpdateNetwork(UNTRUSTED_WIFI_CONFIGURATION, Process.WIFI_UID))
+                .thenReturn(networkUpdateResult);
+        when(mWifiConfigManager.getConfiguredNetwork(networkUpdateResult.getNetworkId()))
+                .thenReturn(UNTRUSTED_WIFI_CONFIGURATION);
+        when(mWifiConfigManager.wasEphemeralNetworkDeleted(anyString())).thenReturn(false);
+        when(mNetworkScoreManager.requestRecommendation(any(RecommendationRequest.class)))
+                .thenReturn(new RecommendationResult(UNTRUSTED_WIFI_CONFIGURATION));
+
+        WifiConfiguration result = mRecommendedNetworkEvaluator.evaluateNetworks(
+                Lists.newArrayList(TRUSTED_SCAN_DETAIL, UNTRUSTED_SCAN_DETAIL),
+                null, null, false, true /* untrustedNetworkAllowed */, null);
+
+        assertEquals(UNTRUSTED_WIFI_CONFIGURATION, result);
+        verify(mNetworkScoreManager).requestRecommendation(mRecommendationRequestCaptor.capture());
+        assertEquals(2, mRecommendationRequestCaptor.getValue().getScanResults().length);
+        assertEquals(TRUSTED_SCAN_DETAIL.getScanResult(),
+                mRecommendationRequestCaptor.getValue().getScanResults()[0]);
+        assertEquals(UNTRUSTED_SCAN_DETAIL.getScanResult(),
+                mRecommendationRequestCaptor.getValue().getScanResults()[1]);
+        verify(mWifiConfigManager).setNetworkCandidateScanResult(
+                networkUpdateResult.getNetworkId(), UNTRUSTED_SCAN_DETAIL.getScanResult(), 0);
+    }
+
+    @Test
+    public void testEvaluateNetworks_untrustedRecommendation_updateFailed() {
+        NetworkUpdateResult networkUpdateResult = new NetworkUpdateResult(
+                WifiConfiguration.INVALID_NETWORK_ID);
+        when(mWifiConfigManager.addOrUpdateNetwork(UNTRUSTED_WIFI_CONFIGURATION, Process.WIFI_UID))
+                .thenReturn(networkUpdateResult);
+        when(mWifiConfigManager.wasEphemeralNetworkDeleted(anyString())).thenReturn(false);
+        when(mNetworkScoreManager.requestRecommendation(any(RecommendationRequest.class)))
+                .thenReturn(new RecommendationResult(UNTRUSTED_WIFI_CONFIGURATION));
+
+        WifiConfiguration result = mRecommendedNetworkEvaluator.evaluateNetworks(
+                Lists.newArrayList(TRUSTED_SCAN_DETAIL, UNTRUSTED_SCAN_DETAIL),
+                null, null, false, true /* untrustedNetworkAllowed */, null);
+
+        assertNull(result);
+        verify(mNetworkScoreManager).requestRecommendation(mRecommendationRequestCaptor.capture());
+        assertEquals(2, mRecommendationRequestCaptor.getValue().getScanResults().length);
+        assertEquals(TRUSTED_SCAN_DETAIL.getScanResult(),
+                mRecommendationRequestCaptor.getValue().getScanResults()[0]);
+        assertEquals(UNTRUSTED_SCAN_DETAIL.getScanResult(),
+                mRecommendationRequestCaptor.getValue().getScanResults()[1]);
+        verify(mWifiConfigManager).setNetworkCandidateScanResult(
+                UNTRUSTED_WIFI_CONFIGURATION.networkId, UNTRUSTED_SCAN_DETAIL.getScanResult(), 0);
     }
 
     @Test
