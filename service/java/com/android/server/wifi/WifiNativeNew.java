@@ -583,6 +583,34 @@ public class WifiNativeNew {
         }
     }
 
+    /** not supported */
+    public boolean setScanningMacOui(byte[] oui) {
+        Log.e(TAG, "setScanningMacOui does nothing");
+        return false;
+    }
+
+    /** not supported */
+    public int [] getChannelsForBand(int band) {
+        // stub - only known caller is ApConfigUtil.updateApChannelConfig()
+        return null;
+    }
+
+    /** not supported */
+    public boolean isGetChannelsForBandSupported() {
+        // see getChannelsForBand
+        return false;
+    }
+
+    /** Set DFS - actually, this is always on.
+     *
+     * @param dfsOn
+     * @return success indication
+     */
+    public boolean setDfsFlag(boolean dfsOn) {
+        if (dfsOn) return true;
+        return false;
+    }
+
 
 
     private boolean startSupplicantHal() {
