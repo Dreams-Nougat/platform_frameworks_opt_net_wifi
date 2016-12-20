@@ -20,8 +20,9 @@ import android.util.Log;
 
 import com.android.internal.annotations.Immutable;
 
-import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides a WifiLog implementation which uses logd as the
  * logging backend.
@@ -33,9 +34,39 @@ import javax.annotation.concurrent.ThreadSafe;
 @Immutable
 class LogcatLog implements WifiLog {
     private final String mTag;
+    private static boolean sVerboseLogging = false;
+    private static final ReentrantReadWriteLock sLock = new ReentrantReadWriteLock();
 
     LogcatLog(String tag) {
         mTag = tag;
+    }
+
+    public static void enableVerboseLogging(int verboseMode) {
+        if (verboseMode > 0) {
+            setVerboseLogging(true);
+        } else {
+            setVerboseLogging(false);
+        }
+    }
+
+    private static void setVerboseLogging(boolean value) {
+        sLock.writeLock().lock();
+        try {
+            sVerboseLogging = value;
+        } finally {
+            sLock.writeLock().unlock();
+        }
+    }
+
+    private static boolean getVerboseLogging() {
+        boolean retValue = false;
+        sLock.readLock().lock();
+        try {
+            retValue = sVerboseLogging;
+        } finally {
+            sLock.readLock().unlock();
+        }
+        return retValue;
     }
 
     /* New-style methods */
@@ -56,7 +87,7 @@ class LogcatLog implements WifiLog {
 
     @Override
     public LogMessage trace(String format) {
-        return makeLogMessage(Log.DEBUG, format);
+        return makeLogMessage(Log.VERBOSE, format);
     }
 
     @Override
@@ -168,7 +199,9 @@ class LogcatLog implements WifiLog {
             if (mNextFormatCharPos < mFormat.length()) {
                 mStringBuilder.append(mFormat, mNextFormatCharPos, mFormat.length());
             }
-            Log.println(mLogLevel, mTag, mStringBuilder.toString());
+            if (getVerboseLogging() || mLogLevel > Log.VERBOSE) {
+                Log.println(mLogLevel, mTag, mStringBuilder.toString());
+            }
         }
 
         /* Should generally not be used; implemented primarily to aid in testing. */
