@@ -21,7 +21,6 @@ import android.util.Log;
 import com.android.internal.annotations.Immutable;
 
 import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Provides a WifiLog implementation which uses logd as the
  * logging backend.
@@ -33,9 +32,18 @@ import javax.annotation.concurrent.ThreadSafe;
 @Immutable
 class LogcatLog implements WifiLog {
     private final String mTag;
+    private static volatile boolean sVerboseLogging = false;
 
     LogcatLog(String tag) {
         mTag = tag;
+    }
+
+    public static void enableVerboseLogging(int verboseMode) {
+        if (verboseMode > 0) {
+            sVerboseLogging = true;
+        } else {
+            sVerboseLogging = false;
+        }
     }
 
     /* New-style methods */
@@ -168,7 +176,9 @@ class LogcatLog implements WifiLog {
             if (mNextFormatCharPos < mFormat.length()) {
                 mStringBuilder.append(mFormat, mNextFormatCharPos, mFormat.length());
             }
-            Log.println(mLogLevel, mTag, mStringBuilder.toString());
+            if (sVerboseLogging || mLogLevel > Log.DEBUG) {
+                Log.println(mLogLevel, mTag, mStringBuilder.toString());
+            }
         }
 
         /* Should generally not be used; implemented primarily to aid in testing. */
