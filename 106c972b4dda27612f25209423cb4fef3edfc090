@@ -11,6 +11,14 @@ does this mean that if a user toggles wifi off (say to save battery) but they ha
 
 Also, I might be missing it, but since I don't see a lot of protection here between updating the wifi state and handling scan results, i can imagine that some scan results would come in and at that time, the user might have started hotspot or something.  This would cause wifi to be disabled, a scan result to come in and then the hotspot that was just started by the user would be turned off.
 
+154
+Tue Dec 20 03:56:48 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_262336c0
+UUID: d7c9e645_fa4ef5de
+Bytes: 99
+Added a check to ensure that wifi ap state is also disabled before checking whether to enable wifi.
+
 183:9-183:13
 Sat Dec 17 05:59:41 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -26,4 +34,12 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: 1a772381_86088a4d
 Bytes: 110
 please add a comment for each test.  We are trying for a short summary + steps and expectations for each test.
+
+120
+Tue Dec 20 03:56:48 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 1a772381_86088a4d
+UUID: d7c9e645_9a5b319c
+Bytes: 4
+Done
 
