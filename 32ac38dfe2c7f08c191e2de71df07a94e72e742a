@@ -1,0 +1,20 @@
+Revision: 32ac38dfe2c7f08c191e2de71df07a94e72e742a
+Patch-set: 6
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+45:0-46:59
+Tue Dec 20 18:57:32 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_97aa27ba
+Bytes: 7
+unused?
+
+File: tests/wifitests/src/com/android/server/wifi/aware/WifiAwareServiceImplTest.java
+
+109:7-110:31
+Tue Dec 20 18:57:32 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_b70ba305
+Bytes: 65
+is this for testing message handling?  you can use the TestLooper
+
