@@ -9,6 +9,16 @@ UUID: d7c9e645_97aa27ba
 Bytes: 7
 unused?
 
+45:0-46:59
+Wed Dec 21 19:09:40 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_97aa27ba
+UUID: d7c9e645_8622edb9
+Bytes: 83
+Done
+
+Didn't have checkstyle enabled on branch so wasn't caught. Fixed that glitch.
+
 File: tests/wifitests/src/com/android/server/wifi/aware/WifiAwareServiceImplTest.java
 
 109:7-110:31
@@ -17,4 +27,12 @@ Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_b70ba305
 Bytes: 65
 is this for testing message handling?  you can use the TestLooper
+
+109:7-110:31
+Wed Dec 21 19:09:40 2016 +0000
+Author: Etan Cohen <1039103@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_b70ba305
+UUID: d7c9e645_86f98d0d
+Bytes: 95
+Replaced with a full mock. It is passed to another mock so don't really need a functioning one.
 
