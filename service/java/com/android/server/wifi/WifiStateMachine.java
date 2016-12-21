@@ -3720,6 +3720,9 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
                 case CMD_BOOT_COMPLETED:
                     maybeRegisterNetworkFactory();
                     mWifiNativeNew.registerForServiceNotification();
+                    if (!mWifiP2pNativeNew.registerForServiceNotification()) {
+                        loge("Could not register P2P interface for service notifications.");
+                    }
                     break;
                 case CMD_SCREEN_STATE_CHANGED:
                     handleScreenStateChanged(message.arg1 != 0);
@@ -4132,7 +4135,11 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
 
             /*if (!mWifiNativeNew.startSupplicantHidl()) {
                 Log.e(TAG, "Failed to start HIDL Supplicant Interface");
-            }*/
+            }
+            if (!mWifiP2pNativeNew.startSupplicantHidl()) {
+                Log.e(TAG, "Failed to start HIDL P2P Supplicant Interface");
+            }
+            */
 
             /* Wifi is available as long as we have a connection to supplicant */
             mNetworkInfo.setIsAvailable(true);
