@@ -899,9 +899,11 @@ public class WifiConfigManager {
                             existingInternalConfig, config, uid);
         }
 
-        // Update the keys for enterprise networks.
+        // Update the keys for non-Passpoint enterprise networks.  For Passpoint, the certificates
+        // and keys are installed at the time the provider is installed.
         if (config.enterpriseConfig != null
-                && config.enterpriseConfig.getEapMethod() != WifiEnterpriseConfig.Eap.NONE) {
+                && config.enterpriseConfig.getEapMethod() != WifiEnterpriseConfig.Eap.NONE
+                && !config.isPasspoint()) {
             if (!(mWifiKeyStore.updateNetworkKeys(newInternalConfig, existingInternalConfig))) {
                 return new NetworkUpdateResult(WifiConfiguration.INVALID_NETWORK_ID);
             }
