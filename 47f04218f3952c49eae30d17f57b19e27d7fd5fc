@@ -1,0 +1,35 @@
+Revision: 47f04218f3952c49eae30d17f57b19e27d7fd5fc
+Patch-set: 2
+File: service/java/com/android/server/wifi/LogcatLog.java
+
+38
+Wed Dec 21 21:20:41 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_bcf4d6af
+Bytes: 225
+Could we simply declare sVerboseLogging as |volatile|, instead?
+
+
+Note that Java's notion of "volatile" provides stronger guarantees than C's notion. (https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html)
+
+69
+Wed Dec 21 21:20:41 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_7cd74e0e
+Bytes: 91
+Assuming that |volatile| is sufficient, these three methods can (and should) be simplified.
+
+90:34-90:41
+Wed Dec 21 21:20:41 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_3c3f8678
+Bytes: 189
+IIRC, |VERBOSE| was just our first stab at trying to filter the messages out. Now that we've got a better way (one that actually works :-)), I think we can back out this part of the change.
+
+202:51-202:62
+Wed Dec 21 21:20:41 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_bcc6165c
+Bytes: 84
+Assuming we change trace() to map to DEBUG, we should change this condition as well.
+
