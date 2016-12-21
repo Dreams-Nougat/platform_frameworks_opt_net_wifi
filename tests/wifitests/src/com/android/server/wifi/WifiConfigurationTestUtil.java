@@ -277,7 +277,7 @@ public class WifiConfigurationTestUtil {
     public static WifiConfiguration createEapNetwork() {
         WifiConfiguration configuration =
                 generateWifiConfig(TEST_NETWORK_ID, TEST_UID, createNewSSID(), true, true,
-                        TEST_FQDN, TEST_PROVIDER_FRIENDLY_NAME, SECURITY_EAP);
+                        null, null, SECURITY_EAP);
         return configuration;
     }
 
