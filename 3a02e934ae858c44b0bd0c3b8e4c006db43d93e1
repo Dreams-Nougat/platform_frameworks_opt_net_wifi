@@ -1,0 +1,15 @@
+Revision: 3a02e934ae858c44b0bd0c3b8e4c006db43d93e1
+Patch-set: 2
+File: service/java/com/android/server/wifi/WifiInjector.java
+
+61:4-63:67
+Wed Dec 21 19:28:47 2016 +0000
+Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_e6f971a5
+Bytes: 663
+I can't say that I am too fond of this.  These seem like a sign that too much is getting pushed in to WifiInjector.
+
+Making WifiNotificationController to depend on WifiNetworkSelector seems like an odd direction.  We are attempting to get WifiNetworkSelector out of WifiInjector.  This would be especially awkward if WifiNotificationController is eventually moved out of this package (which was what I thought was the intended direction based on the abandoned CL discussion).
+
+Is there a design for all of this?  There are many implications for doing these moves - including slowing down work that we are doing to refactor code that is also a high priority for O.
+
