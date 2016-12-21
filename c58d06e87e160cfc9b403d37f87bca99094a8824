@@ -18,3 +18,11 @@ Bytes: 200
 Flash the watch, check that the consent UI was displayed, in both apps (the one with CompileSDK=21 and TargetSD=21, and the one with CompileSDK=25 and TargetSD=25).
 Or, you mean in the CL description?
 
+10
+Wed Dec 21 16:37:51 2016 +0000
+Author: Paul Stewart <1077073@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: 17237e9f_5b55dbdc
+UUID: d7c9e645_d76d02af
+Bytes: 43
+I'd prefer to see it in the CL description.
+
