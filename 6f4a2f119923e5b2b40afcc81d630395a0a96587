@@ -9,12 +9,28 @@ UUID: d7c9e645_71f45e64
 Bytes: 54
 can we also log if they wanted it enabled or disabled?
 
+591:20-591:34
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_71f45e64
+UUID: d7c9e645_72253cd1
+Bytes: 4
+Done
+
 641:39-641:40
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_11095a97
 Bytes: 4
 typo
+
+641:39-641:40
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_11095a97
+UUID: d7c9e645_92ff88f2
+Bytes: 4
+Done
 
 654:20-654:36
 Wed Dec 21 06:58:55 2016 +0000
@@ -23,12 +39,28 @@ UUID: d7c9e645_3106d689
 Bytes: 37
 also log if it is enabled or disabled
 
+654:20-654:36
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_3106d689
+UUID: d7c9e645_f2104c71
+Bytes: 4
+Done
+
 768:27-768:29
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_d102f272
 Bytes: 6
 delete
+
+768:27-768:29
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_d102f272
+UUID: d7c9e645_d213d07b
+Bytes: 4
+Done
 
 990:20-990:33
 Wed Dec 21 06:58:55 2016 +0000
@@ -37,12 +69,28 @@ UUID: d7c9e645_51684231
 Bytes: 249
 i don't know if this is something we want to do here, but it would be good to log the network id and the boolean too.  then we will know if a particular network is enabled, who is to blame..  or after one is disabled, why the rest are also disabled.
 
+990:20-990:33
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_51684231
+UUID: d7c9e645_32f0141d
+Bytes: 103
+network id can be classified as private information. Let me create another bug to use PII logging APIs.
+
 1009:20-1009:34
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_1152ba83
 Bytes: 99
 say which network?  (then we will know if someone is disabling networks that shouldn't be doing it)
+
+1009:20-1009:34
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_1152ba83
+UUID: d7c9e645_f2328c03
+Bytes: 24
+same comment as line 990
 
 1494:29-1494:30
 Wed Dec 21 06:58:55 2016 +0000
@@ -51,12 +99,28 @@ UUID: d7c9e645_d15bd29a
 Bytes: 59
 was this not working?  it seems like it should have been ok
 
+1494:29-1494:30
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_d15bd29a
+UUID: d7c9e645_9241c85e
+Bytes: 4
+Typo
+
 1544:20-1544:35
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_f1584ea0
 Bytes: 42
 tracing the lockMode here would be helpful
+
+1544:20-1544:35
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_f1584ea0
+UUID: d7c9e645_523b60dc
+Bytes: 4
+Done
 
 1599:20-1599:40
 Wed Dec 21 06:58:55 2016 +0000
@@ -65,12 +129,28 @@ UUID: d7c9e645_113b9a2b
 Bytes: 40
 trace the setting here would be nice too
 
+1599:20-1599:40
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_113b9a2b
+UUID: d7c9e645_5274c0ac
+Bytes: 4
+Done
+
 1629:15-1629:36
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_f1312e48
 Bytes: 15
 trace this one?
+
+1629:15-1629:36
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_f1312e48
+UUID: d7c9e645_d26750fe
+Bytes: 4
+Done
 
 1637:20-1637:44
 Wed Dec 21 06:58:55 2016 +0000
@@ -79,6 +159,14 @@ UUID: d7c9e645_91a0ea45
 Bytes: 6
 param?
 
+1637:20-1637:44
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_91a0ea45
+UUID: d7c9e645_b29884c5
+Bytes: 4
+Done
+
 1651:20-1651:51
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -86,10 +174,26 @@ UUID: d7c9e645_d134323b
 Bytes: 48
 log the param too so we know if it is on or off?
 
+1651:20-1651:51
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_d134323b
+UUID: d7c9e645_d280b04c
+Bytes: 4
+Done
+
 1804:20-1804:49
 Wed Dec 21 06:58:55 2016 +0000
 Author: Rebecca Silberstein <1081395@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_b1a5e655
 Bytes: 14
 and the param?
+
+1804:20-1804:49
+Wed Dec 21 18:28:00 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_b1a5e655
+UUID: d7c9e645_d2d99084
+Bytes: 4
+Done
 
