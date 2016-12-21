@@ -1,0 +1,18 @@
+Revision: bc5b2315018df3fe5dc883f9d282b80437202721
+Patch-set: 5
+File: service/java/com/android/server/wifi/WifiServiceImpl.java
+
+593:19-593:44
+Wed Dec 21 21:33:06 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_1fce3c46
+Bytes: 142
+I suspect there will be multiple places where we want to log a bool. Perhaps we should add a corresponding overload of LogMessage.c() instead?
+
+660:19-660:45
+Wed Dec 21 21:33:06 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_3f20d80f
+Bytes: 15
+As at line 593.
+
