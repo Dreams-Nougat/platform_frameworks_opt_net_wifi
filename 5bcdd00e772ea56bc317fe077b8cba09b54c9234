@@ -1,0 +1,20 @@
+Revision: 5bcdd00e772ea56bc317fe077b8cba09b54c9234
+Patch-set: 7
+File: service/java/com/android/server/wifi/WifiServiceImpl.java
+
+590
+Thu Dec 22 22:33:42 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_475f0d58
+Bytes: 191
+Unless there's a pressing need to get this CL in, I'd like to have this CL updated to use the new overload, rather than landing as-is.
+
+(If there's a pressing need, please elaborate. Thanks.)
+
+658
+Thu Dec 22 22:33:42 2016 +0000
+Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_e72dd9c4
+Bytes: 15
+As at line 590.
+
