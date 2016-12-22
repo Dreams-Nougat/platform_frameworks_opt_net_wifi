@@ -1,0 +1,34 @@
+Revision: 952b7c99064ecba0e8982f2c298b01b55d47c12b
+Patch-set: 5
+File: service/java/com/android/server/wifi/RecommendedNetworkEvaluator.java
+
+123:0-126:9
+Thu Dec 22 19:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_d8dd202f
+Bytes: 162
+Is that this shouldn't happen? In case it does, it means something bad happened within RecommendationResult? Shall we raise a flag in addition to just a locallog?
+
+144:16-144:48
+Thu Dec 22 19:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_3886a4a7
+Bytes: 138
+Since there is already ScanResultUtil#createQuotedSSID, why not apply that to ScanResult.SSID then compare against WifiConfiguration#SSID?
+
+157:0-158:73
+Thu Dec 22 19:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_7ba2e681
+Bytes: 146
+WifiConfigManager will make a copy of this WifiConfiguration and broadcast it with the internal one. Just want to make sure you are aware of that.
+
+File: service/java/com/android/server/wifi/util/ScanResultUtil.java
+
+91:0-101:5
+Thu Dec 22 19:18:45 2016 +0000
+Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_9bc47234
+Bytes: 69
+Don't need this. See the comment in RecommendedNetworkEvaluator.java.
+
