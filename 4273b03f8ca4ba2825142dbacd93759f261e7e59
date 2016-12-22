@@ -1,0 +1,12 @@
+Revision: 4273b03f8ca4ba2825142dbacd93759f261e7e59
+Patch-set: 4
+File: service/java/com/android/server/wifi/hotspot2/PasspointProvider.java
+
+202:26-202:31
+Thu Dec 22 20:59:34 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_db0e7a1c
+Bytes: 188
+Should this be named something more explicit, like authMatch()?
+If this is specifically for matching auth, I think yes, but if auth is being used as the generic matcher, then i understand.
+
