@@ -9,6 +9,14 @@ UUID: d7c9e645_d027437b
 Bytes: 78
 Can this scoring expression be explained in comments? Where does it come from?
 
+127:0-128:83
+Thu Dec 22 00:17:49 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_d027437b
+UUID: d7c9e645_0b7efe7f
+Bytes: 99
+This is out of scope of this CL. This file will get updated in the future. It is on my TODO list :)
+
 File: tests/wifitests/src/com/android/server/wifi/hotspot2/anqp/HSWanMetricsElementTest.java
 
 37:0-41:47
@@ -17,4 +25,12 @@ Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_0b591ea2
 Bytes: 82
 Make these unique values so the test will fail if they get mixed up or mis-parsed.
+
+37:0-41:47
+Thu Dec 22 00:17:49 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_0b591ea2
+UUID: d7c9e645_0bd7de51
+Bytes: 13
+Sure will do.
 
