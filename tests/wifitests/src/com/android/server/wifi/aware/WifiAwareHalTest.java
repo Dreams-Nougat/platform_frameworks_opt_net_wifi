@@ -120,12 +120,15 @@ public class WifiAwareHalTest {
         final int publishTtl = 66;
         final boolean enableTerminateNotification = true;
 
-        TlvBufferUtils.TlvConstructor tlvMatch = new TlvBufferUtils.TlvConstructor(0, 1);
-        tlvMatch.allocate(150).putByte(0, (byte) 10).putInt(0, 100).putString(0, "some string")
-                .putZeroLengthElement(0);
+        byte[][] matchFilter =  {
+                { 10 },
+                { 20, 30 },
+                null,
+                new String("some string").getBytes()
+        };
 
         testPublish(transactionId, publishId, PublishConfig.PUBLISH_TYPE_UNSOLICITED, serviceName,
-                ssi, tlvMatch, publishCount, publishTtl, enableTerminateNotification);
+                ssi, matchFilter, publishCount, publishTtl, enableTerminateNotification);
     }
 
     @Test
@@ -138,12 +141,15 @@ public class WifiAwareHalTest {
         final int publishTtl = 33;
         final boolean enableTerminateNotification = false;
 
-        TlvBufferUtils.TlvConstructor tlvMatch = new TlvBufferUtils.TlvConstructor(0, 1);
-        tlvMatch.allocate(150).putByte(0, (byte) 10).putInt(0, 100).putString(0, "some string")
-                .putZeroLengthElement(0);
+        byte[][] matchFilter =  {
+                { 10 },
+                { 20, 30 },
+                null,
+                new String("some string").getBytes()
+        };
 
         testPublish(transactionId, publishId, PublishConfig.PUBLISH_TYPE_SOLICITED, serviceName,
-                ssi, tlvMatch, publishCount, publishTtl, enableTerminateNotification);
+                ssi, matchFilter, publishCount, publishTtl, enableTerminateNotification);
     }
 
     @Test
@@ -171,12 +177,15 @@ public class WifiAwareHalTest {
         final int matchStyle = SubscribeConfig.MATCH_STYLE_ALL;
         final boolean enableTerminateNotification = true;
 
-        TlvBufferUtils.TlvConstructor tlvMatch = new TlvBufferUtils.TlvConstructor(0, 1);
-        tlvMatch.allocate(150).putByte(0, (byte) 10).putInt(0, 100).putString(0, "some string")
-                .putZeroLengthElement(0);
+        byte[][] matchFilter =  {
+                { 10 },
+                { 20, 30 },
+                null,
+                new String("some string").getBytes()
+        };
 
         testSubscribe(transactionId, subscribeId, SubscribeConfig.SUBSCRIBE_TYPE_PASSIVE,
-                serviceName, ssi, tlvMatch, subscribeCount, subscribeTtl, matchStyle,
+                serviceName, ssi, matchFilter, subscribeCount, subscribeTtl, matchStyle,
                 enableTerminateNotification);
     }
 
@@ -191,12 +200,15 @@ public class WifiAwareHalTest {
         final int matchStyle = SubscribeConfig.MATCH_STYLE_FIRST_ONLY;
         final boolean enableTerminateNotification = false;
 
-        TlvBufferUtils.TlvConstructor tlvMatch = new TlvBufferUtils.TlvConstructor(0, 1);
-        tlvMatch.allocate(150).putByte(0, (byte) 10).putInt(0, 100).putString(0, "some string")
-                .putZeroLengthElement(0);
+        byte[][] matchFilter =  {
+                { 10 },
+                { 20, 30 },
+                null,
+                new String("some string").getBytes()
+        };
 
         testSubscribe(transactionId, subscribeId, SubscribeConfig.SUBSCRIBE_TYPE_ACTIVE,
-                serviceName, ssi, tlvMatch, subscribeCount, subscribeTtl, matchStyle,
+                serviceName, ssi, matchFilter, subscribeCount, subscribeTtl, matchStyle,
                 enableTerminateNotification);
     }
 
@@ -1091,12 +1103,11 @@ public class WifiAwareHalTest {
     }
 
     private void testPublish(short transactionId, int publishId, int publishType,
-            String serviceName, String ssi, TlvBufferUtils.TlvConstructor tlvMatch,
+            String serviceName, String ssi, byte[][] matchFilter,
             int publishCount, int publishTtl, boolean enableTerminateNotification)
             throws JSONException {
         PublishConfig publishConfig = new PublishConfig.Builder().setServiceName(serviceName)
-                .setServiceSpecificInfo(ssi.getBytes()).setMatchFilter(
-                        new TlvBufferUtils.TlvIterable(0, 1, tlvMatch.getArray()).toList())
+                .setServiceSpecificInfo(ssi.getBytes()).setMatchFilter(matchFilter)
                 .setPublishType(publishType)
                 .setPublishCount(publishCount).setTtlSec(publishTtl)
                 .setTerminateNotificationEnabled(enableTerminateNotification).build();
@@ -1126,10 +1137,12 @@ public class WifiAwareHalTest {
                 equalTo(0));
         if (publishType == PublishConfig.PUBLISH_TYPE_SOLICITED) {
             collector.checkThat("rx_match_filter", argsData.getByteArray("rx_match_filter"),
-                    equalTo(tlvMatch.getArray()));
+                    equalTo(new TlvBufferUtils.TlvConstructor(0, 1).allocateAndPut(
+                            matchFilter).getArray()));
         } else {
             collector.checkThat("tx_match_filter", argsData.getByteArray("tx_match_filter"),
-                    equalTo(tlvMatch.getArray()));
+                    equalTo(new TlvBufferUtils.TlvConstructor(0, 1).allocateAndPut(
+                            matchFilter).getArray()));
         }
         collector.checkThat("rssi_threshold_flag", argsData.getInt("rssi_threshold_flag"),
                 equalTo(0));
@@ -1139,13 +1152,12 @@ public class WifiAwareHalTest {
     }
 
     private void testSubscribe(short transactionId, int subscribeId, int subscribeType,
-            String serviceName, String ssi, TlvBufferUtils.TlvConstructor tlvMatch,
+            String serviceName, String ssi, byte[][] matchFilter,
             int subscribeCount, int subscribeTtl, int matchStyle,
             boolean enableTerminateNotification) throws JSONException {
         SubscribeConfig subscribeConfig = new SubscribeConfig.Builder()
                 .setServiceName(serviceName).setServiceSpecificInfo(ssi.getBytes())
-                .setMatchFilter(
-                        new TlvBufferUtils.TlvIterable(0, 1, tlvMatch.getArray()).toList())
+                .setMatchFilter(matchFilter)
                 .setSubscribeType(subscribeType)
                 .setSubscribeCount(subscribeCount).setTtlSec(subscribeTtl).setMatchStyle(matchStyle)
                 .setTerminateNotificationEnabled(enableTerminateNotification).build();
@@ -1183,10 +1195,12 @@ public class WifiAwareHalTest {
                 equalTo(ssi.getBytes()));
         if (subscribeType == SubscribeConfig.SUBSCRIBE_TYPE_PASSIVE) {
             collector.checkThat("rx_match_filter", argsData.getByteArray("rx_match_filter"),
-                    equalTo(tlvMatch.getArray()));
+                    equalTo(new TlvBufferUtils.TlvConstructor(0, 1).allocateAndPut(
+                            matchFilter).getArray()));
         } else {
             collector.checkThat("tx_match_filter", argsData.getByteArray("tx_match_filter"),
-                    equalTo(tlvMatch.getArray()));
+                    equalTo(new TlvBufferUtils.TlvConstructor(0, 1).allocateAndPut(
+                            matchFilter).getArray()));
         }
         collector.checkThat("rssi_threshold_flag", argsData.getInt("rssi_threshold_flag"),
                 equalTo(0));
