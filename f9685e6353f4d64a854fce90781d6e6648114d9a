@@ -1,0 +1,20 @@
+Revision: f9685e6353f4d64a854fce90781d6e6648114d9a
+Patch-set: 1
+File: service/java/com/android/server/wifi/WifiConnectivityManager.java
+
+123:29-123:69
+Thu Dec 22 00:14:03 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_8b250ed4
+Bytes: 54
+Still need to figure out if that's the right priority.
+
+File: tests/wifitests/src/com/android/server/wifi/WifiConfigurationTestUtil.java
+
+280:24-280:34
+Thu Dec 22 00:14:03 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_2bf3ba2c
+Bytes: 107
+I think that's the right value to use, since there is difference between EAP network and Passpoint network.
+
