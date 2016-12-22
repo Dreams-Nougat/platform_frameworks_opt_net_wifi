@@ -9,3 +9,11 @@ UUID: d7c9e645_2bddfac9
 Bytes: 36
 [Immaterial Comment] Do we use this?
 
+37:13-37:28
+Thu Dec 22 04:13:28 2016 +0000
+Author: Peter Qiu <1079868@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_2bddfac9
+UUID: d7c9e645_f5afcc7a
+Bytes: 87
+Yes, it is used by ThreeGPPNetworkElement, where it contains a list of CellularNetwork.
+
