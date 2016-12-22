@@ -12,12 +12,28 @@ Could we simply declare sVerboseLogging as |volatile|, instead?
 
 Note that Java's notion of "volatile" provides stronger guarantees than C's notion. (https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html)
 
+38
+Thu Dec 22 18:15:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_bcf4d6af
+UUID: d7c9e645_c4d7800c
+Bytes: 4
+Done
+
 69
 Wed Dec 21 21:20:41 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_7cd74e0e
 Bytes: 91
 Assuming that |volatile| is sufficient, these three methods can (and should) be simplified.
+
+69
+Thu Dec 22 18:15:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_7cd74e0e
+UUID: d7c9e645_a4eef4d1
+Bytes: 4
+Done
 
 90:34-90:41
 Wed Dec 21 21:20:41 2016 +0000
@@ -26,10 +42,26 @@ UUID: d7c9e645_3c3f8678
 Bytes: 189
 IIRC, |VERBOSE| was just our first stab at trying to filter the messages out. Now that we've got a better way (one that actually works :-)), I think we can back out this part of the change.
 
+90:34-90:41
+Thu Dec 22 18:15:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_3c3f8678
+UUID: d7c9e645_44eb90c2
+Bytes: 4
+Done
+
 202:51-202:62
 Wed Dec 21 21:20:41 2016 +0000
 Author: Mukesh Agrawal <1081399@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_bcc6165c
 Bytes: 84
 Assuming we change trace() to map to DEBUG, we should change this condition as well.
+
+202:51-202:62
+Thu Dec 22 18:15:08 2016 +0000
+Author: Sohani Rao <1118893@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_bcc6165c
+UUID: d7c9e645_64e80cc5
+Bytes: 4
+Done
 
