@@ -1,0 +1,18 @@
+Revision: 91b5161b8d8447b9353948be078e9bfeb26b7ed6
+Patch-set: 5
+File: service/java/com/android/server/wifi/hotspot2/ANQPRequestManager.java
+
+46:22-46:26
+Thu Dec 22 23:57:15 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_d1ddfb2e
+Bytes: 34
+What does this Long key represent?
+
+112:0-113:74
+Thu Dec 22 23:57:15 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_a7f111e6
+Bytes: 111
+Please also explicitly state what ANQP Elements (or sets of elements) you are requesting by setting these flags
+
