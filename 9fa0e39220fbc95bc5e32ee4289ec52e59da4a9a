@@ -1,0 +1,12 @@
+Revision: 9fa0e39220fbc95bc5e32ee4289ec52e59da4a9a
+Patch-set: 4
+File: service/java/com/android/server/wifi/hotspot2/PasspointManager.java
+
+52:0-54:3
+Thu Dec 22 18:21:51 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_d868c065
+Bytes: 366
+Could you please make this more detailed, as it will probably be the first touchpoint people have on passpoint code (that and passpoint configuration). Something closer to WifiConfigManager's javadoc:
+https://cs.corp.google.com/android/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java?q=configmanager&sq=package:android&dr=CSs&l=86
+
