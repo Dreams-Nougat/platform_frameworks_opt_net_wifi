@@ -1,0 +1,11 @@
+Revision: d27f88f3d8ea33c73379249eb8e37c02f249bc39
+Patch-set: 6
+File: service/java/com/android/server/wifi/hotspot2/anqp/CellularNetwork.java
+
+37:13-37:28
+Thu Dec 22 00:17:08 2016 +0000
+Author: Glen Kuhne <1094298@85c56323-6fa9-3386-8a01-6480fb634889>
+UUID: d7c9e645_2bddfac9
+Bytes: 36
+[Immaterial Comment] Do we use this?
+
