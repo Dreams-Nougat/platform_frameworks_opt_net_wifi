@@ -9,6 +9,16 @@ UUID: d7c9e645_d8dd202f
 Bytes: 162
 Is that this shouldn't happen? In case it does, it means something bad happened within RecommendationResult? Shall we raise a flag in addition to just a locallog?
 
+123:0-126:9
+Thu Dec 22 20:27:26 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_d8dd202f
+UUID: d7c9e645_ae924ea2
+Bytes: 446
+This means that the NetworkRecommendationProvider is misbehaving by not creating a matching WifiConfiguration from a ScanResult that it receives. We need to ensure that RecommendedNetworkEvaluator deals with this properly and doesn't return the invalid WifiConfiguration to WifiNetworkSelector.
+
+What do you mean by raise a flag? I don't think we should throw an exception since the framework should be able to deal with providers that misbehave.
+
 144:16-144:48
 Thu Dec 22 19:18:45 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
@@ -16,12 +26,28 @@ UUID: d7c9e645_3886a4a7
 Bytes: 138
 Since there is already ScanResultUtil#createQuotedSSID, why not apply that to ScanResult.SSID then compare against WifiConfiguration#SSID?
 
+144:16-144:48
+Thu Dec 22 20:27:26 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_3886a4a7
+UUID: d7c9e645_6eff86b6
+Bytes: 190
+I thought it was wasteful to allocate a new string for each of the scan results instead of simply allocating one string for the unquoted WifiConfiguration and comparing it to ScanResult#SSID
+
 157:0-158:73
 Thu Dec 22 19:18:45 2016 +0000
 Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_7ba2e681
 Bytes: 146
 WifiConfigManager will make a copy of this WifiConfiguration and broadcast it with the internal one. Just want to make sure you are aware of that.
+
+157:0-158:73
+Thu Dec 22 20:27:26 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_7ba2e681
+UUID: d7c9e645_cea55aee
+Bytes: 197
+Yes that makes sense - it's the same behavior as the current ExternalScoreEvaluator. We call WifiConfigManager#getConfiguredNetwork for the returned networkId to retrieve the internal config above.
 
 File: service/java/com/android/server/wifi/util/ScanResultUtil.java
 
@@ -31,4 +57,12 @@ Author: Randy Pan <1086611@85c56323-6fa9-3386-8a01-6480fb634889>
 UUID: d7c9e645_9bc47234
 Bytes: 69
 Don't need this. See the comment in RecommendedNetworkEvaluator.java.
+
+91:0-101:5
+Thu Dec 22 20:27:26 2016 +0000
+Author: Amin Shaikh <1122613@85c56323-6fa9-3386-8a01-6480fb634889>
+Parent: d7c9e645_9bc47234
+UUID: d7c9e645_4eebaaf4
+Bytes: 123
+This was made to avoid the extra String allocations since there are many ScanResult objects and only one WifiConfiguration.
 
